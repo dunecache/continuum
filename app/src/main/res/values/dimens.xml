@@ -46,5 +46,9 @@
     <dimen name="navigation_icon_size">24dp</dimen>
     <dimen name="navigation_indicator_width">64dp</dimen>
     <dimen name="navigation_indicator_height">32dp</dimen>
+    <dimen name="domain_chip_min_height">32dp</dimen>
+    <dimen name="domain_chip_padding_horizontal">12dp</dimen>
+    <dimen name="domain_chip_icon_size">16dp</dimen>
+    <dimen name="feed_state_icon_size">48dp</dimen>
     <dimen name="content_max_width">720dp</dimen>
 </resources>

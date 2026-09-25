@@ -197,12 +197,11 @@
                 android:src="@drawable/ic_crosspost_24dp"
                 android:visibility="gone" />
 
-            <TextView
+            <ml.docilealligator.infinityforreddit.customviews.LinkDomainView
                 android:id="@+id/link_text_view_item_post_card_2_compact_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="?attr/font_family"
-                android:textSize="?attr/font_12"
                 android:visibility="gone" />
 
             <TextView

@@ -1331,17 +1331,24 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         mAdapter.addLoadStateListener(combinedLoadStates -> {
             LoadState refreshLoadState = combinedLoadStates.getRefresh();
             LoadState appendLoadState = combinedLoadStates.getAppend();
+            boolean listIsEmpty = mAdapter.getItemCount() < 1;
 
-            binding.swipeRefreshLayoutPostFragment.setRefreshing(refreshLoadState instanceof LoadState.Loading);
-            if (refreshLoadState instanceof LoadState.NotLoading) {
-                if (refreshLoadState.getEndOfPaginationReached() && mAdapter.getItemCount() < 1) {
+            // Two spinners for one load reads as a bug: the pull-to-refresh one belongs to a list
+            // that already has content, the centered one to a first load with nothing on screen.
+            binding.swipeRefreshLayoutPostFragment.setRefreshing(
+                    refreshLoadState instanceof LoadState.Loading && !listIsEmpty);
+            if (refreshLoadState instanceof LoadState.Loading) {
+                if (listIsEmpty) {
+                    showLoadingState();
+                }
+            } else if (refreshLoadState instanceof LoadState.NotLoading) {
+                if (refreshLoadState.getEndOfPaginationReached() && listIsEmpty) {
                     noPostFound();
                 } else {
                     binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.GONE);
                     hasPost = true;
                 }
             } else if (refreshLoadState instanceof LoadState.Error) {
-                binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> refresh());
                 Throwable e = ((LoadState.Error) refreshLoadState).getError();
                 if (e instanceof PostPagingSource.PostPagingSourceError) {
                     if (((PostPagingSource.PostPagingSourceError) e).code == 403 && Account.ANONYMOUS_ACCOUNT.equals(mActivity.accountName)) {
@@ -1441,16 +1448,51 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
             stopLazyMode();
         }
 
-        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
         if (isAnonymousFrontPageOrMultireddit() && concatenatedSubredditNames == null) {
             // An anonymous home/multireddit feed with no subscriptions has no posts to load, but the
             // generic "no posts" message is misleading here. Tell the user to add a subreddit instead.
-            showErrorView(postType == PostType.ANONYMOUS_MULTIREDDIT
+            showEmptyState(postType == PostType.ANONYMOUS_MULTIREDDIT
                     ? R.string.anonymous_multireddit_no_subreddit
                     : R.string.anonymous_front_page_no_subscriptions);
         } else {
-            showErrorView(R.string.no_posts);
+            showEmptyState(R.string.no_posts);
         }
+    }
+
+    /**
+     * A first load with nothing on screen used to show a blank list until posts arrived, because the
+     * only loading affordance belonged to the pull-to-refresh gesture.
+     */
+    private void showLoadingState() {
+        if (mActivity == null || !isAdded()) {
+            return;
+        }
+        binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
+        binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
+        binding.feedStateProgressPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoImageViewPostFragment.setVisibility(View.GONE);
+        binding.fetchPostInfoTextViewPostFragment.setText("");
+        binding.feedStateRetryPostFragment.setVisibility(View.GONE);
+    }
+
+    /**
+     * "Nothing here yet" is not a failure, so it gets its own presentation: the quiet inbox glyph
+     * and no retry button. The error strings still end in "Tap to retry", so the container keeps
+     * that behaviour for the error state only.
+     */
+    private void showEmptyState(int stringResId) {
+        if (mActivity == null || !isAdded()) {
+            return;
+        }
+        binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
+        binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
+        binding.feedStateProgressPostFragment.setVisibility(View.GONE);
+        binding.fetchPostInfoImageViewPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoImageViewPostFragment.setImageResource(R.drawable.ic_inbox_day_night_24dp);
+        binding.fetchPostInfoTextViewPostFragment.setText(stringResId);
+        binding.feedStateRetryPostFragment.setVisibility(View.GONE);
     }
 
     public void changeSortType(SortType sortType) {
@@ -1857,12 +1899,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
 
     @Override
     protected void showErrorView(int stringResId) {
-        if (mActivity != null && isAdded()) {
-            binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
-            binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
-            binding.fetchPostInfoTextViewPostFragment.setText(stringResId);
-            mGlide.load(R.drawable.error_image).into(binding.fetchPostInfoImageViewPostFragment);
-        }
+        showErrorView(getString(stringResId));
     }
 
     @Override
@@ -1870,8 +1907,16 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         if (mActivity != null && isAdded()) {
             binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
             binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
+            binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> refresh());
+            binding.feedStateProgressPostFragment.setVisibility(View.GONE);
+            binding.fetchPostInfoImageViewPostFragment.setVisibility(View.VISIBLE);
+            // A themed glyph rather than the fixed illustration this used to load: the old
+            // artwork carried its own purple and read as a sticker on a black feed.
+            binding.fetchPostInfoImageViewPostFragment.setImageResource(
+                    R.drawable.ic_error_outline_black_day_night_24dp);
             binding.fetchPostInfoTextViewPostFragment.setText(errorMessage);
-            mGlide.load(R.drawable.error_image).into(binding.fetchPostInfoImageViewPostFragment);
+            binding.feedStateRetryPostFragment.setVisibility(View.VISIBLE);
+            binding.feedStateRetryPostFragment.setOnClickListener(view -> refresh());
         }
     }
 

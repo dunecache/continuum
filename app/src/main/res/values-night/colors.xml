@@ -19,6 +19,7 @@
     <color name="signal_on_secondary_container">#D9E2FF</color>
     <color name="signal_surface">#101310</color>
     <color name="signal_on_surface">#E1E4DE</color>
+    <color name="signal_surface_container_high">#232623</color>
     <color name="signal_surface_variant">#414941</color>
     <color name="signal_on_surface_variant">#C1C9C0</color>
     <color name="signal_outline">#8B938A</color>

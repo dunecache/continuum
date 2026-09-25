@@ -1,0 +1,54 @@
+name: Screenshots
+
+# The Roborazzi goldens in app/src/test/screenshots are the visual gate for layout work: `check`
+# fails on any pixel diff. There is no local JDK here, so recording them has to happen on CI.
+# Run this after an intentional layout change, download the artifact, and commit the new PNGs.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: record rewrites the goldens, verify fails on a diff
+        required: false
+        default: record
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Clone subreddit lists
+        run: git clone --depth 1 https://github.com/cygnusx-1-org/subreddit-lists.git "$GITHUB_WORKSPACE/../subreddit-lists"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Record or verify
+        run: |
+          case "${{ inputs.mode }}" in
+            record) ./gradlew recordRoborazziDebug ;;
+            verify) ./gradlew verifyRoborazziDebug ;;
+            *) echo "mode must be record or verify" >&2; exit 1 ;;
+          esac
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: roborazzi-goldens-${{ github.run_number }}
+          path: app/src/test/screenshots
+          if-no-files-found: ignore
+          retention-days: 14

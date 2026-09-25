@@ -280,14 +280,11 @@
 
         </com.nex3z.flowlayout.FlowLayout>
 
-        <TextView
+        <ml.docilealligator.infinityforreddit.customviews.LinkDomainView
             android:id="@+id/link_text_view_item_post_compact"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="?attr/font_family"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textSize="?attr/font_12"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

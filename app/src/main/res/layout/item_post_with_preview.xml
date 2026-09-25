@@ -183,16 +183,15 @@
 
         </com.nex3z.flowlayout.FlowLayout>
 
-        <TextView
+        <ml.docilealligator.infinityforreddit.customviews.LinkDomainView
             android:id="@+id/link_text_view_item_post_with_preview"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textSize="?attr/font_12"
+            android:layout_marginStart="@dimen/space_16"
+            android:layout_marginBottom="@dimen/space_16"
             android:fontFamily="?attr/font_family"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <!-- The words a text post's body puts before the image below, so the card reads in the
              body's own order; the twin below the preview holds the words that follow it, and

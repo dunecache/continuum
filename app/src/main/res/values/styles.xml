@@ -576,7 +576,7 @@
         <item name="colorOnSurfaceVariant">@color/signal_on_surface_variant</item>
         <item name="colorSurfaceContainerLow">@color/signal_surface</item>
         <item name="colorSurfaceContainer">@color/backgroundColor</item>
-        <item name="colorSurfaceContainerHigh">@color/backgroundColor</item>
+        <item name="colorSurfaceContainerHigh">@color/signal_surface_container_high</item>
         <item name="colorOutline">@color/signal_outline</item>
         <item name="colorOutlineVariant">@color/dividerColor</item>
         <item name="colorError">@color/signal_error</item>
@@ -608,7 +608,7 @@
         <item name="colorOnSurfaceVariant">@color/signal_on_surface_variant</item>
         <item name="colorSurfaceContainerLow">@color/signal_surface</item>
         <item name="colorSurfaceContainer">@color/backgroundColor</item>
-        <item name="colorSurfaceContainerHigh">#242424</item>
+        <item name="colorSurfaceContainerHigh">@color/signal_surface_container_high</item>
         <item name="colorOutline">@color/signal_outline</item>
         <item name="colorOutlineVariant">@color/dividerColor</item>
         <item name="colorError">@color/signal_error</item>
