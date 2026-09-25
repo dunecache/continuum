@@ -31,7 +31,7 @@ import org.robolectric.annotation.GraphicsMode
 // 411dp is below the sw600dp threshold, so this picks the phone shell. `night` makes the render use
 // the dark palette, because dark-on-dark text in a screenshot artifact is indistinguishable from no
 // text at all.
-private const val PHONE_QUALIFIERS = "w411dp-h891dp-xxhdpi-night"
+private const val PHONE_QUALIFIERS = "w411dp-h891dp-night-xxhdpi"
 private const val TABLET_QUALIFIERS = "sw600dp-w1280dp-h800dp-xhdpi"
 private const val REPORT_DIR = "build/reports/shell"
 
