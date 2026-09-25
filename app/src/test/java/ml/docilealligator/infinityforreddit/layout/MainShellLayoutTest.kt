@@ -2,14 +2,16 @@ package ml.docilealligator.infinityforreddit.layout
 
 import android.app.Activity
 import android.app.Application
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
-import com.github.takahirom.roborazzi.captureRoboImage
 import java.io.File
 import ml.docilealligator.infinityforreddit.R
 import ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
@@ -21,6 +23,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
@@ -93,6 +96,32 @@ class MainShellLayoutTest {
         )
     }
 
+    @Test
+    fun navigationRowSurvivesALargeFontScale() {
+        RuntimeEnvironment.setFontScale(2f)
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-font200")
+        val navigationBar = shell.requireView(R.id.bottom_app_bar_bottom_app_bar)
+        navigationBar.visibility = View.VISIBLE
+        val feedItem = shell.requireView(R.id.option_1_bottom_app_bar) as SignalNavigationItemView
+        feedItem.setLabel("Feed")
+        val measured = measure(shell, "phone-font200")
+
+        val icon = requireNotNull(feedItem.findImageView()) { "navigation item has no icon" }
+        val iconBounds = boundsWithin(icon, feedItem)
+        assertTrue(
+            "the icon must stay inside its row at 200% font. icon=$iconBounds row=0..${feedItem.height}. $measured",
+            iconBounds.top >= 0 && iconBounds.bottom <= feedItem.height,
+        )
+        // Whether the label survives a doubled font is a design choice; overflowing the row is not.
+        feedItem.findTextView()?.let { label ->
+            val labelBounds = boundsWithin(label, feedItem)
+            assertTrue(
+                "a visible label must fit inside its row. label=$labelBounds row=0..${feedItem.height}. $measured",
+                labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height,
+            )
+        }
+    }
+
     private fun View.findTextView(): TextView? {
         if (this is TextView) {
             return this
@@ -102,6 +131,19 @@ class MainShellLayoutTest {
         }
         for (i in 0 until childCount) {
             getChildAt(i).findTextView()?.let { return it }
+        }
+        return null
+    }
+
+    private fun View.findImageView(): ImageView? {
+        if (this is ImageView) {
+            return this
+        }
+        if (this !is ViewGroup) {
+            return null
+        }
+        for (i in 0 until childCount) {
+            getChildAt(i).findImageView()?.let { return it }
         }
         return null
     }
@@ -167,10 +209,23 @@ class MainShellLayoutTest {
             MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY),
         )
         shell.layout(0, 0, width, height)
-        shell.captureRoboImage(filePath = "$REPORT_DIR/$label-shell.png")
         val geometry = "shell=${shell.width}x${shell.height} " + describe(shell)
         File("$REPORT_DIR/$label-measured.txt").writeText(geometry)
+        writeRender(shell, "$REPORT_DIR/$label-shell.png")
         return geometry
+    }
+
+    /**
+     * Roborazzi's capture needs a plugin task to be wired up; drawing the view straight into a
+     * bitmap is one line and puts a real picture of the shell in the artifact, which is the only
+     * way to *see* what the numbers say.
+     */
+    private fun writeRender(shell: FrameLayout, path: String) {
+        val bitmap = Bitmap.createBitmap(shell.width, shell.height, Bitmap.Config.ARGB_8888)
+        shell.draw(Canvas(bitmap))
+        File(path).outputStream().use { stream ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        }
     }
 
     private fun FrameLayout.requireView(id: Int): View = requireNotNull(findViewById(id)) {

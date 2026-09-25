@@ -86,11 +86,36 @@ public final class SignalNavigationItemView extends FrameLayout {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // The row is a fixed height, so the label gets whatever is left after the icon rather than
+        // whatever size it asks for. Left to measure itself it overflows the row at large font
+        // scales, which pushed the icon out of the top (and the active pill out with it) and left
+        // the row showing icons only. If a whole line will not fit, the label goes away and the
+        // icon centres on its own, which is what a navigation bar is expected to do.
+        int available = MeasureSpec.getSize(heightMeasureSpec)
+                - getPaddingTop() - getPaddingBottom();
+        int iconHeight = iconView.getLayoutParams().height;
+        int labelMargin = ((LinearLayout.LayoutParams) labelView.getLayoutParams()).topMargin;
+        int labelRoom = available - iconHeight - labelMargin;
+        if (labelRoom > 0) {
+            labelView.measure(
+                    MeasureSpec.makeMeasureSpec(
+                            Math.max(0, MeasureSpec.getSize(widthMeasureSpec) - getPaddingLeft()
+                                    - getPaddingRight()), MeasureSpec.AT_MOST),
+                    MeasureSpec.makeMeasureSpec(labelRoom, MeasureSpec.AT_MOST));
+        }
+        labelView.setVisibility(labelRoom > 0 && labelView.getMeasuredHeight() > 0
+                ? VISIBLE : GONE);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         // The active indicator is a pill behind the icon, not a row above it: the row has to hold
-        // the icon and its label, and spending 24dp of it on a separate indicator row pushed the
-        // label past the bottom edge, where the bar clipped it and only icons were left.
+        // the icon and its label, and spending 24dp of it on a separate indicator row left the
+        // label with nowhere to go. Centring the pill on the icon is also what keeps it inside the
+        // row once onMeasure has decided whether the label fits.
         int iconCentre = contentView.getTop() + iconView.getTop() + iconView.getHeight() / 2;
         int pillCentre = indicatorView.getTop() + indicatorView.getHeight() / 2;
         indicatorView.setTranslationY(iconCentre - pillCentre);

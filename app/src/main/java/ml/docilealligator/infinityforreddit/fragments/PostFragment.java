@@ -1019,7 +1019,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                                         this.postFilter.allowNSFW = mNsfwAndSpoilerSharedPreferences.getBoolean(AccountScope.key(mActivity.accountName, SharedPreferencesUtils.NSFW_BASE), false);
                                         this.concatenatedSubredditNames = concatenatedSubredditNames;
                                         if (concatenatedSubredditNames == null) {
-                                            showErrorView(R.string.anonymous_front_page_no_subscriptions);
+                                            showEmptyState(R.string.anonymous_front_page_no_subscriptions);
                                         } else {
                                             initializeAndBindPostViewModelForAnonymous(concatenatedSubredditNames);
                                         }
@@ -1037,7 +1037,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                                         this.postFilter.allowNSFW = mNsfwAndSpoilerSharedPreferences.getBoolean(AccountScope.key(mActivity.accountName, SharedPreferencesUtils.NSFW_BASE), false);
                                         this.concatenatedSubredditNames = concatenatedSubredditNames;
                                         if (concatenatedSubredditNames == null) {
-                                            showErrorView(R.string.anonymous_multireddit_no_subreddit);
+                                            showEmptyState(R.string.anonymous_multireddit_no_subreddit);
                                         } else {
                                             initializeAndBindPostViewModelForAnonymous(concatenatedSubredditNames);
                                         }
@@ -1074,7 +1074,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                                         Objects.requireNonNull(this.postFilter).allowNSFW = mNsfwAndSpoilerSharedPreferences.getBoolean(AccountScope.key(mActivity.accountName, SharedPreferencesUtils.NSFW_BASE), false);
                                         this.concatenatedSubredditNames = concatenatedSubredditNames;
                                         if (concatenatedSubredditNames == null) {
-                                            showErrorView(R.string.anonymous_front_page_no_subscriptions);
+                                            showEmptyState(R.string.anonymous_front_page_no_subscriptions);
                                         } else {
                                             initializeAndBindPostViewModelForAnonymous(concatenatedSubredditNames);
                                         }
@@ -1091,7 +1091,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                                         Objects.requireNonNull(this.postFilter).allowNSFW = mNsfwAndSpoilerSharedPreferences.getBoolean(AccountScope.key(mActivity.accountName, SharedPreferencesUtils.NSFW_BASE), false);
                                         this.concatenatedSubredditNames = concatenatedSubredditNames;
                                         if (concatenatedSubredditNames == null) {
-                                            showErrorView(R.string.anonymous_multireddit_no_subreddit);
+                                            showEmptyState(R.string.anonymous_multireddit_no_subreddit);
                                         } else {
                                             initializeAndBindPostViewModelForAnonymous(concatenatedSubredditNames);
                                         }
