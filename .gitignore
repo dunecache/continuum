@@ -111,9 +111,13 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 
 # Lint file
-app/lint-baseline.xml
+# The baseline is committed on purpose: .github/workflows/lint.yml runs plain `:app:lintDebug`, and
+# without a committed baseline that gate fails on the whole legacy backlog instead of on new issues.
+# Regenerate it with: gh workflow run lint.yml -f update_baseline=true, then commit what it uploads.
 
 keystore.properties
+# Written by the preview workflow from repository secrets; never commit it.
+preview-keystore.properties
 test.properties
 
 backup/
