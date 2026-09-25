@@ -48,7 +48,7 @@ jobs:
         if: always()
         with:
           name: main-shell-render
-          path: app/build/reports/shell/*.png
+          path: app/build/reports/shell/*
           if-no-files-found: ignore
 
       - uses: actions/upload-artifact@v4

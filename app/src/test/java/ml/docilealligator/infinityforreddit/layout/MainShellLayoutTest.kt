@@ -5,8 +5,10 @@ import android.app.Application
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.github.takahirom.roborazzi.captureRoboImage
+import java.io.File
 import ml.docilealligator.infinityforreddit.R
 import ml.docilealligator.infinityforreddit.font.FontFamily
 import ml.docilealligator.infinityforreddit.font.FontStyle
@@ -46,8 +48,13 @@ class MainShellLayoutTest {
         // A real parent is required: the shell reaches the app bar, the pager and the navigation
         // bar through nested <include>s, and a null root inflates those subtrees detached.
         root.addView(LayoutInflater.from(activity).inflate(R.layout.activity_main, root, false))
+        // Gradle's console prints only the exception type, so the shell's view tree goes to the
+        // artifact instead: it is the fastest way to see what an <include> actually produced.
+        File(REPORT_DIR).mkdirs()
+        File("$REPORT_DIR/tree.txt").writeText(describe(root))
         // bindOptionDrawableResource() shows the bar at runtime; it ships GONE.
         val navigationBar = root.findViewById<View>(R.id.bottom_app_bar_bottom_app_bar)
+            ?: error("navigation bar is not in the shell")
         navigationBar.visibility = View.VISIBLE
 
         root.measure(
@@ -55,7 +62,7 @@ class MainShellLayoutTest {
             MeasureSpec.makeMeasureSpec(SHELL_HEIGHT_PX, MeasureSpec.EXACTLY),
         )
         root.layout(0, 0, SHELL_WIDTH_PX, SHELL_HEIGHT_PX)
-        root.captureRoboImage(filePath = REPORT_PATH)
+        root.captureRoboImage(filePath = "$REPORT_DIR/main-shell.png")
 
         val shell = root.findViewById<View>(R.id.coordinator_layout_main_activity)
         val appBar = root.findViewById<View>(R.id.appbar_layout_main_activity)
@@ -84,9 +91,26 @@ class MainShellLayoutTest {
         )
     }
 
+    private fun describe(view: View, depth: Int = 0): String = buildString {
+        repeat(depth) { append("  ") }
+        append(view.javaClass.simpleName)
+        if (view.id != View.NO_ID) {
+            append(" #").append(view.resources.getResourceEntryName(view.id))
+        }
+        if (view is ViewGroup) {
+            append(" children=").append(view.childCount)
+        }
+        append('\n')
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                append(describe(view.getChildAt(i), depth + 1))
+            }
+        }
+    }
+
     private companion object {
         const val SHELL_WIDTH_PX = 2160
         const val SHELL_HEIGHT_PX = 4320
-        const val REPORT_PATH = "build/reports/shell/main-shell.png"
+        const val REPORT_DIR = "build/reports/shell"
     }
 }
