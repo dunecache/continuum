@@ -440,16 +440,24 @@ public class HistoryPostFragment extends PostFragmentBase implements FragmentCom
         mAdapter.addLoadStateListener(combinedLoadStates -> {
             LoadState refreshLoadState = combinedLoadStates.getRefresh();
             LoadState appendLoadState = combinedLoadStates.getAppend();
+            boolean listIsEmpty = mAdapter.getItemCount() < 1;
 
-            binding.swipeRefreshLayoutHistoryPostFragment.setRefreshing(refreshLoadState instanceof LoadState.Loading);
-            if (refreshLoadState instanceof LoadState.NotLoading) {
-                if (refreshLoadState.getEndOfPaginationReached() && mAdapter.getItemCount() < 1) {
+            // Two spinners for one load reads as a bug: the pull-to-refresh one belongs to a list
+            // that already has content, the centered one to a first load with nothing on screen.
+            binding.swipeRefreshLayoutHistoryPostFragment.setRefreshing(
+                    refreshLoadState instanceof LoadState.Loading && !listIsEmpty);
+            if (refreshLoadState instanceof LoadState.Loading) {
+                if (listIsEmpty) {
+                    showLoadingState();
+                }
+            } else if (refreshLoadState instanceof LoadState.NotLoading) {
+                if (refreshLoadState.getEndOfPaginationReached() && listIsEmpty) {
                     noPostFound();
                 } else {
+                    binding.fetchPostInfoLinearLayoutHistoryPostFragment.setVisibility(View.GONE);
                     hasPost = true;
                 }
             } else if (refreshLoadState instanceof LoadState.Error) {
-                binding.fetchPostInfoLinearLayoutHistoryPostFragment.setOnClickListener(view -> refresh());
                 Throwable e = ((LoadState.Error) refreshLoadState).getError();
                 if (e instanceof PostPagingSource.PostPagingSourceError) {
                     if (((PostPagingSource.PostPagingSourceError) e).code == 403 && Account.ANONYMOUS_ACCOUNT.equals(mActivity.accountName)) {
@@ -509,8 +517,38 @@ public class HistoryPostFragment extends PostFragmentBase implements FragmentCom
             stopLazyMode();
         }
 
+        showEmptyState(R.string.no_posts);
+    }
+
+    /** A first load with nothing on screen used to show a blank list, because the only loading
+     * affordance belonged to the pull-to-refresh gesture. */
+    private void showLoadingState() {
+        if (mActivity == null || !isAdded()) {
+            return;
+        }
+        binding.swipeRefreshLayoutHistoryPostFragment.setRefreshing(false);
+        binding.fetchPostInfoLinearLayoutHistoryPostFragment.setVisibility(View.VISIBLE);
         binding.fetchPostInfoLinearLayoutHistoryPostFragment.setOnClickListener(null);
-        showErrorView(R.string.no_posts);
+        binding.feedStateProgressHistoryPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoImageViewHistoryPostFragment.setVisibility(View.GONE);
+        binding.fetchPostInfoTextViewHistoryPostFragment.setText("");
+        binding.feedStateRetryHistoryPostFragment.setVisibility(View.GONE);
+    }
+
+    /** "Nothing here yet" is not a failure, so it gets its own presentation: the quiet inbox glyph
+     * and no retry button. */
+    private void showEmptyState(int stringResId) {
+        if (mActivity == null || !isAdded()) {
+            return;
+        }
+        binding.swipeRefreshLayoutHistoryPostFragment.setRefreshing(false);
+        binding.fetchPostInfoLinearLayoutHistoryPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoLinearLayoutHistoryPostFragment.setOnClickListener(null);
+        binding.feedStateProgressHistoryPostFragment.setVisibility(View.GONE);
+        binding.fetchPostInfoImageViewHistoryPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoImageViewHistoryPostFragment.setImageResource(R.drawable.ic_inbox_day_night_24dp);
+        binding.fetchPostInfoTextViewHistoryPostFragment.setText(stringResId);
+        binding.feedStateRetryHistoryPostFragment.setVisibility(View.GONE);
     }
 
     @Override
@@ -557,11 +595,7 @@ public class HistoryPostFragment extends PostFragmentBase implements FragmentCom
 
     @Override
     protected void showErrorView(int stringResId) {
-        if (mActivity != null && isAdded()) {
-            binding.swipeRefreshLayoutHistoryPostFragment.setRefreshing(false);
-            binding.fetchPostInfoLinearLayoutHistoryPostFragment.setVisibility(View.VISIBLE);
-            binding.fetchPostInfoTextViewHistoryPostFragment.setText(stringResId);
-        }
+        showErrorView(getString(stringResId));
     }
 
     @Override
@@ -569,8 +603,16 @@ public class HistoryPostFragment extends PostFragmentBase implements FragmentCom
         if (mActivity != null && isAdded()) {
             binding.swipeRefreshLayoutHistoryPostFragment.setRefreshing(false);
             binding.fetchPostInfoLinearLayoutHistoryPostFragment.setVisibility(View.VISIBLE);
+            binding.fetchPostInfoLinearLayoutHistoryPostFragment.setOnClickListener(view -> refresh());
+            binding.feedStateProgressHistoryPostFragment.setVisibility(View.GONE);
+            binding.fetchPostInfoImageViewHistoryPostFragment.setVisibility(View.VISIBLE);
+            // A themed glyph rather than the fixed illustration this used to load: the old artwork
+            // carried its own purple and read as a sticker on a black feed.
+            binding.fetchPostInfoImageViewHistoryPostFragment.setImageResource(
+                    R.drawable.ic_error_outline_black_day_night_24dp);
             binding.fetchPostInfoTextViewHistoryPostFragment.setText(errorMessage);
-            mGlide.load(R.drawable.error_image).into(binding.fetchPostInfoImageViewHistoryPostFragment);
+            binding.feedStateRetryHistoryPostFragment.setVisibility(View.VISIBLE);
+            binding.feedStateRetryHistoryPostFragment.setOnClickListener(view -> refresh());
         }
     }
 

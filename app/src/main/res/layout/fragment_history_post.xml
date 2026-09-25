@@ -1,4 +1,5 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,30 +18,54 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <!-- Mirrors the main feed's states (fragment_post.xml): a first load with nothing on screen
+         needs its own indicator, and "no history yet" should not look like a failure. -->
     <LinearLayout
         android:id="@+id/fetch_post_info_linear_layout_history_post_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="48dp"
-        android:layout_marginBottom="48dp"
-        android:layout_marginHorizontal="36dp"
+        android:layout_marginHorizontal="@dimen/space_24"
         android:gravity="center"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.google.android.material.loadingindicator.LoadingIndicator
+            android:id="@+id/feed_state_progress_history_post_fragment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/fetch_post_info_image_view_history_post_fragment"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content" />
+            android:layout_width="@dimen/feed_state_icon_size"
+            android:layout_height="@dimen/feed_state_icon_size"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no"
+            app:tint="?attr/colorOnSurfaceVariant" />
 
         <TextView
             android:id="@+id/fetch_post_info_text_view_history_post_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:gravity="center"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="?attr/font_16"
+            android:fontFamily="?attr/font_family"
+            tools:text="@string/no_posts" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/feed_state_retry_history_post_fragment"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:textSize="?attr/font_default"
-            android:fontFamily="?attr/font_family" />
+            android:layout_marginTop="@dimen/space_16"
+            android:minHeight="@dimen/touch_target_min"
+            android:text="@string/retry"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
