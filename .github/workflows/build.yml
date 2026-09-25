@@ -89,6 +89,10 @@ jobs:
           name: continuum-ui-preview-apks
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+          # The APKs are also attached to the release, so this copy only exists to recover from a
+          # failed publish. Keeping it for the default 90 days burned ~70 MB of the free plan's
+          # 500 MB artifact storage per build, which is about seven builds.
+          retention-days: 2
 
       - name: Publish GitHub prerelease
         if: ${{ inputs.publish_release }}
