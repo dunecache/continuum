@@ -20,6 +20,11 @@ on:
 permissions:
   contents: write
 
+# Lint is a separate workflow (lint.yml) so a lint fix never waits behind an APK build.
+concurrency:
+  group: build-ui-preview-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -38,8 +43,36 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Build and lint
-        run: ./gradlew :app:assembleDebug :app:lintDebug -Dlint.baselines.continue=true
+      # One-time setup, run these once in a shell (keytool ships with the JDK):
+      #   keytool -genkeypair -v -keystore preview.jks -alias continuum-preview \
+      #           -keyalg RSA -keysize 4096 -validity 10000
+      #   base64 -w0 preview.jks | gh secret set PREVIEW_KEYSTORE_BASE64
+      #   gh secret set PREVIEW_KEYSTORE_PASSWORD   # the -storepass value, or a fresh one
+      #   gh secret set PREVIEW_KEY_ALIAS           # continuum-preview
+      #   gh secret set PREVIEW_KEY_PASSWORD        # the -keypass value
+      # Keep preview.jks out of the repository; losing it means previews stop upgrading each other.
+      - name: Set up preview signing key
+        env:
+          PREVIEW_KEYSTORE_BASE64: ${{ secrets.PREVIEW_KEYSTORE_BASE64 }}
+          PREVIEW_KEYSTORE_PASSWORD: ${{ secrets.PREVIEW_KEYSTORE_PASSWORD }}
+          PREVIEW_KEY_ALIAS: ${{ secrets.PREVIEW_KEY_ALIAS }}
+          PREVIEW_KEY_PASSWORD: ${{ secrets.PREVIEW_KEY_PASSWORD }}
+        run: |
+          if [ -z "$PREVIEW_KEYSTORE_BASE64" ] || [ -z "$PREVIEW_KEYSTORE_PASSWORD" ] \
+             || [ -z "$PREVIEW_KEY_ALIAS" ] || [ -z "$PREVIEW_KEY_PASSWORD" ]; then
+            echo "::warning::Preview signing secrets are not all set. APKs will be signed with this job's throwaway debug key, so the next preview will need an uninstall before it installs."
+            exit 0
+          fi
+          echo "$PREVIEW_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/preview.jks"
+          cat > preview-keystore.properties <<EOF
+          storeFile=$RUNNER_TEMP/preview.jks
+          storePassword=$PREVIEW_KEYSTORE_PASSWORD
+          keyAlias=$PREVIEW_KEY_ALIAS
+          keyPassword=$PREVIEW_KEY_PASSWORD
+          EOF
+
+      - name: Build
+        run: ./gradlew :app:assembleDebug
 
       - name: Verify main shell layout
         run: ./gradlew :app:testDebugUnitTest --tests 'ml.docilealligator.infinityforreddit.layout.MainShellLayoutTest'

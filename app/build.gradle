@@ -56,6 +56,29 @@ android {
         println("Warning: keystore.properties file not found. Skipping signing configuration.")
     }
 
+    // Written by the preview workflow from repository secrets, never committed. A fixed key means
+    // every preview APK is signed identically, so a new preview installs straight over the last one
+    // instead of Android demanding an uninstall first (the runner's own debug key is regenerated
+    // per job, which is why the previews used to conflict).
+    def previewKeystorePropertiesFile = rootProject.file("preview-keystore.properties")
+    def previewKeystoreProperties = null
+
+    if (previewKeystorePropertiesFile.exists()) {
+        previewKeystoreProperties = new Properties()
+        previewKeystoreProperties.load(new FileInputStream(previewKeystorePropertiesFile))
+
+        signingConfigs {
+            preview {
+                keyAlias previewKeystoreProperties['keyAlias']
+                keyPassword previewKeystoreProperties['keyPassword']
+                storeFile file(previewKeystoreProperties['storeFile'])
+                storePassword previewKeystoreProperties['storePassword']
+            }
+        }
+    } else {
+        println("Warning: preview-keystore.properties file not found. Debug builds will use the default debug signing key.")
+    }
+
     def testPropertiesFile = rootProject.file("test.properties")
     def testProperties = new Properties()
 
@@ -120,6 +143,9 @@ android {
             // and toolbar actually use.
         }
         debug {
+            if (previewKeystoreProperties != null) {
+                signingConfig = signingConfigs.preview
+            }
             applicationIdSuffix '.debug'
             versionNameSuffix '-debug'
             resValue "string", "app_name", "Continuum Debug"

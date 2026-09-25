@@ -1,0 +1,63 @@
+name: Lint
+
+# Separate from build.yml on purpose: lint is the cheap gate you push through first, and a lint
+# failure should not cost an APK build. This workflow runs on every push; build.yml only runs when
+# a preview is actually wanted.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      update_baseline:
+        description: Regenerate app/lint-baseline.xml instead of failing (download and commit it)
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Clone subreddit lists
+        run: git clone --depth 1 https://github.com/cygnusx-1-org/subreddit-lists.git "$GITHUB_WORKSPACE/../subreddit-lists"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # No -Dlint.baselines.continue by default: with the committed baseline in place the run fails
+      # on issues the baseline does not already cover, which is the whole point of a separate gate.
+      # update_baseline regenerates it instead, for when an intentional change moves the line.
+      - name: Lint
+        run: |
+          if [ "${{ inputs.update_baseline }}" = "true" ]; then
+            ./gradlew :app:lintDebug -Dlint.baselines.continue=true
+          else
+            ./gradlew :app:lintDebug
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lint-report-${{ github.run_number }}
+          path: |
+            app/build/reports/lint-results-debug.html
+            app/build/reports/lint-results-debug.xml
+            app/lint-baseline.xml
+          if-no-files-found: ignore
+          retention-days: 14
