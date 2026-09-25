@@ -40,6 +40,7 @@
     <dimen name="shape_corner_sheet">28dp</dimen>
     <dimen name="divider_thickness">1dp</dimen>
     <dimen name="navigation_item_min_height">64dp</dimen>
+    <dimen name="feed_bottom_navigation_clearance">64dp</dimen>
     <dimen name="feed_tab_height">48dp</dimen>
     <dimen name="community_banner_height">88dp</dimen>
     <dimen name="navigation_icon_size">24dp</dimen>

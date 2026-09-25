@@ -363,6 +363,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 findViewById(R.id.option_3_bottom_app_bar), findViewById(R.id.option_4_bottom_app_bar),
                 findViewById(R.id.fab_main_activity),
                 findViewById(R.id.navigation_rail), customThemeWrapper, showBottomAppBar);
+        pinNavigationViews();
 
         // Track AppBar collapsed/expanded state so we can restore it across rotation.
         binding.includedAppBar.appbarLayoutMainActivity.addOnOffsetChangedListener(
@@ -591,6 +592,28 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         });
 
         initializeNotificationAndBindView();
+    }
+
+    private void pinNavigationViews() {
+        if (navigationWrapper.bottomAppBar != null) {
+            CoordinatorLayout.LayoutParams barParams =
+                    (CoordinatorLayout.LayoutParams) navigationWrapper.bottomAppBar.getLayoutParams();
+            barParams.gravity = Gravity.BOTTOM;
+            barParams.anchorId = View.NO_ID;
+            navigationWrapper.bottomAppBar.setLayoutParams(barParams);
+        }
+
+        CoordinatorLayout.LayoutParams fabParams =
+                (CoordinatorLayout.LayoutParams) navigationWrapper.floatingActionButton.getLayoutParams();
+        fabParams.gravity = Gravity.BOTTOM | Gravity.END;
+        if (navigationWrapper.bottomAppBar == null) {
+            fabParams.anchorId = View.NO_ID;
+            fabParams.anchorGravity = 0;
+        } else {
+            fabParams.anchorId = navigationWrapper.bottomAppBar.getId();
+            fabParams.anchorGravity = Gravity.TOP | Gravity.END;
+        }
+        navigationWrapper.floatingActionButton.setLayoutParams(fabParams);
     }
 
     @Override
@@ -1428,7 +1451,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                     if (showBottomAppBar) {
                         navigationWrapper.showNavigation();
                     }
-                    if (!hideFab) {
+                    if (!hideFab && !showSignalNavigation) {
                         navigationWrapper.showFab();
                     }
                 }
@@ -2118,7 +2141,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             if (navigationWrapper != null && navigationWrapper.bottomAppBar != null) {
                 navigationWrapper.bottomAppBar.performHide(false);
             }
-            if (navigationWrapper != null) {
+            if (navigationWrapper != null && !showSignalNavigation) {
                 navigationWrapper.hideFab();
             }
         });
