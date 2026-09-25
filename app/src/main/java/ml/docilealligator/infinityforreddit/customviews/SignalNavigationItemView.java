@@ -42,9 +42,9 @@ public final class SignalNavigationItemView extends LinearLayout {
         setClickable(true);
         setFocusable(true);
         TypedValue backgroundValue = new TypedValue();
-        if (getContext().getTheme().resolveAttribute(
-                com.google.android.material.R.attr.selectableItemBackgroundBorderless, backgroundValue, true)) {
-            setBackground(backgroundValue.resourceId);
+        if (getContext().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
+                backgroundValue, true)) {
+            setBackgroundResource(backgroundValue.resourceId);
         }
 
         indicatorView = new View(context);
@@ -120,8 +120,7 @@ public final class SignalNavigationItemView extends LinearLayout {
     private float resolveDimension(int attribute, float fallback) {
         TypedValue value = new TypedValue();
         if (getContext().getTheme().resolveAttribute(attribute, value, true)
-                && value.type >= TypedValue.TYPE_FIRST_DIMENSION
-                && value.type <= TypedValue.TYPE_LAST_DIMENSION) {
+                && value.type == TypedValue.TYPE_DIMENSION) {
             return value.data;
         }
         return fallback;

@@ -43,8 +43,7 @@ public class NavigationWrapper {
     private BadgeDrawable badgeDrawable;
     @Nullable
     private View badgedView;
-    @Nullable
-    private MenuItem badgedMenuItem;
+    private int badgedRailItemId = View.NO_ID;
     @Nullable
     private View.OnLayoutChangeListener badgeLayoutListener;
 
@@ -291,18 +290,16 @@ public class NavigationWrapper {
         }
 
         if (navigationRailView != null) {
-            Menu menu = navigationRailView.getMenu();
             int[] itemIds = {R.id.navigation_rail_option_1, R.id.navigation_rail_option_2,
                     R.id.navigation_rail_option_3, R.id.navigation_rail_option_4};
             int[] boundOptions = {option1, option2, option3, option4};
             for (int i = 0; i < itemIds.length; i++) {
                 if (isInboxOption(boundOptions[i])) {
-                    badgedMenuItem = menu.findItem(itemIds[i]);
-                    badgeDrawable = BadgeDrawable.create(context);
+                    badgeDrawable = navigationRailView.getOrCreateBadge(itemIds[i]);
                     badgeDrawable.setNumber(inboxCount);
                     badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
                     badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
-                    BadgeUtils.attachBadgeDrawable(badgeDrawable, badgedMenuItem);
+                    badgedRailItemId = itemIds[i];
                     return;
                 }
             }
@@ -352,8 +349,8 @@ public class NavigationWrapper {
         if (badgedView != null && badgeDrawable != null) {
             BadgeUtils.detachBadgeDrawable(badgeDrawable, badgedView);
         }
-        if (badgedMenuItem != null && badgeDrawable != null) {
-            BadgeUtils.detachBadgeDrawable(badgeDrawable, badgedMenuItem);
+        if (navigationRailView != null && badgedRailItemId != View.NO_ID) {
+            navigationRailView.removeBadge(badgedRailItemId);
         }
         if (badgedView != null && badgeLayoutListener != null) {
             badgedView.removeOnLayoutChangeListener(badgeLayoutListener);
@@ -361,7 +358,7 @@ public class NavigationWrapper {
         badgeDrawable = null;
         badgeLayoutListener = null;
         badgedView = null;
-        badgedMenuItem = null;
+        badgedRailItemId = View.NO_ID;
     }
 
     @Nullable
