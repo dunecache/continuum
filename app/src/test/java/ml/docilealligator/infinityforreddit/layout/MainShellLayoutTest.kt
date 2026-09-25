@@ -125,7 +125,9 @@ class MainShellLayoutTest {
         )
         shell.layout(0, 0, width, height)
         shell.captureRoboImage(filePath = "$REPORT_DIR/$label-shell.png")
-        return "shell=${shell.width}x${shell.height} " + describe(shell)
+        val geometry = "shell=${shell.width}x${shell.height} " + describe(shell)
+        File("$REPORT_DIR/$label-measured.txt").writeText(geometry)
+        return geometry
     }
 
     private fun FrameLayout.requireView(id: Int): View = requireNotNull(findViewById(id)) {
