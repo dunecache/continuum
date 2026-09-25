@@ -45,6 +45,13 @@ jobs:
         run: ./gradlew :app:testDebugUnitTest --tests 'ml.docilealligator.infinityforreddit.layout.MainShellLayoutTest'
 
       - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: main-shell-render
+          path: app/build/reports/shell/*.png
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
         with:
           name: continuum-ui-preview-apks
           path: app/build/outputs/apk/debug/*.apk
