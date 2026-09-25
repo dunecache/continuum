@@ -49,6 +49,7 @@ public class SharedPreferencesUtils {
     public static final String IMMERSIVE_INTERFACE_KEY = "immersive_interface";
     public static final String DISABLE_IMMERSIVE_INTERFACE_IN_LANDSCAPE_MODE = "disable_immersive_interface_in_landscape_mode";
     public static final String BOTTOM_APP_BAR_KEY = "bottom_app_bar";
+    public static final String SIGNAL_NAVIGATION_KEY = "signal_navigation";
     public static final String VOTE_BUTTONS_ON_THE_RIGHT_KEY = "vote_buttons_on_the_right";
     public static final String SHOW_AVATAR_ON_THE_RIGHT = "show_avatar_on_the_right";
     public static final String DEFAULT_SEARCH_RESULT_TAB = "default_search_result_tab";

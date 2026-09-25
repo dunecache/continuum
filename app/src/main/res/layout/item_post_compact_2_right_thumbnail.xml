@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:animateLayoutChanges="true"
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -117,8 +116,10 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:fontFamily="?attr/title_font_family"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
+            android:paddingStart="@dimen/space_16"
+            android:paddingEnd="@dimen/space_8"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="?attr/primaryTextColor"
             android:textSize="?attr/title_font_18"
             app:layout_constraintStart_toStartOf="parent"
@@ -193,7 +194,7 @@
                 android:layout_height="@dimen/post_compact_thumbnail_size"
                 android:scaleType="center"
                 android:src="@drawable/ic_link_day_night_24dp"
-                app:tint="@android:color/tab_indicator_text" />
+                app:tint="?attr/secondaryTextColor" />
 
             <ml.docilealligator.infinityforreddit.customviews.PostTypeIndicatorView
                 android:id="@+id/post_type_indicator_view_no_preview_item_post_compact_2_right_thumbnail"
@@ -223,6 +224,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/upvote_button_item_post_compact_2_right_thumbnail"
             style="?attr/materialIconButtonStyle"
             android:layout_width="wrap_content"
@@ -253,6 +255,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/downvote_button_item_post_compact_2_right_thumbnail"
             style="?attr/materialIconButtonStyle"
             android:layout_width="wrap_content"

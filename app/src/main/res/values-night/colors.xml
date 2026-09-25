@@ -9,4 +9,22 @@
     <color name="roundedBottomSheetPrimaryBackground">#242424</color>
     <color name="primaryTextColor">#FFFFFF</color>
     <color name="dividerColor">#69666c</color>
+    <color name="signal_primary">#FFB1C8</color>
+    <color name="signal_on_primary">#5A0032</color>
+    <color name="signal_primary_container">#7A294F</color>
+    <color name="signal_on_primary_container">#FFD9E5</color>
+    <color name="signal_secondary">#AAC7FF</color>
+    <color name="signal_on_secondary">#0B305F</color>
+    <color name="signal_secondary_container">#284777</color>
+    <color name="signal_on_secondary_container">#D9E2FF</color>
+    <color name="signal_surface">#101310</color>
+    <color name="signal_on_surface">#E1E4DE</color>
+    <color name="signal_surface_variant">#414941</color>
+    <color name="signal_on_surface_variant">#C1C9C0</color>
+    <color name="signal_outline">#8B938A</color>
+    <color name="signal_outline_variant">#414941</color>
+    <color name="signal_error">#FFB4AB</color>
+    <color name="signal_on_error">#690005</color>
+    <color name="signal_error_container">#93000A</color>
+    <color name="signal_on_error_container">#FFDAD6</color>
 </resources>

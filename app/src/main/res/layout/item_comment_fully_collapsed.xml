@@ -17,8 +17,9 @@
             android:id="@+id/header_linear_layout_item_comment_fully_collapsed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:paddingBottom="12dp">
+            android:layout_marginStart="@dimen/space_16"
+            android:minHeight="@dimen/touch_target_min"
+            android:paddingBottom="@dimen/space_12">
 
             <ImageView
                 android:id="@+id/author_icon_image_view_item_comment_fully_collapsed"
@@ -86,10 +87,11 @@
 
         </ml.docilealligator.infinityforreddit.customviews.CollapsedCommentHeader>
 
-        <View
+        <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider_item_comment_fully_collapsed"
+            style="@style/Widget.Continuum.Divider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="wrap_content"
             android:visibility="gone" />
 
     </LinearLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search_handle_link"
+        android:icon="@drawable/ic_open_link_day_night_24dp"
+        android:title="@string/content_description_handle_link"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_search_incognito_keyboard"
+        android:icon="@drawable/ic_incognito_24dp"
+        android:title="@string/content_description_incognito_keyboard_off"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_search_random_subreddit"
+        android:icon="@drawable/ic_random_day_night_24dp"
+        android:title="@string/random_subreddits"
+        app:showAsAction="never" />
+</menu>

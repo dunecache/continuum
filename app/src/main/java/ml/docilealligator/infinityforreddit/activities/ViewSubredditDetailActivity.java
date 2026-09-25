@@ -974,6 +974,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option2BottomAppBar, option1);
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option4BottomAppBar, option2);
                 } else {
+                    navigationWrapper.setRailItemTitles(this, option1, option2);
                     navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
                         int itemId = item.getItemId();
                         if (itemId == R.id.navigation_rail_option_1) {
@@ -1017,6 +1018,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option3BottomAppBar, option3);
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option4BottomAppBar, option4);
                 } else {
+                    navigationWrapper.setRailItemTitles(this, option1, option2, option3, option4);
                     navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
                         int itemId = item.getItemId();
                         if (itemId == R.id.navigation_rail_option_1) {

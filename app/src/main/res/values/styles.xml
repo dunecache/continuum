@@ -154,6 +154,74 @@
         <item name="android:color">#00000000</item>
     </style>
 
+    <style name="ShapeAppearance.Continuum.Small" parent="ShapeAppearance.Material3.Corner.ExtraSmall">
+        <item name="cornerSize">@dimen/shape_corner_small</item>
+    </style>
+
+    <style name="ShapeAppearance.Continuum.Medium" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerSize">@dimen/shape_corner_medium</item>
+    </style>
+
+    <style name="ShapeAppearance.Continuum.Large" parent="ShapeAppearance.Material3.Corner.Large">
+        <item name="cornerSize">@dimen/shape_corner_large</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.Title" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">?attr/title_font_family</item>
+        <item name="android:textSize">?attr/title_font_18</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">?attr/content_font_family</item>
+        <item name="android:textSize">?attr/content_font_default</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:lineSpacingMultiplier">1.45</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.Meta" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:fontFamily">?attr/font_family</item>
+        <item name="android:textSize">?attr/font_12</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.Caption" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:fontFamily">?attr/font_family</item>
+        <item name="android:textSize">?attr/font_10</item>
+        <item name="android:textColor">?attr/secondaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.Input" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:fontFamily">?attr/font_family</item>
+        <item name="android:textSize">?attr/font_16</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.Display" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">?attr/title_font_family</item>
+        <item name="android:textSize">?attr/title_font_20</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="Widget.Continuum.PostCard" parent="Widget.Material3.CardView">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
+        <item name="cardCornerRadius">@dimen/shape_corner_medium</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+        <item name="strokeWidth">@dimen/divider_thickness</item>
+    </style>
+
+    <style name="Widget.Continuum.Divider" parent="Widget.Material3.MaterialDivider">
+        <item name="dividerColor">?attr/colorOutlineVariant</item>
+        <item name="dividerThickness">@dimen/divider_thickness</item>
+    </style>
+
+    <style name="Widget.Continuum.BottomBar" parent="Widget.Material3.BottomAppBar">
+        <item name="android:minHeight">@dimen/navigation_item_min_height</item>
+        <item name="backgroundTint">?attr/colorSurfaceContainer</item>
+        <item name="elevation">0dp</item>
+    </style>
+
     <style name="FontStyle" />
 
     <style name="FontStyle.XSmall">
@@ -228,7 +296,7 @@
     </style>
 
     <style name="TitleFontStyle.Large">
-        <item name="font_default">16sp</item>
+        <item name="title_font_default">16sp</item>
         <item name="title_font_12">14sp</item>
         <item name="title_font_16">18sp</item>
         <item name="title_font_18">20sp</item>
@@ -494,10 +562,31 @@
     <style name="Theme" />
 
     <style name="Theme.Normal">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/signal_primary</item>
+        <item name="colorOnPrimary">@color/signal_on_primary</item>
+        <item name="colorPrimaryContainer">@color/signal_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/signal_on_primary_container</item>
+        <item name="colorSecondary">@color/signal_secondary</item>
+        <item name="colorOnSecondary">@color/signal_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/signal_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/signal_on_secondary_container</item>
+        <item name="colorSurface">@color/signal_surface</item>
+        <item name="colorOnSurface">@color/signal_on_surface</item>
+        <item name="colorSurfaceVariant">@color/signal_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/signal_on_surface_variant</item>
+        <item name="colorSurfaceContainerLow">@color/signal_surface</item>
+        <item name="colorSurfaceContainer">@color/backgroundColor</item>
+        <item name="colorSurfaceContainerHigh">@color/backgroundColor</item>
+        <item name="colorOutline">@color/signal_outline</item>
+        <item name="colorOutlineVariant">@color/dividerColor</item>
+        <item name="colorError">@color/signal_error</item>
+        <item name="colorOnError">@color/signal_on_error</item>
+        <item name="colorErrorContainer">@color/signal_error_container</item>
+        <item name="colorOnErrorContainer">@color/signal_on_error_container</item>
+        <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimaryLightTheme">@color/colorPrimary</item>
+        <item name="colorPrimaryLightTheme">@color/signal_primary_container</item>
         <item name="primaryTextColor">#000000</item>
         <item name="secondaryTextColor">#8A000000</item>
         <item name="backgroundColor">@color/backgroundColor</item>
@@ -505,10 +594,31 @@
     </style>
 
     <style name="Theme.Normal.NormalDark">
-        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/signal_primary</item>
+        <item name="colorOnPrimary">@color/signal_on_primary</item>
+        <item name="colorPrimaryContainer">@color/signal_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/signal_on_primary_container</item>
+        <item name="colorSecondary">@color/signal_secondary</item>
+        <item name="colorOnSecondary">@color/signal_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/signal_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/signal_on_secondary_container</item>
+        <item name="colorSurface">@color/signal_surface</item>
+        <item name="colorOnSurface">@color/signal_on_surface</item>
+        <item name="colorSurfaceVariant">@color/signal_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/signal_on_surface_variant</item>
+        <item name="colorSurfaceContainerLow">@color/signal_surface</item>
+        <item name="colorSurfaceContainer">@color/backgroundColor</item>
+        <item name="colorSurfaceContainerHigh">#242424</item>
+        <item name="colorOutline">@color/signal_outline</item>
+        <item name="colorOutlineVariant">@color/dividerColor</item>
+        <item name="colorError">@color/signal_error</item>
+        <item name="colorOnError">@color/signal_on_error</item>
+        <item name="colorErrorContainer">@color/signal_error_container</item>
+        <item name="colorOnErrorContainer">@color/signal_on_error_container</item>
+        <item name="android:colorBackground">@color/backgroundColor</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimaryLightTheme">#0336FF</item>
+        <item name="colorPrimaryLightTheme">@color/signal_primary_container</item>
         <item name="primaryTextColor">#FFFFFF</item>
         <item name="secondaryTextColor">#B3FFFFFF</item>
         <item name="backgroundColor">@color/backgroundColor</item>
@@ -518,14 +628,35 @@
     </style>
 
     <style name="Theme.Normal.AmoledDark">
-        <item name="colorPrimary">#000000</item>
+        <item name="colorPrimary">@color/signal_primary</item>
+        <item name="colorOnPrimary">@color/signal_on_primary</item>
+        <item name="colorPrimaryContainer">@color/signal_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/signal_on_primary_container</item>
+        <item name="colorSecondary">@color/signal_secondary</item>
+        <item name="colorOnSecondary">@color/signal_on_secondary</item>
+        <item name="colorSecondaryContainer">@color/signal_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/signal_on_secondary_container</item>
+        <item name="colorSurface">@android:color/black</item>
+        <item name="colorOnSurface">@color/signal_on_surface</item>
+        <item name="colorSurfaceVariant">@color/signal_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/signal_on_surface_variant</item>
+        <item name="colorSurfaceContainerLow">@android:color/black</item>
+        <item name="colorSurfaceContainer">#0A0C0A</item>
+        <item name="colorSurfaceContainerHigh">#121512</item>
+        <item name="colorOutline">@color/signal_outline</item>
+        <item name="colorOutlineVariant">@color/dividerColor</item>
+        <item name="colorError">@color/signal_error</item>
+        <item name="colorOnError">@color/signal_on_error</item>
+        <item name="colorErrorContainer">@color/signal_error_container</item>
+        <item name="colorOnErrorContainer">@color/signal_on_error_container</item>
+        <item name="android:colorBackground">@android:color/black</item>
         <item name="colorPrimaryDark">#000000</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorPrimaryLightTheme">#0336FF</item>
+        <item name="colorPrimaryLightTheme">@color/signal_primary_container</item>
         <item name="primaryTextColor">#FFFFFF</item>
         <item name="secondaryTextColor">#B3FFFFFF</item>
         <item name="backgroundColor">#000000</item>
-        <item name="cardViewBackgroundColor">#000000</item>
+        <item name="cardViewBackgroundColor">#0A0C0A</item>
         <item name="checkboxStyle">@style/Widget.App.CheckBox.Dark</item>
         <item name="switchStyle">@style/Widget.App.Switch.Dark</item>
     </style>

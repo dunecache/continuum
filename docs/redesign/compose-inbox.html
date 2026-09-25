@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Compose &amp; inbox (Direction B)</title>
+<style>
+  :root{
+    --bg:#f4f2fa; --card:#faf9ff; --ink:#191423; --ink-2:#4d465e;
+    --accent:#4f3891; --accent-ink:#fff; --line:#d9d4e8; --surface:#ece9f5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101a; --card:#201c2e; --ink:#ece8f7; --ink-2:#b3abd0;
+      --accent:#cdbcf5; --accent-ink:#241a4d; --line:#35314a; --surface:#2b2640;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center}
+  .phone{width:100%; max-width:412px; background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:32px}
+  h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-2); margin:16px 16px 8px}
+  .topbar{display:flex; align-items:center; padding:8px 4px; background:var(--card); border-bottom:1px solid var(--line)}
+  .topbar .t{flex:1; font-size:17px; font-weight:600; padding-left:12px}
+  .iconbtn{width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--ink-2)}
+  .postbtn{min-height:48px; padding:0 20px; font-size:14px; font-weight:700; color:var(--accent)}
+  .field{padding:12px 16px 4px}
+  .field label{display:block; font-size:12px; color:var(--ink-2); margin-bottom:2px}
+  .field .in{font-size:16px; padding:10px 0; border-bottom:1px solid var(--line)}
+  .field .in.big{font-size:18px; font-weight:600}
+  .field .hint{color:var(--ink-2)}
+  .dest{display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--line); min-height:56px}
+  .ava{width:28px; height:28px; border-radius:14px; background:var(--accent); flex:none}
+  .dest .v{flex:1; font-size:15px} .dest .s{font-size:13px; color:var(--ink-2)}
+  .mdbar{display:flex; gap:0; padding:6px 8px; border-top:1px solid var(--line); background:var(--card);
+    position:sticky; bottom:0; overflow-x:auto}
+  .md{min-width:48px; min-height:48px; display:flex; align-items:center; justify-content:center;
+    font-size:17px; color:var(--ink-2)}
+  .msg{background:var(--card); border:1px solid var(--line); border-radius:12px; margin:0 12px 8px; padding:12px 16px}
+  .msg.unread{border-left:4px solid var(--accent)}
+  .msg .from{font-size:12px; color:var(--ink-2)}
+  .msg .subj{font-size:15px; font-weight:700; margin-top:2px}
+  .msg .prev{font-size:13.5px; color:var(--ink-2); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .cap{font-size:12px; color:var(--ink-2); margin:10px 16px; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Compose and inbox mockup">
+  <h2>Compose — persistent labels</h2>
+  <div class="topbar"><div class="iconbtn">✕</div><div class="t">New text post</div><div class="postbtn">Post</div></div>
+  <div class="dest"><div class="ava"></div><div class="v">r/continuum <span class="s">· u/edgan</span></div><div class="s">Rules ›</div></div>
+  <div class="field"><label>Title</label><div class="in big">Direction B keeps every control, labels included</div></div>
+  <div class="field"><label>Body <span style="float:right">Markdown supported</span></label><div class="in hint">Write more… (hint never replaces the label)</div></div>
+  <div class="mdbar" aria-hidden="true"><div class="md">B</div><div class="md">I</div><div class="md">H</div><div class="md">🔗</div><div class="md">❝</div><div class="md">&lt;/&gt;</div><div class="md">☰</div></div>
+  <h2>Inbox — unread you can see</h2>
+  <div class="msg unread"><div class="from">u/selene · 12m · unread</div><div class="subj">Re: compact vs card density</div><div class="prev">The tabular scores sold me — one question on the badge line…</div></div>
+  <div class="msg"><div class="from">r/continuum · 2h</div><div class="subj">Your post was approved</div><div class="prev">Thanks for posting — flair has been added automatically.</div></div>
+  <p class="cap">Compose: labels persist, destination is one modern row, markdown bar keeps its items at 48dp labeled. Inbox: accent edge + bold subject + announced unread; preview ellipsizes; copy/reply labeled.</p>
+</div>
+</body>
+</html>

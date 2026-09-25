@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Subreddit &amp; profile (Direction B)</title>
+<style>
+  :root{
+    --bg:#f4f2fa; --card:#faf9ff; --ink:#191423; --ink-2:#4d465e;
+    --accent:#4f3891; --accent-ink:#fff; --line:#d9d4e8; --surface:#ece9f5;
+    --banner-1:#6f6694; --banner-2:#3a3454;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101a; --card:#201c2e; --ink:#ece8f7; --ink-2:#b3abd0;
+      --accent:#cdbcf5; --accent-ink:#241a4d; --line:#35314a; --surface:#2b2640;
+      --banner-1:#3a3454; --banner-2:#1b1826;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center}
+  .phone{width:100%; max-width:412px; background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:40px}
+  .banner{height:88px; background:linear-gradient(120deg,var(--banner-1),var(--banner-2)); position:relative}
+  .banner span{position:absolute; right:12px; bottom:8px; font-size:11px; color:rgba(255,255,255,.8)}
+  .head{background:var(--card); border-bottom:1px solid var(--line); padding:0 16px 12px}
+  .idrow{display:flex; align-items:center; gap:12px; margin-top:-24px}
+  .ava{width:64px; height:64px; border-radius:32px; background:var(--accent); border:3px solid var(--card); flex:none}
+  .who{flex:1; min-width:0}
+  .who h1{font-size:18px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .who p{font-size:12px; color:var(--ink-2)}
+  .follow{min-height:48px; padding:0 20px; border-radius:12px; border:1px solid var(--accent);
+    background:var(--accent); color:var(--accent-ink); font-size:14px; font-weight:600}
+  .stats{display:flex; gap:16px; padding:10px 0 2px; font-size:13px; color:var(--ink-2)}
+  .stats b{color:var(--ink); font-variant-numeric:tabular-nums}
+  .desc{font-size:13.5px; line-height:1.5; color:var(--ink-2); margin-top:6px;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .tabs{display:flex; background:var(--card); border-bottom:1px solid var(--line);
+    position:sticky; top:0}
+  .tab{flex:1; text-align:center; padding:12px; font-size:14px; color:var(--ink-2)}
+  .tab.on{color:var(--ink); font-weight:700; border-bottom:3px solid var(--accent)}
+  .feed{padding:8px 12px; display:flex; flex-direction:column; gap:8px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px}
+  .meta{font-size:12px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .title{font-size:15px; font-weight:600; margin-top:4px}
+  .actions{display:flex; margin:4px -8px -4px; align-items:center}
+  .act{min-width:48px; min-height:48px; display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+  .sp{flex:1}
+  .cap{font-size:12px; color:var(--ink-2); margin:12px 16px; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Subreddit mockup">
+  <div class="banner"><span>banner · atmosphere only</span></div>
+  <div class="head">
+    <div class="idrow">
+      <div class="ava"></div>
+      <div class="who"><h1>r/continuum</h1><p>124k members · est. 2019</p></div>
+      <button class="follow">Join</button>
+    </div>
+    <div class="stats"><span><b>124k</b> members</span><span><b>312</b> online</span></div>
+    <div class="desc">A quiet reader for Reddit. Rules, sidebar and flair live under About — description clamps at 2 lines with more on tap…</div>
+  </div>
+  <div class="tabs"><div class="tab on">Posts</div><div class="tab">About</div></div>
+  <div class="feed">
+    <div class="card">
+      <div class="meta"><b>r/continuum</b> · u/edgan · 2h</div>
+      <div class="title">First paint is content: 88dp banner, overlapping avatar, sticky Join</div>
+      <div class="actions"><div class="act">↑</div><div class="act">4.2k</div><div class="act">↓</div>
+        <div class="act">💬 318</div><span class="sp"></span><div class="act">☆</div><div class="act">↗</div></div>
+    </div>
+    <div class="card">
+      <div class="meta"><b>r/continuum</b> · u/selene · 5h</div>
+      <div class="title">User profile reuses the same header: avatar, name, karma/cakeday stats, Follow + Save</div>
+      <div class="actions"><div class="act">↑</div><div class="act">9.1k</div><div class="act">↓</div>
+        <div class="act">💬 44</div><span class="sp"></span><div class="act">☆</div><div class="act">↗</div></div>
+    </div>
+  </div>
+  <p class="cap">Header contract: 88dp banner (hidden when none) · 64dp avatar overlaps onto card · bordered Join/Follow ≥48dp, sticky on collapse · stats one line, tabular · description 2-line clamp · pinned toolbar keeps title + overflow only.</p>
+</div>
+</body>
+</html>

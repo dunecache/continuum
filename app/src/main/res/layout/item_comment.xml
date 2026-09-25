@@ -15,8 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="0dp"
-        android:orientation="vertical"
-        android:animateLayoutChanges="true">
+        android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -154,6 +153,7 @@
             android:paddingEnd="4dp">
 
             <com.google.android.material.button.MaterialButton
+                android:minHeight="@dimen/touch_target_min"
                 style="?attr/materialIconButtonStyle"
                 android:id="@+id/upvote_button_item_post_comment"
                 android:layout_width="wrap_content"
@@ -188,6 +188,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
+                android:minHeight="@dimen/touch_target_min"
                 style="?attr/materialIconButtonStyle"
                 android:id="@+id/downvote_button_item_post_comment"
                 android:layout_width="wrap_content"
@@ -241,6 +242,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
+                android:minHeight="@dimen/touch_target_min"
                 android:id="@+id/more_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -258,9 +260,11 @@
                 android:id="@+id/expand_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="?actionBarItemBackground"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
+                android:minWidth="@dimen/touch_target_min"
+                android:minHeight="@dimen/touch_target_min"
                 android:fontFamily="?attr/font_family"
                 android:gravity="center"
                 android:paddingStart="8dp"
@@ -274,6 +278,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.button.MaterialButton
+                android:minHeight="@dimen/touch_target_min"
                 android:id="@+id/save_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -287,6 +292,7 @@
                 style="?attr/materialIconButtonOutlinedStyle" />
 
             <com.google.android.material.button.MaterialButton
+                android:minHeight="@dimen/touch_target_min"
                 android:id="@+id/reply_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -302,10 +308,11 @@
 
         </ml.docilealligator.infinityforreddit.customviews.CommentToolbar>
 
-        <View
+        <com.google.android.material.divider.MaterialDivider
             android:id="@+id/divider_item_comment"
+            style="@style/Widget.Continuum.Divider"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="wrap_content"
             android:visibility="gone" />
 
     </LinearLayout>

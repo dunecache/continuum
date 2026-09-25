@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Post card modes (Direction B)</title>
+<style>
+  :root{
+    --bg:#f4f2fa; --card:#faf9ff; --ink:#191423; --ink-2:#4d465e;
+    --accent:#4f3891; --line:#d9d4e8; --surface:#ece9f5;
+    --thumb:#c9c2e0; --thumb-2:#a89ed1; --guide:#8f86b8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101a; --card:#201c2e; --ink:#ece8f7; --ink-2:#b3abd0;
+      --accent:#cdbcf5; --line:#35314a; --surface:#2b2640;
+      --thumb:#3a3454; --thumb-2:#55506f; --guide:#6f6694;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center}
+  .phone{width:100%; max-width:412px; background:var(--bg); color:var(--ink); padding:12px 12px 32px}
+  h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-2); margin:16px 4px 8px}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin-bottom:4px}
+  .meta{font-size:12px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .meta b{font-weight:600}
+  .avatar{display:inline-block; width:16px; height:16px; border-radius:8px; background:var(--accent);
+    vertical-align:-3px; margin-right:4px}
+  .title{font-size:16px; font-weight:600; line-height:1.35; margin-top:6px;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden}
+  .row{display:flex; gap:12px; margin-top:6px}
+  .thumb{width:72px; height:72px; border-radius:8px; flex:none;
+    background:linear-gradient(135deg,var(--thumb),var(--thumb-2))}
+  .hero{height:150px; border-radius:8px; margin-top:8px;
+    background:linear-gradient(135deg,var(--thumb-2),var(--thumb))}
+  .chips{display:flex; gap:6px; margin-top:8px}
+  .chip{font-size:11px; padding:3px 8px; border-radius:6px; background:var(--surface); color:var(--ink-2)}
+  .actions{display:flex; align-items:center; margin:8px -8px -4px}
+  .act{min-width:48px; min-height:48px; display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+  .act.vote{font-size:18px}
+  .act.lit{color:var(--accent)}
+  .score{font-size:13px; font-weight:700; min-width:48px; text-align:center; font-variant-numeric:tabular-nums}
+  .sp{flex:1}
+  .depth{margin:12px 0 0 0; border-left:2px solid var(--guide); padding-left:12px; display:flex; gap:12px}
+  .depth .d2{border-left:2px solid var(--guide); padding-left:12px; opacity:.85}
+  .cap{font-size:12px; color:var(--ink-2); margin:8px 4px 0; line-height:1.5}
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Post card modes mockup">
+  <h2>Compact — thumb right</h2>
+  <div class="card">
+    <div class="meta"><span class="avatar"></span><b>r/compact</b> · u/reader · 1h</div>
+    <div class="row"><div style="flex:1">
+      <div class="title">Title caps at 3 lines, then ellipsizes — actions never pushed away</div>
+    </div><div class="thumb"></div></div>
+    <div class="actions">
+      <div class="act vote lit">↑</div><div class="score">842</div><div class="act vote">↓</div>
+      <div class="act">💬 57</div><span class="sp"></span><div class="act">☆</div><div class="act">↗</div>
+    </div>
+  </div>
+  <p class="cap">Upvoted state carries the accent; score stays centered in its 48dp column.</p>
+
+  <h2>Default — text + badges</h2>
+  <div class="card">
+    <div class="meta"><span class="avatar"></span><b>r/defaultmode</b> · u/writer · 3h · via X-Post</div>
+    <div class="title">Flair, spoiler and NSFW live on one badge line — restored to card_3</div>
+    <div class="chips"><span class="chip">Guide</span><span class="chip">Spoiler</span><span class="chip">OC</span></div>
+    <div class="actions">
+      <div class="act vote">↑</div><div class="score">1.1k</div><div class="act vote">↓</div>
+      <div class="act">💬 96</div><span class="sp"></span><div class="act">☆</div><div class="act">↗</div>
+    </div>
+  </div>
+
+  <h2>Media-first — capped preview</h2>
+  <div class="card">
+    <div class="meta"><span class="avatar"></span><b>r/pics</b> · u/shooter · 6h</div>
+    <div class="title">Preview reserves 16:10 before load — no layout jump</div>
+    <div class="hero"></div>
+    <div class="actions">
+      <div class="act vote">↑</div><div class="score">22k</div><div class="act vote">↓</div>
+      <div class="act">💬 402</div><span class="sp"></span><div class="act">☆</div><div class="act">↗</div>
+    </div>
+  </div>
+
+  <h2>Depth guides (comment thread)</h2>
+  <div class="card">
+    <div class="meta"><b>u/parent</b> · 42 · 2h</div>
+    <div class="title" style="font-size:14px; font-weight:400">Top-level comment body…</div>
+    <div class="depth"><div style="flex:1">
+      <div class="meta"><b>u/child</b> · 18 · 1h</div>
+      <div class="title" style="font-size:14px; font-weight:400">Nested reply under a 2dp guide…</div>
+      <div class="d2">
+        <div class="meta"><b>u/grandchild</b> · 5 · 44m</div>
+        <div class="title" style="font-size:14px; font-weight:400">Guides continue, text column stops shrinking past level 4.</div>
+      </div>
+    </div></div>
+  </div>
+</div>
+</body>
+</html>

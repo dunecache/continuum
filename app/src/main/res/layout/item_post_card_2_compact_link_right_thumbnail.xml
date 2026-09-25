@@ -199,7 +199,7 @@
                 android:layout_height="@dimen/post_compact_thumbnail_size"
                 android:scaleType="center"
                 android:src="@drawable/ic_link_day_night_24dp"
-                app:tint="@android:color/tab_indicator_text" />
+                app:tint="?attr/secondaryTextColor" />
 
             <ml.docilealligator.infinityforreddit.customviews.PostTypeIndicatorView
                 android:id="@+id/post_type_indicator_view_no_preview_item_post_card_2_compact_link_right_thumbnail"

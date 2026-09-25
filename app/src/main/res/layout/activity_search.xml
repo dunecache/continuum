@@ -10,13 +10,17 @@
         android:id="@+id/appbar_layout_search_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:background="?attr/colorSurface"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
+            android:background="?attr/colorSurface"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:navigationIcon="?attr/homeAsUpIndicator">
 
@@ -33,16 +37,16 @@
                     android:background="#00000000"
                     android:hint="@string/search"
                     android:maxLines="1"
-                    android:textSize="?attr/font_20"
+                    android:textSize="?attr/font_16"
                     android:fontFamily="?attr/font_family"
                     android:inputType="textNoSuggestions"
                     android:imeOptions="actionSearch" />
 
                 <ImageView
                     android:id="@+id/clear_search_edit_view_search_activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:layout_width="@dimen/touch_target_min"
+                    android:layout_height="@dimen/touch_target_min"
+                    android:padding="@dimen/space_12"
                     android:src="@drawable/ic_cancel_24dp"
                     android:clickable="true"
                     android:focusable="true"
@@ -51,9 +55,10 @@
 
                 <ImageView
                     android:id="@+id/link_handler_image_view_search_activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:visibility="gone"
+                    android:layout_width="@dimen/touch_target_min"
+                    android:layout_height="@dimen/touch_target_min"
+                    android:padding="@dimen/space_12"
                     android:src="@drawable/ic_open_link_day_night_24dp"
                     android:clickable="true"
                     android:focusable="true"
@@ -62,9 +67,10 @@
 
                 <ImageView
                     android:id="@+id/incognito_keyboard_image_view_search_activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:visibility="gone"
+                    android:layout_width="@dimen/touch_target_min"
+                    android:layout_height="@dimen/touch_target_min"
+                    android:padding="@dimen/space_12"
                     android:src="@drawable/ic_incognito_24dp"
                     android:clickable="true"
                     android:focusable="true"
@@ -73,9 +79,10 @@
 
                 <ImageView
                     android:id="@+id/random_subreddit_image_view_search_activity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
+                    android:visibility="gone"
+                    android:layout_width="@dimen/touch_target_min"
+                    android:layout_height="@dimen/touch_target_min"
+                    android:padding="@dimen/space_12"
                     android:src="@drawable/ic_random_day_night_24dp"
                     android:clickable="true"
                     android:focusable="true"

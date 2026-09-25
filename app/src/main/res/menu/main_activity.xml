@@ -12,15 +12,22 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_sort_main_activity"
+        android:id="@+id/action_create_post_main_activity"
         android:orderInCategory="2"
-        android:title="@string/action_sort"
-        android:icon="@drawable/ic_sort_toolbar_24dp"
+        android:title="@string/content_description_submit_post"
+        android:icon="@drawable/ic_add_day_night_24dp"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_refresh_main_activity"
+        android:id="@+id/action_sort_main_activity"
         android:orderInCategory="3"
+        android:title="@string/action_sort"
+        android:icon="@drawable/ic_sort_toolbar_24dp"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_refresh_main_activity"
+        android:orderInCategory="4"
         android:title="@string/action_refresh"
         app:showAsAction="never" />
 

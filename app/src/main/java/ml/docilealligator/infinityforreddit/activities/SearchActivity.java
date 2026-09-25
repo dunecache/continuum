@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -247,7 +248,7 @@ public class SearchActivity extends BaseActivity {
         } else {
             // IME_FLAG_NO_PERSONALIZED_LEARNING does nothing before Android O. Keep the icon's space
             // reserved so the toolbar measures identically on every API level.
-            binding.incognitoKeyboardImageViewSearchActivity.setVisibility(View.INVISIBLE);
+            binding.incognitoKeyboardImageViewSearchActivity.setVisibility(View.GONE);
         }
 
         handler = new Handler();
@@ -426,10 +427,7 @@ public class SearchActivity extends BaseActivity {
             });
         }
 
-        // INVISIBLE rather than GONE: the toolbar icons keep the same positions whichever way this
-        // screen was opened, so the search field never changes width under them.
-        binding.randomSubredditImageViewSearchActivity.setVisibility(
-                canOpenRandomSubreddit ? View.VISIBLE : View.INVISIBLE);
+        binding.randomSubredditImageViewSearchActivity.setVisibility(View.GONE);
     }
 
     private void bindView() {
@@ -683,8 +681,25 @@ public class SearchActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_activity, menu);
+        menu.findItem(R.id.action_search_incognito_keyboard).setVisible(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O);
+        menu.findItem(R.id.action_search_random_subreddit).setVisible(canOpenRandomSubreddit);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == R.id.action_search_handle_link) {
+            binding.linkHandlerImageViewSearchActivity.performClick();
+            return true;
+        } else if (item.getItemId() == R.id.action_search_incognito_keyboard) {
+            binding.incognitoKeyboardImageViewSearchActivity.performClick();
+            return true;
+        } else if (item.getItemId() == R.id.action_search_random_subreddit) {
+            binding.randomSubredditImageViewSearchActivity.performClick();
+            return true;
+        } else if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }

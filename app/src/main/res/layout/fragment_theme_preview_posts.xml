@@ -223,7 +223,7 @@
                 android:layout_height="150dp"
                 android:scaleType="center"
                 android:src="@drawable/ic_link_day_night_24dp"
-                app:tint="@android:color/tab_indicator_text" />
+                app:tint="?attr/secondaryTextColor" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bottom_constraint_layout_theme_preview_posts_fragment"

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:background="?attr/cardViewBackgroundColor">
+    android:background="@drawable/bg_post_detail_signal">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_item_post_detail_image_and_gif_autoplay"
@@ -266,6 +266,7 @@
         android:paddingEnd="4dp">
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             style="?attr/materialIconButtonStyle"
             android:id="@+id/upvote_button_item_post_detail_image_and_gif_autoplay"
             android:layout_width="wrap_content"
@@ -294,6 +295,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             style="?attr/materialIconButtonStyle"
             android:id="@+id/downvote_button_item_post_detail_image_and_gif_autoplay"
             android:layout_width="wrap_content"
@@ -310,6 +312,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/comments_count_button_item_post_detail_image_and_gif_autoplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -330,6 +333,7 @@
             style="?attr/materialIconButtonOutlinedStyle" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/save_button_item_post_detail_image_and_gif_autoplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -343,6 +347,7 @@
             style="?attr/materialIconButtonOutlinedStyle" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/share_button_item_post_detail_image_and_gif_autoplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

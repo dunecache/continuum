@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:background="?attr/cardViewBackgroundColor">
+    android:background="@drawable/bg_post_detail_signal">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_item_post_detail_video_autoplay"
@@ -219,7 +219,6 @@
             android:id="@+id/player_view_item_post_detail_video_autoplay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
             app:show_timeout="1500"
             app:auto_show="false"
             app:controller_layout_id="@layout/exo_autoplay_playback_control_view_legacy"
@@ -262,6 +261,7 @@
         android:paddingEnd="4dp">
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             style="?attr/materialIconButtonStyle"
             android:id="@+id/upvote_button_item_post_detail_video_autoplay"
             android:layout_width="wrap_content"
@@ -290,6 +290,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             style="?attr/materialIconButtonStyle"
             android:id="@+id/downvote_button_item_post_detail_video_autoplay"
             android:layout_width="wrap_content"
@@ -306,6 +307,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/comments_count_button_item_post_detail_video_autoplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -326,6 +328,7 @@
             style="?attr/materialIconButtonOutlinedStyle" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/save_button_item_post_detail_video_autoplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -339,6 +342,7 @@
             style="?attr/materialIconButtonOutlinedStyle" />
 
         <com.google.android.material.button.MaterialButton
+            android:minHeight="@dimen/touch_target_min"
             android:id="@+id/share_button_item_post_detail_video_autoplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

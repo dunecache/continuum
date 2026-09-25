@@ -180,6 +180,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private static final String STATE_RESUME_TAB_KEY = "RTK";
     /** Whether the bottom app bar was scrolled away. See {@link #saveResumeState}. */
     private static final String STATE_RESUME_BOTTOM_BAR_HIDDEN = "RBBH";
+    private static final int SIGNAL_OPTION_FEED = Integer.MIN_VALUE;
+    private static final int SIGNAL_OPTION_LIBRARY = Integer.MIN_VALUE + 1;
+    private static final int SIGNAL_OPTION_SAVED = Integer.MIN_VALUE + 2;
 
     @SuppressWarnings("NullAway.Init")
     MultiRedditViewModel multiRedditViewModel;
@@ -283,6 +286,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private boolean resumeTabApplied;
     private boolean hideFab;
     private boolean showBottomAppBar;
+    private boolean showSignalNavigation;
     private int mBackButtonAction;
     private boolean mLockBottomAppBar;
     private boolean mDisableSwipingBetweenTabs;
@@ -350,7 +354,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         claimResumeState();
 
         hideFab = mSharedPreferences.getBoolean(SharedPreferencesUtils.HIDE_FAB_IN_POST_FEED, false);
-        showBottomAppBar = mSharedPreferences.getBoolean(SharedPreferencesUtils.BOTTOM_APP_BAR_KEY, false);
+        showBottomAppBar = mSharedPreferences.getBoolean(SharedPreferencesUtils.BOTTOM_APP_BAR_KEY, true);
+        showSignalNavigation = showBottomAppBar
+                && mSharedPreferences.getBoolean(SharedPreferencesUtils.SIGNAL_NAVIGATION_KEY, true);
 
         navigationWrapper = new NavigationWrapper(findViewById(R.id.bottom_app_bar_bottom_app_bar), findViewById(R.id.linear_layout_bottom_app_bar),
                 findViewById(R.id.option_1_bottom_app_bar), findViewById(R.id.option_2_bottom_app_bar),
@@ -535,7 +541,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             mMessageFullname = savedInstanceState.getString(MESSAGE_FULLNAME_STATE);
             mNewAccountName = savedInstanceState.getString(NEW_ACCOUNT_NAME_STATE);
             mAppBarCollapsed = savedInstanceState.getBoolean(APP_BAR_COLLAPSED_STATE, false);
-            mBottomBarHidden = savedInstanceState.getBoolean(BOTTOM_APP_BAR_HIDDEN_STATE, false);
+            mBottomBarHidden = !showSignalNavigation
+                    && savedInstanceState.getBoolean(BOTTOM_APP_BAR_HIDDEN_STATE, false);
             if (mAppBarCollapsed) {
                 // Restore the collapsed AppBar without animation so the post feed isn't pushed
                 // down by the re-expanded toolbar on rotation.
@@ -688,6 +695,22 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
     private void bottomAppBarOptionAction(int option) {
         switch (option) {
+            case SIGNAL_OPTION_FEED: {
+                if (sectionsPagerAdapter != null) {
+                    sectionsPagerAdapter.goBackToTop();
+                }
+                break;
+            }
+            case SIGNAL_OPTION_LIBRARY: {
+                binding.drawerLayout.open();
+                break;
+            }
+            case SIGNAL_OPTION_SAVED: {
+                Intent intent = new Intent(this, HistoryActivity.class);
+                intent.putExtra(HistoryActivity.EXTRA_READ_POST_TYPE, ReadPostType.ANONYMOUS_SAVED_POSTS);
+                startActivity(intent);
+                break;
+            }
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SUBSCRIPTIONS: {
                 Intent intent = new Intent(this, SubscribedThingListingActivity.class);
                 startActivity(intent);
@@ -792,6 +815,12 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
     private int getBottomAppBarOptionDrawableResource(int option) {
         switch (option) {
+            case SIGNAL_OPTION_FEED:
+                return R.drawable.ic_home_day_night_24dp;
+            case SIGNAL_OPTION_LIBRARY:
+                return R.drawable.ic_multi_reddit_day_night_24dp;
+            case SIGNAL_OPTION_SAVED:
+                return R.drawable.ic_bookmark_day_night_24dp;
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SUBSCRIPTIONS:
                 return R.drawable.ic_subscriptions_bottom_app_bar_day_night_24dp;
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_MULTIREDDITS:
@@ -844,6 +873,61 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         bindNavigationDrawerAndTabs();
     }
 
+    @ExperimentalBadgeUtils
+    private void bindSignalNavigation() {
+        int option1 = SIGNAL_OPTION_FEED;
+        int option2 = SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SEARCH;
+        int option3 = accountName.equals(Account.ANONYMOUS_ACCOUNT)
+                ? SIGNAL_OPTION_SAVED : SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX;
+        int option4 = SIGNAL_OPTION_LIBRARY;
+
+        navigationWrapper.bindOptionDrawableResource(
+                getBottomAppBarOptionDrawableResource(option1),
+                getBottomAppBarOptionDrawableResource(option2),
+                getBottomAppBarOptionDrawableResource(option3),
+                getBottomAppBarOptionDrawableResource(option4));
+        navigationWrapper.bindOptions(option1, option2, option3, option4);
+
+        if (navigationWrapper.navigationRailView == null) {
+            navigationWrapper.option1BottomAppBar.setOnClickListener(view -> bottomAppBarOptionAction(option1));
+            navigationWrapper.option2BottomAppBar.setOnClickListener(view -> bottomAppBarOptionAction(option2));
+            navigationWrapper.option3BottomAppBar.setOnClickListener(view -> bottomAppBarOptionAction(option3));
+            navigationWrapper.option4BottomAppBar.setOnClickListener(view -> bottomAppBarOptionAction(option4));
+            navigationWrapper.option4BottomAppBar.setOnLongClickListener(view -> {
+                openAccountManagementInDrawer();
+                return true;
+            });
+            setBottomAppBarContentDescription(navigationWrapper.option1BottomAppBar, option1);
+            setBottomAppBarContentDescription(navigationWrapper.option2BottomAppBar, option2);
+            setBottomAppBarContentDescription(navigationWrapper.option3BottomAppBar, option3);
+            setBottomAppBarContentDescription(navigationWrapper.option4BottomAppBar, option4);
+        } else {
+            navigationWrapper.setRailItemTitles(
+                    getBottomAppBarOptionTitle(this, option1),
+                    getBottomAppBarOptionTitle(this, option2),
+                    getBottomAppBarOptionTitle(this, option3),
+                    getBottomAppBarOptionTitle(this, option4));
+            navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.navigation_rail_option_1) {
+                    bottomAppBarOptionAction(option1);
+                    return true;
+                } else if (itemId == R.id.navigation_rail_option_2) {
+                    bottomAppBarOptionAction(option2);
+                    return true;
+                } else if (itemId == R.id.navigation_rail_option_3) {
+                    bottomAppBarOptionAction(option3);
+                    return true;
+                } else if (itemId == R.id.navigation_rail_option_4) {
+                    bottomAppBarOptionAction(option4);
+                    return true;
+                }
+                return false;
+            });
+        }
+        navigationWrapper.setActiveItem(1);
+    }
+
     // Builds the bottom app bar options and FAB. Split out of bindView() so it can be re-run
     // live (e.g. from the Customize Bottom App Bar settings) without rebuilding the whole screen.
     @ExperimentalBadgeUtils
@@ -852,7 +936,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             return;
         }
 
-        if (showBottomAppBar) {
+        if (showSignalNavigation) {
+            bindSignalNavigation();
+        } else if (showBottomAppBar) {
             int optionCount = mBottomAppBarSharedPreference.getInt(SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_COUNT, 4);
             int option1 = mBottomAppBarSharedPreference.getInt(SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_1, SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SUBSCRIPTIONS);
             int option2 = mBottomAppBarSharedPreference.getInt(SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_2, SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_MULTIREDDITS);
@@ -876,6 +962,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                     setBottomAppBarContentDescription(navigationWrapper.option2BottomAppBar, option1);
                     setBottomAppBarContentDescription(navigationWrapper.option4BottomAppBar, option2);
                 } else {
+                    navigationWrapper.setRailItemTitles(getBottomAppBarOptionTitle(this, option1),
+                            getBottomAppBarOptionTitle(this, option2));
                     navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
                         int itemId = item.getItemId();
                         if (itemId == R.id.navigation_rail_option_1) {
@@ -924,6 +1012,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                     setBottomAppBarContentDescription(navigationWrapper.option3BottomAppBar, option3);
                     setBottomAppBarContentDescription(navigationWrapper.option4BottomAppBar, option4);
                 } else {
+                    navigationWrapper.setRailItemTitles(getBottomAppBarOptionTitle(this, option1),
+                            getBottomAppBarOptionTitle(this, option2),
+                            getBottomAppBarOptionTitle(this, option3),
+                            getBottomAppBarOptionTitle(this, option4));
                     navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
                         int itemId = item.getItemId();
                         if (itemId == R.id.navigation_rail_option_1) {
@@ -1063,7 +1155,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             fabMoreOptionsBottomSheetFragment.show(getSupportFragmentManager(), fabMoreOptionsBottomSheetFragment.getTag());
             return true;
         });
-        navigationWrapper.floatingActionButton.setVisibility(hideFab ? View.GONE : View.VISIBLE);
+        navigationWrapper.floatingActionButton.setVisibility(
+                hideFab || showSignalNavigation ? View.GONE : View.VISIBLE);
 
         // Rebinding the options moves which icon the inbox badge belongs to, so re-apply it.
         navigationWrapper.setInboxCount(this, InboxCount.get(mCurrentAccountSharedPreferences));
@@ -1436,65 +1529,56 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     }
 
     public void setBottomAppBarContentDescription(View view, int option) {
+        navigationWrapper.setItemLabelAndContentDescription(view, getBottomAppBarOptionTitle(this, option));
+    }
+
+    private static String getBottomAppBarOptionTitle(Context context, int option) {
         switch (option) {
+            case SIGNAL_OPTION_FEED:
+                return context.getString(R.string.navigation_feed);
+            case SIGNAL_OPTION_LIBRARY:
+                return context.getString(R.string.navigation_library);
+            case SIGNAL_OPTION_SAVED:
+                return context.getString(R.string.navigation_saved);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SUBSCRIPTIONS:
-                view.setContentDescription(getString(R.string.content_description_subscriptions));
-                break;
+                return context.getString(R.string.content_description_subscriptions);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX:
-                view.setContentDescription(getString(R.string.content_description_inbox));
-                break;
+                return context.getString(R.string.content_description_inbox);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_PROFILE:
-                view.setContentDescription(getString(R.string.content_description_profile));
-                break;
+                return context.getString(R.string.content_description_profile);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_MULTIREDDITS:
-                view.setContentDescription(getString(R.string.content_description_multireddits));
-                break;
+                return context.getString(R.string.content_description_multireddits);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SUBMIT_POSTS:
-                view.setContentDescription(getString(R.string.content_description_submit_post));
-                break;
+                return context.getString(R.string.content_description_submit_post);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_REFRESH:
-                view.setContentDescription(getString(R.string.content_description_refresh));
-                break;
+                return context.getString(R.string.content_description_refresh);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_CHANGE_SORT_TYPE:
-                view.setContentDescription(getString(R.string.content_description_change_sort_type));
-                break;
+                return context.getString(R.string.content_description_change_sort_type);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_CHANGE_POST_LAYOUT:
-                view.setContentDescription(getString(R.string.content_description_change_post_layout));
-                break;
+                return context.getString(R.string.content_description_change_post_layout);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SEARCH:
-                view.setContentDescription(getString(R.string.content_description_search));
-                break;
+                return context.getString(R.string.content_description_search);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_GO_TO_SUBREDDIT :
-                view.setContentDescription(getString(R.string.content_description_go_to_subreddit));
-                break;
+                return context.getString(R.string.content_description_go_to_subreddit);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_GO_TO_USER :
-                view.setContentDescription(getString(R.string.content_description_go_to_user));
-                break;
+                return context.getString(R.string.content_description_go_to_user);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_HIDE_READ_POSTS :
-                view.setContentDescription(getString(R.string.content_description_hide_read_posts));
-                break;
+                return context.getString(R.string.content_description_hide_read_posts);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_FILTER_POSTS :
-                view.setContentDescription(getString(R.string.content_description_filter_posts));
-                break;
+                return context.getString(R.string.content_description_filter_posts);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_UPVOTED :
-                view.setContentDescription(getString(R.string.content_description_upvoted));
-                break;
+                return context.getString(R.string.content_description_upvoted);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_DOWNVOTED :
-                view.setContentDescription(getString(R.string.content_description_downvoted));
-                break;
+                return context.getString(R.string.content_description_downvoted);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_HIDDEN :
-                view.setContentDescription(getString(R.string.content_description_hidden));
-                break;
+                return context.getString(R.string.content_description_hidden);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SAVED :
-                view.setContentDescription(getString(R.string.content_description_saved));
-                break;
+                return context.getString(R.string.content_description_saved);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SHOW_THUMBNAIL_ON_THE_LEFT :
-                view.setContentDescription(getString(R.string.bottom_app_bar_option_toggle_thumbnail_side));
-                break;
+                return context.getString(R.string.bottom_app_bar_option_toggle_thumbnail_side);
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_GO_TO_TOP :
             default:
-                view.setContentDescription(getString(R.string.content_description_go_to_top));
-                break;
+                return context.getString(R.string.content_description_go_to_top);
         }
     }
 
@@ -1728,6 +1812,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             Intent intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
             return true;
+        } else if (itemId == R.id.action_create_post_main_activity) {
+            PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
+            postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
+            return true;
         } else if (itemId == R.id.action_sort_main_activity) {
             changeSortType();
             return true;
@@ -1770,7 +1858,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         // (landscape navigation-rail mode) keep the sticky value so the portrait hidden-state
         // survives the landscape intermediate of a P→L→P round trip.
         if (navigationWrapper != null && navigationWrapper.bottomAppBar != null) {
-            mBottomBarHidden = navigationWrapper.bottomAppBar.getTranslationY() > 0;
+            mBottomBarHidden = !showSignalNavigation && navigationWrapper.bottomAppBar.getTranslationY() > 0;
         }
         outState.putBoolean(BOTTOM_APP_BAR_HIDDEN_STATE, mBottomBarHidden);
     }
@@ -1832,28 +1920,28 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
     @Override
     public void contentScrollUp() {
-        // Suppress the show while restoring a rotation where the bar was hidden — the
-        // programmatic scroll restore can fire this and would otherwise re-show the bar/FAB.
         if (mKeepBottomBarHiddenOnRestore) {
             return;
         }
-        if (showBottomAppBar && !mLockBottomAppBar) {
+        if (showBottomAppBar) {
             navigationWrapper.showNavigation();
-            // Only track state when the bottom app bar actually exists (portrait); leave it
-            // sticky in landscape rail mode.
             if (navigationWrapper.bottomAppBar != null) {
                 mBottomBarHidden = false;
             }
         }
-        if (!(showBottomAppBar && mLockBottomAppBar) && !hideFab) {
+        if (!hideFab && !showSignalNavigation) {
             navigationWrapper.showFab();
         }
     }
 
     @Override
     public void contentScrollDown() {
-        if (!(showBottomAppBar && mLockBottomAppBar) && !hideFab) {
+        if (!hideFab && !showSignalNavigation) {
             navigationWrapper.hideFab();
+        }
+        if (showSignalNavigation) {
+            navigationWrapper.showNavigation();
+            return;
         }
         if (showBottomAppBar && !mLockBottomAppBar) {
             navigationWrapper.hideNavigation();
@@ -1953,7 +2041,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     @Subscribe
     public void onChangeHideFabInPostFeed(ChangeHideFabInPostFeedEvent event) {
         hideFab = event.hideFabInPostFeed;
-        navigationWrapper.floatingActionButton.setVisibility(hideFab ? View.GONE : View.VISIBLE);
+        navigationWrapper.floatingActionButton.setVisibility(
+                hideFab || showSignalNavigation ? View.GONE : View.VISIBLE);
     }
 
     @Subscribe

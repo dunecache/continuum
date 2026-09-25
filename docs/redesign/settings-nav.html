@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Drawer, settings, onboarding (Direction B)</title>
+<style>
+  :root{
+    --bg:#f4f2fa; --card:#faf9ff; --ink:#191423; --ink-2:#4d465e;
+    --accent:#4f3891; --line:#d9d4e8; --surface:#ece9f5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101a; --card:#201c2e; --ink:#ece8f7; --ink-2:#b3abd0;
+      --accent:#cdbcf5; --line:#35314a; --surface:#2b2640;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center}
+  .phone{width:100%; max-width:412px; background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:32px}
+  h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-2); margin:16px 16px 8px}
+  .drawer{background:var(--card); border-bottom:1px solid var(--line); padding-bottom:8px}
+  .who{display:flex; align-items:center; gap:12px; padding:16px}
+  .ava{width:48px; height:48px; border-radius:24px; background:var(--accent); flex:none}
+  .who .n{flex:1} .who .n b{font-size:16px} .who .n p{font-size:12px; color:var(--ink-2)}
+  .grp{font-size:12px; color:var(--ink-2); padding:10px 16px 2px; text-transform:uppercase; letter-spacing:.06em}
+  .it{display:flex; align-items:center; gap:16px; padding:4px 16px; min-height:52px; font-size:14px}
+  .it .g{width:24px; text-align:center; font-size:19px; color:var(--ink-2)}
+  .set{background:var(--card); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
+  .srow{display:flex; align-items:center; gap:16px; padding:12px 16px; min-height:60px; border-bottom:1px solid var(--line)}
+  .srow:last-child{border-bottom:none}
+  .srow .t{flex:1} .srow .t b{font-size:14.5px; display:block} .srow .t span{font-size:12.5px; color:var(--ink-2)}
+  .sw{width:48px; height:28px; border-radius:14px; background:var(--accent); position:relative; flex:none}
+  .sw::after{content:""; position:absolute; right:3px; top:3px; width:22px; height:22px; border-radius:11px; background:#fff}
+  .wel{margin:0 12px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 18px; text-align:center}
+  .wel h3{font-size:20px; margin-bottom:6px}
+  .wel p{font-size:13.5px; color:var(--ink-2); line-height:1.55; margin-bottom:14px}
+  .cta{min-height:52px; border-radius:14px; background:var(--accent); color:#fff; font-size:15px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; margin-bottom:8px}
+  @media (prefers-color-scheme: dark){ .cta{color:#241a4d} }
+  .ghost{min-height:52px; display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--accent); font-weight:600}
+  .cap{font-size:12px; color:var(--ink-2); margin:10px 16px; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Drawer settings onboarding mockup">
+  <h2>Drawer — library, 4 groups</h2>
+  <div class="drawer">
+    <div class="who"><div class="ava"></div><div class="n"><b>u/edgan</b><p>124k karma · switch account ›</p></div></div>
+    <div class="grp">You</div>
+    <div class="it"><span class="g">☺</span>Profile &amp; saved</div>
+    <div class="it"><span class="g">✉</span>Inbox</div>
+    <div class="grp">Library</div>
+    <div class="it"><span class="g">▤</span>Multireddits</div>
+    <div class="it"><span class="g">☆</span>Followed &amp; history</div>
+    <div class="grp">Filters</div>
+    <div class="it"><span class="g">⧩</span>Post &amp; comment filters</div>
+    <div class="grp">System</div>
+    <div class="it"><span class="g">⚙</span>Settings</div>
+  </div>
+  <h2>Settings — grouped cards, kept framework</h2>
+  <div class="set">
+    <div class="srow"><div class="t"><b>Swipe actions</b><span>3 levels each side, posts &amp; comments</span></div><span>›</span></div>
+    <div class="srow"><div class="t"><b>Appearance</b><span>Theme, fonts, post layout</span></div><span>›</span></div>
+    <div class="srow"><div class="t"><b>Autoplay videos</b><span>Wi-Fi only</span></div><div class="sw"></div></div>
+  </div>
+  <h2>Onboarding — one primer, then OAuth</h2>
+  <div class="wel">
+    <h3>Your Reddit, quieted down</h3>
+    <p>No ads. Your feeds, your swipes, your themes. Sign in with Reddit to start — anonymous browsing works too.</p>
+    <div class="cta">Sign in with Reddit</div>
+    <div class="ghost">Continue anonymously</div>
+  </div>
+  <p class="cap">Drawer: 9 sections → You/Library/Filters/System, account switcher kept, insets replace the 40dp hack. Settings: framework rows kept, grouped with summaries, search stays. Onboarding: single primer (value + choices) before the existing WebView/Custom-Tab/AppAuth paths — the unowned OAuth UI is no longer the first impression.</p>
+</div>
+</body>
+</html>

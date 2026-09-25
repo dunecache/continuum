@@ -6,7 +6,6 @@ import android.content.res.ColorStateList;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuItemImpl;
@@ -25,10 +24,10 @@ import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 public class NavigationWrapper {
     public BottomAppBar bottomAppBar;
     public LinearLayout linearLayoutBottomAppBar;
-    public ImageView option1BottomAppBar;
-    public ImageView option2BottomAppBar;
-    public ImageView option3BottomAppBar;
-    public ImageView option4BottomAppBar;
+    public SignalNavigationItemView option1BottomAppBar;
+    public SignalNavigationItemView option2BottomAppBar;
+    public SignalNavigationItemView option3BottomAppBar;
+    public SignalNavigationItemView option4BottomAppBar;
 
     public NavigationRailView navigationRailView;
     public FloatingActionButton floatingActionButton;
@@ -45,11 +44,13 @@ public class NavigationWrapper {
     @Nullable
     private View badgedView;
     @Nullable
+    private MenuItem badgedMenuItem;
+    @Nullable
     private View.OnLayoutChangeListener badgeLayoutListener;
 
     public NavigationWrapper(BottomAppBar bottomAppBar, LinearLayout linearLayoutBottomAppBar,
-                             ImageView option1BottomAppBar, ImageView option2BottomAppBar,
-                             ImageView option3BottomAppBar, ImageView option4BottomAppBar,
+                             SignalNavigationItemView option1BottomAppBar, SignalNavigationItemView option2BottomAppBar,
+                             SignalNavigationItemView option3BottomAppBar, SignalNavigationItemView option4BottomAppBar,
                              FloatingActionButton floatingActionButton, NavigationRailView navigationRailView,
                              CustomThemeWrapper customThemeWrapper,
                              boolean showBottomAppBar) {
@@ -75,10 +76,10 @@ public class NavigationWrapper {
 
     public void applyCustomTheme(int bottomAppBarIconColor, int bottomAppBarBackgroundColor) {
         if (navigationRailView == null) {
-            option1BottomAppBar.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
-            option2BottomAppBar.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
-            option3BottomAppBar.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
-            option4BottomAppBar.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
+            option1BottomAppBar.setIconTint(bottomAppBarIconColor);
+            option2BottomAppBar.setIconTint(bottomAppBarIconColor);
+            option3BottomAppBar.setIconTint(bottomAppBarIconColor);
+            option4BottomAppBar.setIconTint(bottomAppBarIconColor);
             bottomAppBar.setBackgroundTint(ColorStateList.valueOf(bottomAppBarBackgroundColor));
         } else {
             navigationRailView.setBackgroundColor(bottomAppBarBackgroundColor);
@@ -105,7 +106,7 @@ public class NavigationWrapper {
 
         if (imageResources.length == 2) {
             if (navigationRailView == null) {
-                linearLayoutBottomAppBar.setWeightSum(3);
+                linearLayoutBottomAppBar.setWeightSum(2);
                 option1BottomAppBar.setVisibility(View.GONE);
                 option3BottomAppBar.setVisibility(View.GONE);
 
@@ -122,7 +123,7 @@ public class NavigationWrapper {
             if (navigationRailView == null) {
                 // Undo what the two-option layout hides, so rebinding back to four options restores
                 // the full bar instead of leaving two icons gone and the weights short.
-                linearLayoutBottomAppBar.setWeightSum(5);
+                linearLayoutBottomAppBar.setWeightSum(4);
                 option1BottomAppBar.setVisibility(View.VISIBLE);
                 option3BottomAppBar.setVisibility(View.VISIBLE);
 
@@ -166,65 +167,93 @@ public class NavigationWrapper {
     }
 
     public void setOtherActivitiesContentDescription(Context context, View view, int option) {
+        setItemLabelAndContentDescription(view, getOtherActivitiesContentDescription(context, option));
+    }
+
+    public void setItemLabelAndContentDescription(View view, CharSequence label) {
+        view.setContentDescription(label);
+        if (view instanceof SignalNavigationItemView signalNavigationItemView) {
+            signalNavigationItemView.setLabel(label);
+        }
+    }
+
+    public void setRailItemTitles(Context context, int... options) {
+        String[] titles = new String[options.length];
+        for (int i = 0; i < options.length; i++) {
+            titles[i] = getOtherActivitiesContentDescription(context, options[i]);
+        }
+        setRailItemTitles(titles);
+    }
+
+    public void setRailItemTitles(String... titles) {
+        if (navigationRailView == null) {
+            return;
+        }
+        Menu menu = navigationRailView.getMenu();
+        int[] itemIds = {R.id.navigation_rail_option_1, R.id.navigation_rail_option_2,
+                R.id.navigation_rail_option_3, R.id.navigation_rail_option_4};
+        for (int i = 0; i < titles.length && i < itemIds.length; i++) {
+            menu.findItem(itemIds[i]).setTitle(titles[i]);
+        }
+    }
+
+    public void setActiveItem(int position) {
+        if (navigationRailView == null) {
+            option1BottomAppBar.setActive(position == 1);
+            option2BottomAppBar.setActive(position == 2);
+            option3BottomAppBar.setActive(position == 3);
+            option4BottomAppBar.setActive(position == 4);
+            return;
+        }
+        Menu menu = navigationRailView.getMenu();
+        int[] itemIds = {R.id.navigation_rail_option_1, R.id.navigation_rail_option_2,
+                R.id.navigation_rail_option_3, R.id.navigation_rail_option_4};
+        for (int i = 0; i < itemIds.length; i++) {
+            menu.findItem(itemIds[i]).setChecked(i + 1 == position);
+        }
+    }
+
+    public static String getOtherActivitiesContentDescription(Context context, int option) {
         switch (option) {
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_HOME:
-                view.setContentDescription(context.getString(R.string.content_description_home));
-                break;
+                return context.getString(R.string.content_description_home);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_SUBSCRIPTIONS:
-                view.setContentDescription(context.getString(R.string.content_description_subscriptions));
-                break;
+                return context.getString(R.string.content_description_subscriptions);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX:
-                view.setContentDescription(context.getString(R.string.content_description_inbox));
-                break;
+                return context.getString(R.string.content_description_inbox);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_PROFILE:
-                view.setContentDescription(context.getString(R.string.content_description_profile));
-                break;
+                return context.getString(R.string.content_description_profile);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_MULTIREDDITS:
-                view.setContentDescription(context.getString(R.string.content_description_multireddits));
-                break;
+                return context.getString(R.string.content_description_multireddits);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_SUBMIT_POSTS:
-                view.setContentDescription(context.getString(R.string.content_description_submit_post));
-                break;
+                return context.getString(R.string.content_description_submit_post);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_REFRESH:
-                view.setContentDescription(context.getString(R.string.content_description_refresh));
-                break;
+                return context.getString(R.string.content_description_refresh);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_CHANGE_SORT_TYPE:
-                view.setContentDescription(context.getString(R.string.content_description_change_sort_type));
-                break;
+                return context.getString(R.string.content_description_change_sort_type);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_CHANGE_POST_LAYOUT:
-                view.setContentDescription(context.getString(R.string.content_description_change_post_layout));
-                break;
+                return context.getString(R.string.content_description_change_post_layout);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_SEARCH:
-                view.setContentDescription(context.getString(R.string.content_description_search));
-                break;
+                return context.getString(R.string.content_description_search);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_GO_TO_SUBREDDIT:
-                view.setContentDescription(context.getString(R.string.content_description_go_to_subreddit));
-                break;
+                return context.getString(R.string.content_description_go_to_subreddit);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_GO_TO_USER:
-                view.setContentDescription(context.getString(R.string.content_description_go_to_user));
-                break;
+                return context.getString(R.string.content_description_go_to_user);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_HIDE_READ_POSTS:
-                view.setContentDescription(context.getString(R.string.content_description_hide_read_posts));
-                break;
+                return context.getString(R.string.content_description_hide_read_posts);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_FILTER_POSTS:
-                view.setContentDescription(context.getString(R.string.content_description_filter_posts));
-                break;
+                return context.getString(R.string.content_description_filter_posts);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_UPVOTED:
-                view.setContentDescription(context.getString(R.string.content_description_upvoted));
-                break;
+                return context.getString(R.string.content_description_upvoted);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_DOWNVOTED:
-                view.setContentDescription(context.getString(R.string.content_description_downvoted));
-                break;
+                return context.getString(R.string.content_description_downvoted);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_HIDDEN:
-                view.setContentDescription(context.getString(R.string.content_description_hidden));
-                break;
+                return context.getString(R.string.content_description_hidden);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_SAVED:
-                view.setContentDescription(context.getString(R.string.content_description_saved));
-                break;
+                return context.getString(R.string.content_description_saved);
             case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_GO_TO_TOP:
             default:
-                view.setContentDescription(context.getString(R.string.content_description_go_to_top));
-                break;
+                return context.getString(R.string.content_description_go_to_top);
         }
     }
 
@@ -255,20 +284,32 @@ public class NavigationWrapper {
     @ExperimentalBadgeUtils
     public void setInboxCount(Context context, int inboxCount) {
         this.inboxCount = Math.max(0, inboxCount);
-
-        if (navigationRailView != null) {
-            return;
-        }
-
-        // The anchor changes when the bottom app bar options are rebound, so start from a clean
-        // slate: the badge is a separate drawable in the anchor's overlay and would otherwise stack.
         detachBadge();
 
         if (this.inboxCount == 0) {
             return;
         }
 
-        ImageView anchorView = getInboxOptionView();
+        if (navigationRailView != null) {
+            Menu menu = navigationRailView.getMenu();
+            int[] itemIds = {R.id.navigation_rail_option_1, R.id.navigation_rail_option_2,
+                    R.id.navigation_rail_option_3, R.id.navigation_rail_option_4};
+            int[] boundOptions = {option1, option2, option3, option4};
+            for (int i = 0; i < itemIds.length; i++) {
+                if (isInboxOption(boundOptions[i])) {
+                    badgedMenuItem = menu.findItem(itemIds[i]);
+                    badgeDrawable = BadgeDrawable.create(context);
+                    badgeDrawable.setNumber(inboxCount);
+                    badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
+                    badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
+                    BadgeUtils.attachBadgeDrawable(badgeDrawable, badgedMenuItem);
+                    return;
+                }
+            }
+            return;
+        }
+
+        SignalNavigationItemView anchorView = getInboxOptionView();
         if (anchorView == null) {
             return;
         }
@@ -308,21 +349,23 @@ public class NavigationWrapper {
 
     @ExperimentalBadgeUtils
     private void detachBadge() {
-        if (badgedView != null) {
-            if (badgeDrawable != null) {
-                BadgeUtils.detachBadgeDrawable(badgeDrawable, badgedView);
-            }
-            if (badgeLayoutListener != null) {
-                badgedView.removeOnLayoutChangeListener(badgeLayoutListener);
-            }
+        if (badgedView != null && badgeDrawable != null) {
+            BadgeUtils.detachBadgeDrawable(badgeDrawable, badgedView);
+        }
+        if (badgedMenuItem != null && badgeDrawable != null) {
+            BadgeUtils.detachBadgeDrawable(badgeDrawable, badgedMenuItem);
+        }
+        if (badgedView != null && badgeLayoutListener != null) {
+            badgedView.removeOnLayoutChangeListener(badgeLayoutListener);
         }
         badgeDrawable = null;
         badgeLayoutListener = null;
         badgedView = null;
+        badgedMenuItem = null;
     }
 
     @Nullable
-    private ImageView getInboxOptionView() {
+    private SignalNavigationItemView getInboxOptionView() {
         if (isInboxOption(option1)) {
             return option1BottomAppBar;
         } else if (isInboxOption(option2)) {

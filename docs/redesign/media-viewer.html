@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Media viewer (Direction B)</title>
+<style>
+  :root{ --chrome:rgba(0,0,0,.55); --ink:#fff; --ink-2:rgba(255,255,255,.75); --accent:#cdbcf5; }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center; color:var(--ink)}
+  .phone{width:100%; max-width:412px; min-height:100vh; background:#000; position:relative;
+    display:flex; flex-direction:column}
+  .stage{flex:1; min-height:420px; display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 50% 40%, #2b2640 0%, #000 70%); position:relative}
+  .stage .pic{width:78%; aspect-ratio:4/3; border-radius:4px;
+    background:linear-gradient(135deg,#6f6694,#3a3454 60%,#55506f)}
+  .stage .hint{position:absolute; bottom:14px; font-size:12px; color:var(--ink-2)}
+  .bar{display:flex; align-items:center; padding:6px 4px; background:var(--chrome);
+    backdrop-filter:blur(8px)}
+  .bar.top{position:sticky; top:0}
+  .bar.bottom{position:sticky; bottom:0; padding-bottom:calc(6px + env(safe-area-inset-bottom))}
+  .iconbtn{min-width:48px; min-height:48px; display:flex; align-items:center; justify-content:center;
+    font-size:20px; color:var(--ink)}
+  .ttl{flex:1; font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .sub{font-size:12px; color:var(--ink-2); font-weight:400}
+  .pager{display:flex; gap:6px; justify-content:center; padding:10px; background:#000}
+  .dot{width:6px; height:6px; border-radius:3px; background:rgba(255,255,255,.35)}
+  .dot.on{width:20px; background:var(--accent)}
+  .cap{font-size:12px; color:var(--ink-2); padding:10px 16px 20px; background:#000; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Media viewer mockup">
+  <div class="bar top">
+    <div class="iconbtn">←</div>
+    <div class="ttl">Desert bloom, 6:04am<br><span class="sub">r/EarthPorn · 3 of 7</span></div>
+    <div class="iconbtn">⤓</div><div class="iconbtn">↗</div>
+  </div>
+  <div class="stage">
+    <div class="pic"></div>
+    <div class="hint">pinch · double-tap · drag down to dismiss</div>
+  </div>
+  <div class="pager" aria-hidden="true"><div class="dot"></div><div class="dot"></div><div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="bar bottom">
+    <div class="iconbtn">⟲</div><div class="iconbtn">⟳</div>
+    <div class="iconbtn">⤓</div><div class="iconbtn">↗</div><div class="iconbtn">▦</div>
+  </div>
+  <p class="cap">Viewer contract: enter via shared-element from the feed thumb · chrome auto-hides on scroll/zoom, single tap brings it back · drag-down anywhere dismisses (predictive-back path) · pager dots for galleries, swipe or arrows · download shows inline progress in its own slot, never a dialog.</p>
+</div>
+</body>
+</html>

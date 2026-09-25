@@ -1010,6 +1010,7 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option2BottomAppBar, option1);
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option4BottomAppBar, option2);
                 } else {
+                    navigationWrapper.setRailItemTitles(this, option1, option2);
                     navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
                         int itemId = item.getItemId();
                         if (itemId == R.id.navigation_rail_option_1) {
@@ -1053,6 +1054,7 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option3BottomAppBar, option3);
                     navigationWrapper.setOtherActivitiesContentDescription(this, navigationWrapper.option4BottomAppBar, option4);
                 } else {
+                    navigationWrapper.setRailItemTitles(this, option1, option2, option3, option4);
                     navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
                         int itemId = item.getItemId();
                         if (itemId == R.id.navigation_rail_option_1) {
@@ -1134,7 +1136,7 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
                     break;
                 }
                 case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_FAB_CHANGE_SORT_TYPE: {
-
+                    displaySortTypeBottomSheetFragment();
                     break;
                 }
                 case SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_FAB_CHANGE_POST_LAYOUT: {

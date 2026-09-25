@@ -10,7 +10,10 @@
         android:id="@+id/appbar_layout_view_subreddit_detail_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:background="?attr/colorSurface"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        app:elevation="0dp"
+        app:liftOnScroll="false">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar_layout_view_subreddit_detail_activity"
@@ -28,7 +31,7 @@
                 <pl.droidsonroids.gif.GifImageView
                     android:id="@+id/banner_image_view_view_subreddit_detail_activity"
                     android:layout_width="match_parent"
-                    android:layout_height="160dp"
+                    android:layout_height="@dimen/community_banner_height"
                     android:contentDescription="@string/content_description_banner_imageview"
                     android:scaleType="centerCrop" />
 
@@ -40,8 +43,8 @@
 
                     <pl.droidsonroids.gif.GifImageView
                         android:id="@+id/icon_gif_image_view_view_subreddit_detail_activity"
-                        android:layout_width="72dp"
-                        android:layout_height="72dp"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toTopOf="@id/subscriber_count_text_view_view_subreddit_detail_activity" />
@@ -64,7 +67,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        app:chipStrokeColor="#00000000"
+                        android:minHeight="@dimen/touch_target_min"
+                        app:chipStrokeColor="?attr/colorOutline"
                         app:layout_constraintStart_toEndOf="@id/icon_gif_image_view_view_subreddit_detail_activity"
                         app:layout_constraintTop_toBottomOf="@id/subreddit_name_text_view_view_subreddit_detail_activity"
                         app:layout_constraintBottom_toBottomOf="@id/icon_gif_image_view_view_subreddit_detail_activity" />
@@ -133,6 +137,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
+                android:background="?attr/colorSurface"
                 app:layout_collapseMode="pin"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
@@ -143,13 +148,16 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout_view_subreddit_detail_activity"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/feed_tab_height"
             android:layout_gravity="bottom"
-            app:layout_scrollFlags="scroll|enterAlways"
+            android:background="?attr/colorSurface"
             app:tabGravity="fill"
             app:tabMode="fixed"
-            app:tabIndicatorHeight="3dp"
-            app:tabRippleColor="?attr/colorControlHighlight"
+            app:tabIndicatorColor="?attr/colorPrimary"
+            app:tabIndicatorHeight="@dimen/space_2"
+            app:tabRippleColor="?attr/colorPrimaryContainer"
+            app:tabSelectedTextColor="?attr/colorPrimary"
+            app:tabTextColor="?attr/colorOnSurfaceVariant"
             app:tabUnboundedRipple="false" />
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -195,6 +203,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         android:visibility="gone"
-        android:contentDescription="@null" />
+        android:minWidth="@dimen/touch_target_min"
+        android:minHeight="@dimen/touch_target_min"
+        android:contentDescription="@string/action_sort" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

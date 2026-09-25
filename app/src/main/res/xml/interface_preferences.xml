@@ -31,9 +31,15 @@
         app:title="@string/settings_hide_fab_in_post_feed" />
 
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
-        app:defaultValue="false"
+        app:defaultValue="true"
         app:key="bottom_app_bar"
         app:title="@string/settings_enable_bottom_app_bar_title" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="true"
+        app:key="signal_navigation"
+        app:title="@string/settings_signal_navigation_title"
+        app:summary="@string/settings_signal_navigation_summary" />
 
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"

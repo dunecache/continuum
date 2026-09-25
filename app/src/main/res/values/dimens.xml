@@ -23,4 +23,27 @@
          the score's own width rather than dropping a button. Override per screen-size qualifier
          if a wider column is ever wanted on tablets. -->
     <dimen name="comment_score_min_width">64dp</dimen>
+
+    <dimen name="space_2">2dp</dimen>
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+
+    <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="signal_rail_width">2dp</dimen>
+    <dimen name="shape_corner_small">8dp</dimen>
+    <dimen name="shape_corner_medium">12dp</dimen>
+    <dimen name="shape_corner_large">16dp</dimen>
+    <dimen name="shape_corner_sheet">28dp</dimen>
+    <dimen name="divider_thickness">1dp</dimen>
+    <dimen name="navigation_item_min_height">64dp</dimen>
+    <dimen name="feed_tab_height">48dp</dimen>
+    <dimen name="community_banner_height">88dp</dimen>
+    <dimen name="navigation_icon_size">24dp</dimen>
+    <dimen name="navigation_indicator_width">40dp</dimen>
+    <dimen name="navigation_indicator_height">24dp</dimen>
+    <dimen name="content_max_width">720dp</dimen>
 </resources>

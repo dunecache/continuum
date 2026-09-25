@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Feed</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f4;
+    --surface: #ffffff;
+    --surface-2: #e9ece7;
+    --ink: #191c19;
+    --muted: #5f665f;
+    --accent: #2f6b57;
+    --accent-ink: #ffffff;
+    --accent-soft: #d9ebe2;
+    --line: #d7dbd5;
+    --media: #c7d1c8;
+    --media-2: #91a596;
+    --danger: #a33a3a;
+    --shadow: 0 1px 2px rgba(20, 30, 23, .08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101310;
+      --surface: #181c18;
+      --surface-2: #242a24;
+      --ink: #f0f3ee;
+      --muted: #b3bbb2;
+      --accent: #9ed1bd;
+      --accent-ink: #10271f;
+      --accent-soft: #23483b;
+      --line: #343b34;
+      --media: #33443a;
+      --media-2: #65806f;
+      --danger: #ffb4ab;
+      --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: #050605;
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: flex;
+    justify-content: center;
+  }
+  button, input { font: inherit; }
+  button { color: inherit; }
+  .phone {
+    width: min(100%, 412px);
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: clip;
+  }
+  .app-bar {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    min-height: 56px;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr) 48px 48px;
+    align-items: center;
+    padding-inline: 4px 4px;
+    background: color-mix(in srgb, var(--bg) 94%, transparent);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(14px);
+  }
+  .account, .icon-button {
+    width: 48px;
+    height: 48px;
+    border: 0;
+    background: transparent;
+    display: grid;
+    place-items: center;
+  }
+  .account-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .title { min-width: 0; }
+  .title strong { display: block; font-size: 17px; line-height: 1.2; }
+  .title span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .feed-tabs {
+    position: sticky;
+    top: 56px;
+    z-index: 4;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 6px 10px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .feed-tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    position: relative;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); font-weight: 700; }
+  .tab[aria-selected="true"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 10px;
+    bottom: -7px;
+    height: 2px;
+    background: var(--accent);
+  }
+  .signal-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px 8px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .signal-note::before { content: ""; width: 2px; height: 16px; background: var(--accent); }
+  .feed { display: flex; flex-direction: column; padding: 0 12px 20px; }
+  .post {
+    position: relative;
+    padding: 12px 12px 8px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .post.framed {
+    margin: 8px 0 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  .post.active::before {
+    content: "";
+    position: absolute;
+    inset-block: 12px;
+    inset-inline-start: 0;
+    width: 2px;
+    background: var(--accent);
+  }
+  .meta {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .meta b { color: var(--ink); font-weight: 650; }
+  .dot { opacity: .65; }
+  .post-title {
+    margin: 6px 0 8px;
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 680;
+  }
+  .post-body {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 8px;
+  }
+  .body-row { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 12px; align-items: start; }
+  .media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: var(--media);
+    min-height: 190px;
+  }
+  .media.compact { width: 88px; height: 88px; min-height: 0; }
+  .media::before, .media::after {
+    content: "";
+    position: absolute;
+    background: var(--media-2);
+    opacity: .72;
+  }
+  .media::before { width: 58%; height: 22%; inset-inline-start: 12%; inset-block-start: 24%; transform: skewX(-12deg); }
+  .media::after { width: 42%; height: 34%; inset-inline-end: 8%; inset-block-end: 10%; }
+  .media.compact::before { inset-inline-start: 14%; inset-block-start: 20%; }
+  .media.compact::after { inset-inline-end: 10%; inset-block-end: 12%; }
+  .media-label { position: absolute; inset-inline-start: 10px; inset-block-end: 8px; font-size: 11px; color: var(--ink); background: var(--surface); padding: 4px 7px; border-radius: 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .chip { padding: 4px 8px; border-radius: 7px; background: var(--surface-2); color: var(--muted); font-size: 11px; }
+  .actions { display: flex; align-items: center; min-height: 48px; margin-inline: -8px; }
+  .action {
+    min-width: 48px;
+    min-height: 48px;
+    border: 0;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .action.committed { color: var(--accent); font-weight: 700; }
+  .score { min-width: 48px; text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+  .spacer { flex: 1; }
+  .bottom-nav {
+    position: sticky;
+    bottom: 0;
+    z-index: 6;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    min-height: 68px;
+    padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+  .destination {
+    position: relative;
+    min-height: 60px;
+    border: 0;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .destination[aria-current="page"] { color: var(--accent); font-weight: 700; }
+  .destination[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    width: 40px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    z-index: -1;
+  }
+  .badge { position: absolute; inset-block-start: 4px; inset-inline-end: calc(50% - 24px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-size: 10px; }
+  .states, .spec {
+    margin: 16px 12px 28px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .states > summary, .spec > summary { min-height: 48px; display: flex; align-items: center; padding: 0 14px; font-weight: 700; cursor: pointer; }
+  .state-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: var(--line); border-top: 1px solid var(--line); }
+  .state { background: var(--surface); padding: 12px; }
+  .state strong { display: block; font-size: 13px; margin-bottom: 5px; }
+  .state p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+  .skeleton { height: 9px; border-radius: 5px; background: var(--surface-2); margin-top: 7px; }
+  .skeleton.short { width: 62%; }
+  .spec-body { padding: 0 14px 14px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+  .spec-body ul { margin: 0; padding-inline-start: 18px; }
+  .rtl-sample { margin-top: 12px; padding: 10px; border-inline-start: 2px solid var(--accent); background: var(--bg); color: var(--ink); }
+  .amoled { margin-top: 10px; padding: 10px; background: #000; color: #f4f4f4; border: 1px solid #303030; border-radius: 8px; }
+  @media (max-width: 360px) {
+    .post-title { font-size: 15px; }
+    .body-row { grid-template-columns: minmax(0, 1fr) 72px; }
+    .media.compact { width: 72px; height: 72px; }
+  }
+</style>
+</head>
+<body>
+<main class="phone" aria-label="Continuum Signal feed mockup">
+  <header class="app-bar">
+    <button class="account" aria-label="Open account switcher"><span class="account-mark"></span></button>
+    <div class="title"><strong>Home</strong><span>3 unread messages</span></div>
+    <button class="icon-button" aria-label="Search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+    </button>
+    <button class="icon-button" aria-label="Create post">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </button>
+  </header>
+  <nav class="feed-tabs" aria-label="Feed sources">
+    <button class="tab" aria-selected="true">Best</button>
+    <button class="tab" aria-selected="false">Hot</button>
+    <button class="tab" aria-selected="false">New</button>
+    <button class="tab" aria-selected="false">Top</button>
+    <button class="tab" aria-selected="false">r/androiddev</button>
+    <button class="tab" aria-selected="false">Multireddits</button>
+  </nav>
+  <div class="signal-note">Selected source is marked by a quiet semantic rail, not a permanent card.</div>
+  <section class="feed" aria-label="Example posts">
+    <article class="post active">
+      <div class="meta"><b>r/continuum</b><span class="dot">·</span><span>u/edgan</span><span class="dot">·</span><span>2h</span></div>
+      <div class="body-row">
+        <div>
+          <h2 class="post-title">A dense feed can still feel calm when hierarchy does the work</h2>
+          <div class="chips"><span class="chip">Discussion</span><span class="chip">Design</span></div>
+        </div>
+        <div class="media compact" aria-label="Image placeholder"><span class="media-label">Preview</span></div>
+      </div>
+      <div class="actions" aria-label="Post actions">
+        <button class="action committed" aria-label="Upvote, selected">▲</button><span class="score">4.2k</span><button class="action" aria-label="Downvote">▼</button><button class="action" aria-label="318 comments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H9l-4 4z"></path></svg><span>318</span></button><span class="spacer"></span><button class="action" aria-label="Save post"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"></path></svg></button><button class="action" aria-label="Share post"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2"></circle><circle cx="6" cy="12" r="2"></circle><circle cx="18" cy="19" r="2"></circle><path d="m8 11 8-5M8 13l8 5"></path></svg></button>
+      </div>
+    </article>
+    <article class="post framed">
+      <div class="meta"><b>r/androiddev</b><span class="dot">·</span><span>u/selene</span><span class="dot">·</span><span>5h</span><span class="dot">·</span><span>via link</span></div>
+      <h2 class="post-title">Material You works best when the product identity survives a changing palette</h2>
+      <p class="post-body">Tonal surfaces, quiet metadata, and motion carry the experience. The post remains the strongest object on screen.</p>
+      <div class="chips"><span class="chip">Guide</span><span class="chip">OC</span></div>
+      <div class="actions">
+        <button class="action" aria-label="Upvote">▲</button><span class="score">1.1k</span><button class="action" aria-label="Downvote">▼</button><button class="action" aria-label="96 comments">96 comments</button><span class="spacer"></span><button class="action committed" aria-label="Remove saved post, selected">Saved</button><button class="action" aria-label="Share post">Share</button>
+      </div>
+    </article>
+    <article class="post framed">
+      <div class="meta"><b>r/EarthPorn</b><span class="dot">·</span><span>u/hale</span><span class="dot">·</span><span>8h</span></div>
+      <h2 class="post-title">Media-first reserves its frame before the image arrives</h2>
+      <div class="media" aria-label="Reserved media preview"><span class="media-label">16:10 media frame</span></div>
+      <div class="actions">
+        <button class="action" aria-label="Upvote">▲</button><span class="score">22k</span><button class="action" aria-label="Downvote">▼</button><button class="action" aria-label="402 comments">402 comments</button><span class="spacer"></span><button class="action" aria-label="Save post">Save</button><button class="action" aria-label="Share post">Share</button>
+      </div>
+    </article>
+  </section>
+  <nav class="bottom-nav" aria-label="Primary navigation">
+    <button class="destination" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h14"></path></svg><span>Feed</span></button>
+    <button class="destination"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg><span>Search</span></button>
+    <button class="destination"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v12H8l-4 4z"></path><path d="M8 9h8M8 13h5"></path></svg><span>Inbox</span><span class="badge">3</span></button>
+    <button class="destination"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h6v6H4zM14 5h6v6h-6zM4 15h6v4H4zM14 15h6v4h-6z"></path></svg><span>Library</span></button>
+  </nav>
+  <details class="states" open>
+    <summary>Feed states</summary>
+    <div class="state-grid">
+      <div class="state"><strong>Loading</strong><p>Static tonal skeleton rows reserve exact title, media, and action geometry. There is no looping shimmer.</p><div class="skeleton short"></div><div class="skeleton"></div></div>
+      <div class="state"><strong>Empty or offline</strong><p>Offline keeps cached posts and adds an inline reconnect banner. No subscriptions uses a single explanation and a direct route to subscriptions or public feeds.</p></div>
+      <div class="state"><strong>Error</strong><p>Inline retry preserves the selected tab and scroll anchor. A full-screen error is reserved for a root host that has no usable cache.</p></div>
+    </div>
+  </details>
+  <details class="spec">
+    <summary>Build and behavior notes</summary>
+    <div class="spec-body">
+      <ul>
+        <li>Use RecyclerView, Paging 3, ConstraintLayout, MaterialToolbar, scrollable TabLayout, NavigationBarView, SwipeRefreshLayout, and Glide thumbnail preloading.</li>
+        <li>Touch <code>activity_main.xml</code>, <code>app_bar_main.xml</code>, <code>MainActivity.java</code>, compact/card_3 row families, and the navigation destination registry.</li>
+        <li>No new dependency. Removing root <code>animateLayoutChanges</code>, reserving media ratios, and moving color decisions to styles are required performance work.</li>
+        <li>Swipe levels, pull-to-refresh, tab reselect, rotation restoration, account-scoped sources, and direct media transitions remain intact.</li>
+        <li>Light and dark use the same roles. AMOLED substitutes true black for the base surface while retaining outline contrast. All geometry uses dp; all type uses scalable sp.</li>
+      </ul>
+      <div class="rtl-sample" dir="rtl"><strong>مثال RTL</strong> · مجتمع · كاتب · منذ ساعتين — الإجراء يبقى داخلaccessible هدف 48dp.</div>
+      <div class="amoled"><strong>AMOLED contract</strong><br>True-black background, one raised surface, no pure-black-on-black content.</div>
+    </div>
+  </details>
+</main>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Post detail + thread (Direction B)</title>
+<style>
+  :root{
+    --bg:#f4f2fa; --card:#faf9ff; --ink:#191423; --ink-2:#4d465e;
+    --accent:#4f3891; --accent-soft:#e4dcf8; --line:#d9d4e8;
+    --guide:#8f86b8; --surface:#ece9f5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101a; --card:#201c2e; --ink:#ece8f7; --ink-2:#b3abd0;
+      --accent:#cdbcf5; --accent-soft:#38315a; --line:#35314a;
+      --guide:#6f6694; --surface:#2b2640;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center}
+  .phone{width:100%; max-width:412px; background:var(--bg); color:var(--ink); min-height:100vh;
+    padding-bottom:110px; position:relative}
+  .topbar{display:flex; align-items:center; gap:0; padding:8px 4px; background:var(--bg);
+    border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5}
+  .topbar .t{flex:1; font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .iconbtn{width:48px; height:48px; display:flex; align-items:center; justify-content:center;
+    font-size:20px; color:var(--ink-2)}
+  .post{background:var(--card); border-bottom:1px solid var(--line); padding:14px 16px 8px}
+  .meta{font-size:12px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .meta b{font-weight:600}
+  .title{font-size:19px; font-weight:700; line-height:1.35; margin:6px 0}
+  .body{font-size:15px; line-height:1.55; color:var(--ink); margin-bottom:4px}
+  .chips{display:flex; gap:6px; margin:8px 0}
+  .chip{font-size:11px; padding:3px 8px; border-radius:6px; background:var(--surface); color:var(--ink-2)}
+  .actions{display:flex; align-items:center; margin:4px -8px 0}
+  .act{min-width:48px; min-height:48px; display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--ink-2); font-variant-numeric:tabular-nums}
+  .act.vote{font-size:18px}
+  .score{font-size:13px; font-weight:700; min-width:48px; text-align:center; font-variant-numeric:tabular-nums}
+  .sp{flex:1}
+  .threadbar{display:flex; align-items:center; gap:8px; padding:10px 16px; font-size:13px;
+    color:var(--ink-2); background:var(--bg); border-bottom:1px solid var(--line);
+    position:sticky; top:65px; z-index:4}
+  .threadbar .pill{background:var(--surface); border-radius:8px; padding:6px 10px; font-weight:600; color:var(--ink)}
+  .c{background:var(--bg); padding:10px 16px 10px 16px}
+  .c .row{border-left:2px solid var(--guide); padding-left:12px}
+  .c .row.d2{margin-left:14px}
+  .c .row.d3{margin-left:28px; opacity:.9}
+  .chead{display:flex; align-items:baseline; gap:6px; font-size:12px; color:var(--ink-2)}
+  .chead b{font-size:13px; color:var(--ink)}
+  .cscore{font-variant-numeric:tabular-nums; font-weight:700}
+  .ctime{margin-left:auto}
+  .cbody{font-size:14.5px; line-height:1.5; margin:4px 0}
+  .ctools{display:flex; margin:0 -8px}
+  .collapsed{margin:8px 16px; background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:10px 14px; font-size:13px; color:var(--ink-2); display:flex; gap:8px; align-items:center}
+  .collapsed .n{background:var(--accent-soft); color:var(--ink); border-radius:8px; padding:2px 8px;
+    font-weight:700; font-variant-numeric:tabular-nums}
+  .fab{position:fixed; bottom:24px; left:50%; transform:translateX(150px); width:56px; height:56px;
+    border-radius:18px; background:var(--accent); color:#fff; font-size:24px; display:flex;
+    align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,.3)}
+  @media (max-width:430px){ .fab{transform:none; left:auto; right:16px} }
+  @media (prefers-color-scheme: dark){ .fab{color:#241a4d} }
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Post detail mockup">
+  <div class="topbar">
+    <div class="iconbtn">←</div><div class="t">r/continuum · Comments</div>
+    <div class="iconbtn">⌕</div><div class="iconbtn">⋯</div>
+  </div>
+  <div class="post">
+    <div class="meta"><b>r/continuum</b> · u/edgan · 2h</div>
+    <div class="title">Detail header reads as source, not another card: full-bleed surface, larger title, body voice</div>
+    <div class="body">Post body in the content voice at 15sp/1.55. The boundary below — thread bar with count + sort — is the crisp post/thread split the audit asked for.</div>
+    <div class="chips"><span class="chip">Discussion</span></div>
+    <div class="actions">
+      <div class="act vote">↑</div><div class="score">4.2k</div><div class="act vote">↓</div>
+      <div class="act">☆</div><div class="act">↗</div><span class="sp"></span><div class="act">⤴ Reply</div>
+    </div>
+  </div>
+  <div class="threadbar"><span class="pill">318 comments</span><span>Best ▾</span><span class="sp" style="flex:1"></span><span> collapse all </span></div>
+  <div class="c"><div class="row">
+    <div class="chead"><b>u/selene</b><span class="cscore">1.2k</span><span class="ctime">2h</span></div>
+    <div class="cbody">Top-level comment. Header trims to author · score · time; flair (if any) sits under the name, never in the score lane.</div>
+    <div class="ctools"><div class="act vote">↑</div><div class="act vote">↓</div><div class="act">⤴</div><div class="act">⋯</div></div>
+    <div class="row d2">
+      <div class="chead"><b>u/hale</b><span class="cscore">214</span><span class="ctime">1h</span></div>
+      <div class="cbody">Nested reply. Guides are 2dp tonal lines; text column stops shrinking past level 4.</div>
+      <div class="ctools"><div class="act vote">↑</div><div class="act vote">↓</div><div class="act">⤴</div><div class="act">⋯</div></div>
+    </div>
+  </div></div>
+  <div class="collapsed"><span class="n">+43</span><span><b>u/quiet</b> · collapsed thread — tap to expand</span></div>
+  <div class="c"><div class="row">
+    <div class="chead"><b>u/moss</b><span class="cscore">96</span><span class="ctime">58m</span></div>
+    <div class="cbody">Toolbar keeps vote cluster + reply + overflow; save hides behind overflow on narrow rows.</div>
+    <div class="ctools"><div class="act vote">↑</div><div class="act vote">↓</div><div class="act">⤴</div><div class="act">⋯</div></div>
+  </div></div>
+  <div class="fab" aria-hidden="true">⇅</div>
+</div>
+</body>
+</html>

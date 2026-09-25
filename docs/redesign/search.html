@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Continuum Redesign — Search (Direction B)</title>
+<style>
+  :root{
+    --bg:#f4f2fa; --card:#faf9ff; --ink:#191423; --ink-2:#4d465e;
+    --accent:#4f3891; --line:#d9d4e8; --surface:#ece9f5;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12101a; --card:#201c2e; --ink:#ece8f7; --ink-2:#b3abd0;
+      --accent:#cdbcf5; --line:#35314a; --surface:#2b2640;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:#000;
+    display:flex; justify-content:center}
+  .phone{width:100%; max-width:412px; background:var(--bg); color:var(--ink); min-height:100vh; padding-bottom:40px}
+  .searchbar{display:flex; align-items:center; gap:0; padding:8px 4px 8px 8px; background:var(--card);
+    border-bottom:1px solid var(--line); position:sticky; top:0}
+  .back{width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--ink-2)}
+  .field{flex:1; font-size:17px; padding:12px 4px; color:var(--ink)}
+  .field span{color:var(--ink-2)}
+  .iconbtn{width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--ink-2)}
+  .scope{display:flex; align-items:center; gap:8px; padding:10px 16px; font-size:13px; border-bottom:1px solid var(--line)}
+  .scope b{color:var(--accent)}
+  .scope .pill{background:var(--surface); border-radius:8px; padding:6px 10px; color:var(--ink); font-weight:600}
+  .sec{font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-2); margin:14px 16px 8px;
+    display:flex} .sec a{margin-left:auto; text-transform:none; letter-spacing:0; color:var(--accent)}
+  .list{padding:0 12px; display:flex; flex-direction:column; gap:8px}
+  .row{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px;
+    display:flex; align-items:center; gap:12px; min-height:56px}
+  .row .q{flex:1; min-width:0}
+  .row .q1{font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .row .q2{font-size:12px; color:var(--ink-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .row .go{font-size:18px; color:var(--ink-2)}
+  .chips{display:flex; gap:8px; padding:0 16px; overflow-x:auto}
+  .chip{padding:10px 16px; border-radius:12px; background:var(--card); border:1px solid var(--line);
+    font-size:13px; white-space:nowrap; min-height:48px; display:flex; align-items:center}
+  .cap{font-size:12px; color:var(--ink-2); margin:14px 16px; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="phone" role="main" aria-label="Search mockup">
+  <div class="searchbar">
+    <div class="back">←</div>
+    <div class="field">material you<span>▏</span></div>
+    <div class="iconbtn">✕</div>
+  </div>
+  <div class="scope"><span>Searching</span><span class="pill">All of Reddit ▾</span></div>
+  <div class="sec">Recent <a>View all · Clear</a></div>
+  <div class="list">
+    <div class="row"><div class="q"><div class="q1">material you dynamic color</div><div class="q2">in r/androiddev</div></div><div class="go">↗</div></div>
+    <div class="row"><div class="q"><div class="q1">compact vs card layout density</div><div class="q2">everywhere</div></div><div class="go">↗</div></div>
+  </div>
+  <div class="sec">Trending</div>
+  <div class="chips"><div class="chip">Apollo alternatives</div><div class="chip">foldables</div><div class="chip">M3 Expressive</div></div>
+  <p class="cap">Entry contract: query + clear only in the bar (random/link/incognito move to overflow) · scope is one pill row · recents are static two-line rows (no marquee) · trending is horizontal chips, not cards · single list, autocomplete inline · every icon labeled, 48dp.</p>
+</div>
+</body>
+</html>
