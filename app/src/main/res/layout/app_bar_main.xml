@@ -63,7 +63,7 @@
     <include
         layout="@layout/bottom_app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/navigation_item_min_height"
         android:layout_gravity="bottom" />
 
     <!--<LinearLayout

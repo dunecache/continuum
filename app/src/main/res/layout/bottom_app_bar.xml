@@ -5,7 +5,7 @@
     android:id="@+id/bottom_app_bar_bottom_app_bar"
     style="@style/Widget.Continuum.BottomBar"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/navigation_item_min_height"
     android:visibility="gone"
     app:fabAlignmentMode="end"
     app:paddingBottomSystemWindowInsets="false"
@@ -14,7 +14,7 @@
     <LinearLayout
         android:id="@+id/linear_layout_bottom_app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="horizontal"
         android:weightSum="4">
 

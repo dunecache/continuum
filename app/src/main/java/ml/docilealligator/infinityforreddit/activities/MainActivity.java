@@ -446,12 +446,12 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                         }
 
                         if (navigationWrapper.bottomAppBar != null) {
-                            navigationWrapper.linearLayoutBottomAppBar.setPadding(
-                                    navigationWrapper.linearLayoutBottomAppBar.getPaddingLeft(),
-                                    navigationWrapper.linearLayoutBottomAppBar.getPaddingTop(),
-                                    navigationWrapper.linearLayoutBottomAppBar.getPaddingRight(),
-                                    allInsets.bottom
-                            );
+                            // The bar is a fixed-height row, so the system inset has to go on the
+                            // bar's own margin. Padding the bar's child instead would grow the bar's
+                            // measured height, and a bar taller than its row draws over the feed.
+                            setMargins(navigationWrapper.bottomAppBar,
+                                    BaseActivity.IGNORE_MARGIN, BaseActivity.IGNORE_MARGIN,
+                                    BaseActivity.IGNORE_MARGIN, allInsets.bottom);
                         }
 
                         setMargins(binding.includedAppBar.toolbar,
