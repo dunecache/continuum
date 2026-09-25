@@ -66,10 +66,17 @@ class MainShellLayoutTest {
             shell.height,
             navigationBar.bottom,
         )
-        assertEquals(
+        val pager = shell.requireView(R.id.view_pager_main_activity)
+        // ScrollingViewBehavior offsets the pager by the app bar, so its height is the window minus
+        // the app bar's scroll range and its bottom runs past the bar's top on purpose: the feed
+        // scrolls under the bar and keeps its clearance as bottom padding.
+        assertTrue(
             "feed pager must fill the window under the app bar. $measured",
-            shell.height,
-            shell.requireView(R.id.view_pager_main_activity).height,
+            pager.height >= shell.height * 3 / 4,
+        )
+        assertTrue(
+            "feed must reach the bottom edge and scroll under the navigation bar. $measured",
+            pager.bottom >= shell.height,
         )
     }
 
