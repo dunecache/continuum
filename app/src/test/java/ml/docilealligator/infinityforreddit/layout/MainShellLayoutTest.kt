@@ -7,7 +7,6 @@ import android.view.View
 import android.view.View.MeasureSpec
 import android.widget.FrameLayout
 import com.github.takahirom.roborazzi.captureRoboImage
-import java.io.File
 import ml.docilealligator.infinityforreddit.R
 import ml.docilealligator.infinityforreddit.font.FontFamily
 import ml.docilealligator.infinityforreddit.font.FontStyle
@@ -56,7 +55,7 @@ class MainShellLayoutTest {
             MeasureSpec.makeMeasureSpec(SHELL_HEIGHT_PX, MeasureSpec.EXACTLY),
         )
         root.layout(0, 0, SHELL_WIDTH_PX, SHELL_HEIGHT_PX)
-        root.captureRoboImage(filePath = File(REPORT_PATH))
+        root.captureRoboImage(filePath = REPORT_PATH)
 
         val shell = root.findViewById<View>(R.id.coordinator_layout_main_activity)
         val appBar = root.findViewById<View>(R.id.appbar_layout_main_activity)
