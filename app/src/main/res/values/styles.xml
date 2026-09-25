@@ -203,7 +203,7 @@
         <item name="android:textColor">?attr/primaryTextColor</item>
     </style>
 
-    <style name="Widget.Continuum.PostCard" parent="Widget.Material3.CardView">
+    <style name="Widget.Continuum.PostCard" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/colorSurfaceContainer</item>
         <item name="cardCornerRadius">@dimen/shape_corner_medium</item>
         <item name="cardElevation">0dp</item>
