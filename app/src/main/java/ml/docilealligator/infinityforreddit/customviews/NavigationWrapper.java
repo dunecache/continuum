@@ -79,7 +79,11 @@ public class NavigationWrapper {
             option2BottomAppBar.setIconTint(bottomAppBarIconColor);
             option3BottomAppBar.setIconTint(bottomAppBarIconColor);
             option4BottomAppBar.setIconTint(bottomAppBarIconColor);
-            bottomAppBar.setBackgroundTint(ColorStateList.valueOf(bottomAppBarBackgroundColor));
+            // A picked bar colour still wins; the untouched default does not paint over the theme's
+            // surface, which is what made the bar a slab of a different colour above the feed.
+            if (customThemeWrapper.isBottomAppBarBackgroundColorCustomized()) {
+                bottomAppBar.setBackgroundTint(ColorStateList.valueOf(bottomAppBarBackgroundColor));
+            }
         } else {
             navigationRailView.setBackgroundColor(bottomAppBarBackgroundColor);
             applyMenuItemTheme(navigationRailView.getMenu(), bottomAppBarIconColor);

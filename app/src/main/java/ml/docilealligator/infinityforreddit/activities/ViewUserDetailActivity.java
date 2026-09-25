@@ -418,6 +418,15 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
                                 allInsets.right,
                                 BaseActivity.IGNORE_MARGIN);
 
+                        // The pinned toolbar already holds the status bar inset, so the cover has to
+                        // start below it as well: left alone it began at y=0 and the status bar sat
+                        // on top of the image.
+                        setMargins(binding.bannerImageViewViewUserDetailActivity,
+                                BaseActivity.IGNORE_MARGIN,
+                                allInsets.top,
+                                BaseActivity.IGNORE_MARGIN,
+                                BaseActivity.IGNORE_MARGIN);
+
                         binding.tabLayoutViewUserDetailActivity.setPadding(allInsets.left, 0, allInsets.right, 0);
 
                         return insets;

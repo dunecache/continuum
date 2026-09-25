@@ -157,6 +157,17 @@ public class CustomThemeWrapper {
                 getDefaultColor("#000000", "#FFFFFF", "#FFFFFF"));
     }
 
+    /**
+     * Whether the user actually picked a bottom app bar colour, as opposed to inheriting the
+     * built-in default. The bar only paints itself with {@link #getBottomAppBarBackgroundColor()}
+     * when this is true: the default is a shade chosen for the legacy bar, and on the persistent
+     * global bar it read as a slab of a different colour hanging over the feed.
+     */
+    public boolean isBottomAppBarBackgroundColorCustomized() {
+        return getThemeSharedPreferences().contains(
+                CustomThemeSharedPreferencesUtils.BOTTOM_APP_BAR_BACKGROUND_COLOR);
+    }
+
     public int getPostIconAndInfoColor() {
         return getThemeSharedPreferences().getInt(CustomThemeSharedPreferencesUtils.POST_ICON_AND_INFO_COLOR,
                 getDefaultColor("#8A000000", "#B3FFFFFF", "#B3FFFFFF"));

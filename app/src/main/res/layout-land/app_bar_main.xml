@@ -43,6 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/feed_tab_height"
             android:layout_gravity="bottom"
+            app:layout_scrollFlags="scroll|enterAlways"
             android:background="?attr/colorSurface"
             app:tabGravity="fill"
             app:tabIndicatorColor="?attr/colorPrimary"

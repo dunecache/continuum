@@ -218,7 +218,7 @@
 
     <style name="Widget.Continuum.BottomBar" parent="Widget.Material3.BottomAppBar">
         <item name="android:minHeight">@dimen/navigation_item_min_height</item>
-        <item name="backgroundTint">?attr/colorSurfaceContainer</item>
+        <item name="backgroundTint">?attr/colorSurface</item>
         <item name="elevation">0dp</item>
     </style>
 

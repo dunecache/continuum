@@ -364,6 +364,15 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                                 allInsets.right,
                                 BaseActivity.IGNORE_MARGIN);
 
+                        // The pinned toolbar already holds the status bar inset, so the cover has to
+                        // start below it as well: left alone it began at y=0 and the status bar sat
+                        // on top of the image.
+                        setMargins(binding.bannerImageViewViewSubredditDetailActivity,
+                                BaseActivity.IGNORE_MARGIN,
+                                allInsets.top,
+                                BaseActivity.IGNORE_MARGIN,
+                                BaseActivity.IGNORE_MARGIN);
+
                         binding.tabLayoutViewSubredditDetailActivity.setPadding(allInsets.left, 0, allInsets.right, 0);
 
                         return insets;

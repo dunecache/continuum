@@ -2,14 +2,17 @@ package ml.docilealligator.infinityforreddit.layout
 
 import android.app.Activity
 import android.app.Application
+import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import com.github.takahirom.roborazzi.captureRoboImage
 import java.io.File
 import ml.docilealligator.infinityforreddit.R
+import ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
 import ml.docilealligator.infinityforreddit.font.FontFamily
 import ml.docilealligator.infinityforreddit.font.FontStyle
 import org.junit.Assert.assertEquals
@@ -53,6 +56,10 @@ class MainShellLayoutTest {
         val navigationBar = shell.requireView(R.id.bottom_app_bar_bottom_app_bar)
         // bindOptionDrawableResource() shows the bar at runtime; it ships GONE.
         navigationBar.visibility = View.VISIBLE
+        val feedItem = shell.requireView(R.id.option_1_bottom_app_bar) as SignalNavigationItemView
+        // setBottomAppBarContentDescription() labels the items at runtime; the geometry below only
+        // means anything once a label is there to be clipped.
+        feedItem.setLabel("Feed")
         val measured = measure(shell, "phone")
 
         val rowHeight = shell.resources.getDimensionPixelSize(R.dimen.navigation_item_min_height)
@@ -66,6 +73,12 @@ class MainShellLayoutTest {
             shell.height,
             navigationBar.bottom,
         )
+        val label = requireNotNull(feedItem.findTextView()) { "navigation item has no label view" }
+        val labelBounds = boundsWithin(label, feedItem)
+        assertTrue(
+            "navigation label must fit inside its row; label=$labelBounds row=0..${feedItem.height}. $measured",
+            labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height,
+        )
         val pager = shell.requireView(R.id.view_pager_main_activity)
         // ScrollingViewBehavior offsets the pager by the app bar, so its height is the window minus
         // the app bar's scroll range and its bottom runs past the bar's top on purpose: the feed
@@ -78,6 +91,29 @@ class MainShellLayoutTest {
             "feed must reach the bottom edge and scroll under the navigation bar. $measured",
             pager.bottom >= shell.height,
         )
+    }
+
+    private fun View.findTextView(): TextView? {
+        if (this is TextView) {
+            return this
+        }
+        if (this !is ViewGroup) {
+            return null
+        }
+        for (i in 0 until childCount) {
+            getChildAt(i).findTextView()?.let { return it }
+        }
+        return null
+    }
+
+    private fun boundsWithin(view: View, ancestor: View): Rect {
+        val bounds = Rect(0, 0, view.width, view.height)
+        var current: View = view
+        while (current !== ancestor) {
+            bounds.offset(current.left, current.top)
+            current = current.parent as View
+        }
+        return bounds
     }
 
     @Test

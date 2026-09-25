@@ -11,37 +11,53 @@
     app:paddingBottomSystemWindowInsets="false"
     tools:ignore="BottomAppBar">
 
-    <LinearLayout
-        android:id="@+id/linear_layout_bottom_app_bar"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:weightSum="4">
+        android:layout_height="match_parent">
 
-        <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
-            android:id="@+id/option_1_bottom_app_bar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+        <LinearLayout
+            android:id="@+id/linear_layout_bottom_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="4">
 
-        <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
-            android:id="@+id/option_2_bottom_app_bar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
+                android:id="@+id/option_1_bottom_app_bar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
-        <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
-            android:id="@+id/option_3_bottom_app_bar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
+                android:id="@+id/option_2_bottom_app_bar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
-        <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
-            android:id="@+id/option_4_bottom_app_bar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
+                android:id="@+id/option_3_bottom_app_bar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
-    </LinearLayout>
+            <ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
+                android:id="@+id/option_4_bottom_app_bar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+        <!--
+          The bar now shares the app's surface, so a hairline is what separates it from the feed
+          scrolling underneath. A tonal slab read as a hover highlight instead of a navigation bar.
+        -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_thickness"
+            android:layout_gravity="top"
+            android:background="?attr/colorOutlineVariant" />
+
+    </FrameLayout>
 
 </com.google.android.material.bottomappbar.BottomAppBar>
