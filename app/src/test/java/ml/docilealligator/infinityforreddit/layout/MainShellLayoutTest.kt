@@ -28,8 +28,10 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
-// 411dp is below the sw600dp threshold, so this picks the phone shell.
-private const val PHONE_QUALIFIERS = "w411dp-h891dp-xxhdpi"
+// 411dp is below the sw600dp threshold, so this picks the phone shell. `night` makes the render use
+// the dark palette, because dark-on-dark text in a screenshot artifact is indistinguishable from no
+// text at all.
+private const val PHONE_QUALIFIERS = "w411dp-h891dp-xxhdpi-night"
 private const val TABLET_QUALIFIERS = "sw600dp-w1280dp-h800dp-xhdpi"
 private const val REPORT_DIR = "build/reports/shell"
 
@@ -77,10 +79,16 @@ class MainShellLayoutTest {
             navigationBar.bottom,
         )
         val label = requireNotNull(feedItem.findTextView()) { "navigation item has no label view" }
+        assertEquals("label must carry the destination's name", "Feed", label.text.toString())
+        assertEquals(
+            "label must be visible at the default font scale. $measured",
+            View.VISIBLE,
+            label.visibility,
+        )
         val labelBounds = boundsWithin(label, feedItem)
         assertTrue(
             "navigation label must fit inside its row; label=$labelBounds row=0..${feedItem.height}. $measured",
-            labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height,
+            labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height && labelBounds.height() > 0,
         )
         val pager = shell.requireView(R.id.view_pager_main_activity)
         // ScrollingViewBehavior offsets the pager by the app bar, so its height is the window minus
