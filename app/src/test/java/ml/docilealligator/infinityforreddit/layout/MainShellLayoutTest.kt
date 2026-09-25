@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.color.MaterialColors
 import java.io.File
 import ml.docilealligator.infinityforreddit.R
 import ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
@@ -90,6 +92,21 @@ class MainShellLayoutTest {
             "navigation label must fit inside its row; label=$labelBounds row=0..${feedItem.height}. $measured",
             labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height && labelBounds.height() > 0,
         )
+        // Robolectric will not rasterise the text, so "it has ink" has to be argued rather than
+        // measured: a label in the bar's own colour is invisible no matter that it is laid out well.
+        val barColour = MaterialColors.getColor(
+            navigationBar,
+            com.google.android.material.R.attr.colorSurface,
+        )
+        val labelColour = label.currentTextColor
+        assertTrue("navigation label must not be transparent", Color.alpha(labelColour) > 0)
+        assertTrue(
+            "navigation label (#%06X) must contrast with the bar (#%06X)".format(
+                labelColour and 0xFFFFFF,
+                barColour and 0xFFFFFF,
+            ),
+            colourDistance(labelColour, barColour) > 24,
+        )
         val pager = shell.requireView(R.id.view_pager_main_activity)
         // ScrollingViewBehavior offsets the pager by the app bar, so its height is the window minus
         // the app bar's scroll range and its bottom runs past the bar's top on purpose: the feed
@@ -128,6 +145,14 @@ class MainShellLayoutTest {
                 labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height,
             )
         }
+    }
+
+    /** Rough perceptual distance; enough to catch "the label is the bar's own colour". */
+    private fun colourDistance(a: Int, b: Int): Int {
+        val dr = Color.red(a) - Color.red(b)
+        val dg = Color.green(a) - Color.green(b)
+        val db = Color.blue(a) - Color.blue(b)
+        return (dr * dr + dg * dg + db * db) / 3
     }
 
     private fun View.findTextView(): TextView? {
