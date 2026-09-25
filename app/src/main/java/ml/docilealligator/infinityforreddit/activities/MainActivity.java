@@ -726,7 +726,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 break;
             }
             case SIGNAL_OPTION_LIBRARY: {
-                binding.drawerLayout.open();
+                Intent intent = new Intent(this, ViewUserDetailActivity.class);
+                intent.putExtra(ViewUserDetailActivity.EXTRA_USER_NAME_KEY, accountName);
+                startActivity(intent);
                 break;
             }
             case SIGNAL_OPTION_SAVED: {
@@ -842,7 +844,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             case SIGNAL_OPTION_FEED:
                 return R.drawable.ic_home_day_night_24dp;
             case SIGNAL_OPTION_LIBRARY:
-                return R.drawable.ic_multi_reddit_day_night_24dp;
+                return R.drawable.ic_account_circle_day_night_24dp;
             case SIGNAL_OPTION_SAVED:
                 return R.drawable.ic_bookmark_day_night_24dp;
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SUBSCRIPTIONS:
