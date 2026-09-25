@@ -22,6 +22,11 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
+// 411dp is below the sw600dp threshold, so this picks the phone shell.
+private const val PHONE_QUALIFIERS = "w411dp-h891dp-xxhdpi"
+private const val TABLET_QUALIFIERS = "sw600dp-w1280dp-h800dp-xhdpi"
+private const val REPORT_DIR = "build/reports/shell"
+
 /**
  * Measures the MainActivity shell the way the device does, without an emulator.
  *
@@ -145,12 +150,5 @@ class MainShellLayoutTest {
                 append(describe(view.getChildAt(i), depth + 1))
             }
         }
-    }
-
-    private companion object {
-        // 411dp is below the sw600dp threshold, so this picks the phone shell.
-        const val PHONE_QUALIFIERS = "w411dp-h891dp-xxhdpi"
-        const val TABLET_QUALIFIERS = "sw600dp-w1280dp-h800dp-xhdpi"
-        const val REPORT_DIR = "build/reports/shell"
     }
 }
