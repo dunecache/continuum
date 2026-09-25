@@ -95,7 +95,9 @@ class MainShellLayoutTest {
         repeat(depth) { append("  ") }
         append(view.javaClass.simpleName)
         if (view.id != View.NO_ID) {
-            append(" #").append(view.resources.getResourceEntryName(view.id))
+            // Framework ids (android.R.id.*) are not in the app's resource table.
+            val name = runCatching { view.resources.getResourceEntryName(view.id) }.getOrNull()
+            append(if (name != null) " #$name" else " #0x${Integer.toHexString(view.id)}")
         }
         if (view is ViewGroup) {
             append(" children=").append(view.childCount)
