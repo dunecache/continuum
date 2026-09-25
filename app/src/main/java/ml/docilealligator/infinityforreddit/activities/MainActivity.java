@@ -599,7 +599,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             CoordinatorLayout.LayoutParams barParams =
                     (CoordinatorLayout.LayoutParams) navigationWrapper.bottomAppBar.getLayoutParams();
             barParams.gravity = Gravity.BOTTOM;
-            barParams.anchorId = View.NO_ID;
+            barParams.setAnchorId(View.NO_ID);
+            barParams.setAnchorGravity(0);
             navigationWrapper.bottomAppBar.setLayoutParams(barParams);
         }
 
@@ -607,11 +608,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 (CoordinatorLayout.LayoutParams) navigationWrapper.floatingActionButton.getLayoutParams();
         fabParams.gravity = Gravity.BOTTOM | Gravity.END;
         if (navigationWrapper.bottomAppBar == null) {
-            fabParams.anchorId = View.NO_ID;
-            fabParams.anchorGravity = 0;
+            fabParams.setAnchorId(View.NO_ID);
+            fabParams.setAnchorGravity(0);
         } else {
-            fabParams.anchorId = navigationWrapper.bottomAppBar.getId();
-            fabParams.anchorGravity = Gravity.TOP | Gravity.END;
+            fabParams.setAnchorId(navigationWrapper.bottomAppBar.getId());
+            fabParams.setAnchorGravity(Gravity.TOP | Gravity.END);
         }
         navigationWrapper.floatingActionButton.setLayoutParams(fabParams);
     }
