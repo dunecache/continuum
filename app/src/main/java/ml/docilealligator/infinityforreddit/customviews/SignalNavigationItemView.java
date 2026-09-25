@@ -122,7 +122,7 @@ public final class SignalNavigationItemView extends LinearLayout {
         if (getContext().getTheme().resolveAttribute(attribute, value, true)
                 && value.type >= TypedValue.TYPE_FIRST_DIMENSION
                 && value.type <= TypedValue.TYPE_LAST_DIMENSION) {
-            return value.float;
+            return value.data;
         }
         return fallback;
     }
