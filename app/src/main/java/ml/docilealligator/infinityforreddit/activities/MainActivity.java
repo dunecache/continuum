@@ -62,7 +62,9 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -183,6 +185,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private static final int SIGNAL_OPTION_FEED = Integer.MIN_VALUE;
     private static final int SIGNAL_OPTION_LIBRARY = Integer.MIN_VALUE + 1;
     private static final int SIGNAL_OPTION_SAVED = Integer.MIN_VALUE + 2;
+    /** Held so the Inbox badge can be applied when the bar binds, not only when the count changes. */
+    private int primaryNavigationInboxCount;
 
     @SuppressWarnings("NullAway.Init")
     MultiRedditViewModel multiRedditViewModel;
@@ -408,7 +412,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                         binding.navigationViewMainActivity.setPadding(allInsets.left, 0, 0, 0);
 
                         if (navigationWrapper.navigationRailView == null) {
-                            if (navigationWrapper.bottomAppBar.getVisibility() != View.VISIBLE) {
+                            // Whichever bar is on screen, the FAB docks to it: anchored, its bottom
+                            // margin is what keeps it above the system inset rather than in it.
+                            if (navigationWrapper.bottomAppBar.getVisibility() != View.VISIBLE
+                                    && !isPrimaryNavigationVisible()) {
                                 setMargins(navigationWrapper.floatingActionButton,
                                         BaseActivity.IGNORE_MARGIN,
                                         BaseActivity.IGNORE_MARGIN,
@@ -451,6 +458,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                         // hovering over the feed instead of a bar attached to the screen edge.
                         NavigationWrapper.applyBottomInset(navigationWrapper.bottomAppBar,
                                 allInsets.bottom);
+                        applyPrimaryNavigationBottomInset(allInsets.bottom);
 
                         setMargins(binding.includedAppBar.toolbar,
                                 allInsets.left,
@@ -602,14 +610,22 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             navigationWrapper.bottomAppBar.setLayoutParams(barParams);
         }
 
+        // The FAB rides whichever bar is on screen. The navigation bar is absent from the
+        // landscape and sw600dp shells, where the rail takes over, which is why the anchor is
+        // resolved from the binding rather than assumed.
+        View fabAnchor = binding.includedAppBar.bottomNavigationMainActivity != null
+                && showSignalNavigation
+                ? binding.includedAppBar.bottomNavigationMainActivity
+                : navigationWrapper.bottomAppBar;
+
         CoordinatorLayout.LayoutParams fabParams =
                 (CoordinatorLayout.LayoutParams) navigationWrapper.floatingActionButton.getLayoutParams();
         fabParams.gravity = Gravity.BOTTOM | Gravity.END;
-        if (navigationWrapper.bottomAppBar == null) {
+        if (fabAnchor == null) {
             fabParams.setAnchorId(View.NO_ID);
             fabParams.anchorGravity = 0;
         } else {
-            fabParams.setAnchorId(navigationWrapper.bottomAppBar.getId());
+            fabParams.setAnchorId(fabAnchor.getId());
             fabParams.anchorGravity = Gravity.TOP | Gravity.END;
         }
         navigationWrapper.floatingActionButton.setLayoutParams(fabParams);
@@ -899,6 +915,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
     @ExperimentalBadgeUtils
     private void bindSignalNavigation() {
+        if (binding.includedAppBar.bottomNavigationMainActivity != null) {
+            bindPrimaryNavigation();
+            return;
+        }
+
         int option1 = SIGNAL_OPTION_FEED;
         int option2 = SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SEARCH;
         int option3 = accountName.equals(Account.ANONYMOUS_ACCOUNT)
@@ -950,6 +971,122 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             });
         }
         navigationWrapper.setActiveItem(1);
+    }
+
+    /** The five-destination bar, when this layout variant has one and it is the bar in use. */
+    private boolean isPrimaryNavigationVisible() {
+        BottomNavigationView navigation = binding.includedAppBar.bottomNavigationMainActivity;
+        return navigation != null && navigation.getVisibility() == View.VISIBLE;
+    }
+
+    /**
+     * The same inset treatment the legacy bar gets: the container's own padding takes the inset, so
+     * its surface reaches the bottom edge of the screen while the five destinations stay one row
+     * tall above the gesture bar or the 3-button buttons. No height is set, because
+     * BottomNavigationView already counts its padding into the height it measures, and forcing one
+     * here would clamp the row to the minimum height instead of the height its content needs.
+     */
+    private void applyPrimaryNavigationBottomInset(int bottomInset) {
+        BottomNavigationView navigation = binding.includedAppBar.bottomNavigationMainActivity;
+        if (navigation == null) {
+            return;
+        }
+        ViewGroup.LayoutParams layoutParams = navigation.getLayoutParams();
+        if (layoutParams instanceof ViewGroup.MarginLayoutParams marginParams
+                && marginParams.bottomMargin != 0) {
+            marginParams.bottomMargin = 0;
+            navigation.setLayoutParams(layoutParams);
+        }
+        int inset = Math.max(0, bottomInset);
+        if (navigation.getPaddingBottom() != inset) {
+            navigation.setPadding(navigation.getPaddingLeft(), navigation.getPaddingTop(),
+                    navigation.getPaddingRight(), inset);
+        }
+    }
+
+    /**
+     * The five primary destinations: Home, Inbox, Account, Search, Settings.
+     *
+     * <p>Each destination is an Activity, which is what this app has always done, so the shell hosts
+     * exactly one of them (Home) and the other four open a screen on top of it. Two consequences are
+     * worth stating rather than papering over: the bar is only on screen while Home is showing, so
+     * Home is the selected destination whenever it is visible; and the reselect contract can only be
+     * honoured for Home, because a reselect of another tab happens on a screen where the bar is not
+     * present. Making the other four behave the way a single-host tab bar does means hosting them as
+     * Fragments in this shell, which is a navigation migration rather than a bar restyle.
+     */
+    @ExperimentalBadgeUtils
+    private void bindPrimaryNavigation() {
+        BottomNavigationView navigation = binding.includedAppBar.bottomNavigationMainActivity;
+        if (navigationWrapper.bottomAppBar != null) {
+            navigationWrapper.bottomAppBar.setVisibility(View.GONE);
+        }
+        navigation.setVisibility(View.VISIBLE);
+
+        // Checked before the listener goes on: the shell is on Home when it binds, and a listener
+        // that fired here would scroll the feed before there is a feed to scroll.
+        navigation.setSelectedItemId(R.id.navigation_bottom_home);
+        navigation.setOnItemSelectedListener(item -> {
+            primaryNavigationAction(item.getItemId());
+            return true;
+        });
+        navigation.setOnItemReselectedListener(item -> {
+            if (item.getItemId() == R.id.navigation_bottom_home && sectionsPagerAdapter != null) {
+                sectionsPagerAdapter.goBackToTop();
+            }
+        });
+        setPrimaryNavigationInboxCount(primaryNavigationInboxCount);
+    }
+
+    private void primaryNavigationAction(int itemId) {
+        if (itemId == R.id.navigation_bottom_home) {
+            if (sectionsPagerAdapter != null) {
+                sectionsPagerAdapter.goBackToTop();
+            }
+        } else if (itemId == R.id.navigation_bottom_inbox) {
+            // Anonymous use has no inbox to read: the same slot opens locally saved posts, the way
+            // the bar did before Account took the profile screen's place.
+            if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                Intent intent = new Intent(this, HistoryActivity.class);
+                intent.putExtra(HistoryActivity.EXTRA_READ_POST_TYPE,
+                        ReadPostType.ANONYMOUS_SAVED_POSTS);
+                startActivity(intent);
+            } else {
+                startActivity(new Intent(this, InboxActivity.class));
+            }
+        } else if (itemId == R.id.navigation_bottom_account) {
+            if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                startActivity(new Intent(this, LoginActivity.class));
+            } else {
+                Intent intent = new Intent(this, ViewUserDetailActivity.class);
+                intent.putExtra(ViewUserDetailActivity.EXTRA_USER_NAME_KEY, accountName);
+                startActivity(intent);
+            }
+        } else if (itemId == R.id.navigation_bottom_search) {
+            startActivity(new Intent(this, SearchActivity.class));
+        } else if (itemId == R.id.navigation_bottom_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+        }
+    }
+
+    @ExperimentalBadgeUtils
+    private void setPrimaryNavigationInboxCount(int inboxCount) {
+        BottomNavigationView navigation = binding.includedAppBar.bottomNavigationMainActivity;
+        if (navigation == null) {
+            return;
+        }
+        if (inboxCount <= 0) {
+            navigation.removeBadge(R.id.navigation_bottom_inbox);
+            return;
+        }
+        BadgeDrawable badge = navigation.getOrCreateBadge(R.id.navigation_bottom_inbox);
+        badge.setVisible(true);
+        // A count nobody can act on is noise past a hundred: the inbox is read in the app, not
+        // counted from a badge.
+        badge.setMaxCharacterCount(4);
+        badge.setNumber(inboxCount);
+        badge.setBackgroundColor(customThemeWrapper.getColorAccent());
+        badge.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
     }
 
     // Builds the bottom app bar options and FAB. Split out of bindView() so it can be re-run
@@ -1725,11 +1862,16 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     }
 
     @ExperimentalBadgeUtils
+    @ExperimentalBadgeUtils
     private void setInboxCount(int inboxCount) {
         if (adapter != null) {
             adapter.setInboxCount(inboxCount);
         }
         navigationWrapper.setInboxCount(this, inboxCount);
+        // The count can arrive before the bar is bound, so it is held here and applied again when
+        // the bar is built rather than only when the value changes.
+        primaryNavigationInboxCount = inboxCount;
+        setPrimaryNavigationInboxCount(inboxCount);
     }
 
     @Override

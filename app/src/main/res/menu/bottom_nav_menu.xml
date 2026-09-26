@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The app's primary navigation, in reading order. Mirroring in RTL is the menu view's job, so the
+  order here is never reversed by hand.
+
+  The icons are selectors, not tints: the selected destination shows the filled glyph from the
+  existing icon family and the unselected one shows its outlined counterpart, so a selected tab is
+  distinguishable by shape as well as by colour.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_bottom_home"
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/navigation_home" />
+
+    <item
+        android:id="@+id/navigation_bottom_inbox"
+        android:icon="@drawable/ic_nav_inbox"
+        android:title="@string/navigation_inbox" />
+
+    <item
+        android:id="@+id/navigation_bottom_account"
+        android:icon="@drawable/ic_nav_account"
+        android:title="@string/navigation_account" />
+
+    <!-- Search has one glyph: a magnifier has no filled counterpart that reads differently at
+         24dp, so it is the one destination whose icon does not change shape when selected. -->
+    <item
+        android:id="@+id/navigation_bottom_search"
+        android:icon="@drawable/ic_search_day_night_24dp"
+        android:title="@string/navigation_search" />
+
+    <item
+        android:id="@+id/navigation_bottom_settings"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="@string/navigation_settings" />
+
+</menu>

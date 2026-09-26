@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Selected destination reads as on-secondary-container on the active indicator's
+  secondary-container pill; everything else is on-surface-variant. Both are theme roles, so the pair
+  follows a wallpaper-derived scheme as readily as the static one.
+-->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:color="?attr/colorOnSecondaryContainer"
+        android:state_checked="true" />
+    <item android:color="?attr/colorOnSurfaceVariant" />
+</selector>

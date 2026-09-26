@@ -14,7 +14,9 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.bottomappbar.BottomAppBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.navigation.NavigationBarView
 import java.io.File
 import kotlin.math.roundToInt
 import ml.docilealligator.infinityforreddit.R
@@ -150,6 +152,110 @@ class MainShellLayoutTest {
                 labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height,
             )
         }
+    }
+
+    /**
+     * The primary navigation: five destinations, in reading order, labels always shown, and a
+     * surface that reaches the bottom edge of the screen with the row held above the system inset.
+     */
+    @Test
+    fun primaryNavigationHasFiveLabelledDestinations() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-primary-nav")
+        val navigation = shell.requireView(R.id.bottom_navigation_main_activity) as BottomNavigationView
+        // bindPrimaryNavigation() shows the bar at runtime; it ships GONE.
+        navigation.visibility = View.VISIBLE
+        val measured = measure(shell, "phone-primary-nav")
+
+        val menu = navigation.menu
+        assertEquals("primary navigation must have exactly five destinations. $measured", 5, menu.size())
+        val expected = listOf(
+            R.id.navigation_bottom_home to R.string.navigation_home,
+            R.id.navigation_bottom_inbox to R.string.navigation_inbox,
+            R.id.navigation_bottom_account to R.string.navigation_account,
+            R.id.navigation_bottom_search to R.string.navigation_search,
+            R.id.navigation_bottom_settings to R.string.navigation_settings,
+        )
+        for ((index, destination) in expected.withIndex()) {
+            val item = menu.getItem(index)
+            assertEquals(
+                "destination $index must be ${shell.resources.getResourceEntryName(destination.first)}. $measured",
+                destination.first,
+                item.itemId,
+            )
+            assertEquals(
+                "destination ${item.itemId} must carry a label from strings.xml. $measured",
+                shell.resources.getString(destination.second),
+                item.title.toString(),
+            )
+            assertTrue(
+                "destination ${item.itemId} must have an icon. $measured",
+                item.icon != null,
+            )
+        }
+        assertEquals(
+            "labels must always be shown, not only on the selected destination. $measured",
+            NavigationBarView.LABEL_VISIBILITY_LABELED,
+            navigation.labelVisibilityMode,
+        )
+        assertEquals(
+            "primary navigation must sit flush with the bottom of the shell. $measured",
+            shell.height,
+            navigation.bottom,
+        )
+    }
+
+    @Test
+    fun primaryNavigationKeepsItsRowAboveTheSystemInset() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-primary-nav-inset")
+        val navigation = shell.requireView(R.id.bottom_navigation_main_activity) as BottomNavigationView
+        navigation.visibility = View.VISIBLE
+        val plain = measure(shell, "phone-primary-nav-inset-plain")
+        val rowHeight = navigation.height
+        assertTrue(
+            "a navigation row must clear the 48dp touch target floor; row=$rowHeight. $plain",
+            rowHeight >= shell.resources.getDimensionPixelSize(R.dimen.touch_target_min),
+        )
+
+        val inset = (48 * shell.resources.displayMetrics.density).roundToInt()
+        applyInset(navigation, inset)
+        val measured = measure(shell, "phone-primary-nav-inset")
+
+        assertEquals(
+            "the surface must cover the row plus the system inset. $measured",
+            rowHeight + inset,
+            navigation.height,
+        )
+        assertEquals(
+            "primary navigation must reach the bottom edge of the shell. $measured",
+            shell.height,
+            navigation.bottom,
+        )
+        val row = navigation.requireMenuRow()
+        val rowBounds = boundsWithin(row, navigation)
+        assertTrue(
+            "the destinations row must stay above the system inset; row=$rowBounds " +
+                "inset=$inset. $measured",
+            rowBounds.bottom <= navigation.height - inset,
+        )
+    }
+
+    /** BottomNavigationView's item row is its only child; the class itself is library-internal. */
+    private fun View.requireMenuRow(): View = requireNotNull(
+        (this as? ViewGroup)?.let { group -> (0 until group.childCount).firstOrNull { group.getChildAt(it).height > 0 }?.let { group.getChildAt(it) } }
+    ) { "navigation bar has no item row" }
+
+    private fun applyInset(navigation: BottomNavigationView, inset: Int) {
+        val layoutParams = navigation.layoutParams
+        if (layoutParams is ViewGroup.MarginLayoutParams) {
+            layoutParams.bottomMargin = 0
+        }
+        navigation.setPadding(
+            navigation.paddingLeft,
+            navigation.paddingTop,
+            navigation.paddingRight,
+            inset,
+        )
+        navigation.layoutParams = layoutParams
     }
 
     /**

@@ -61,6 +61,20 @@
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation_main_activity"
+        style="@style/Widget.Continuum.NavigationBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        app:menu="@menu/bottom_nav_menu" />
+
+    <!--
+      The legacy custom-actions bar. It shares this layout with the navigation bar above because it
+      is still the live path for anyone who turned the new navigation off, and BOTTOM_APP_BAR_KEY
+      defaults to true, so exactly one of the two is shown at a time.
+    -->
     <include
         layout="@layout/bottom_app_bar"
         android:layout_width="match_parent"

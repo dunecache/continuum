@@ -222,6 +222,45 @@
         <item name="elevation">0dp</item>
     </style>
 
+    <!--
+      The app's primary navigation. Everything here is a Phase 0 token: the container is the
+      surface-container-high role, the indicator reuses the same 64x32dp pill the rest of the shell
+      draws by hand, and the label is the Meta type step at the navigation icon size.
+
+      colorSurfaceContainer would have been the obvious role for the container, but in this theme it
+      resolves to the page background, which leaves the bar indistinguishable from the feed it sits
+      under. surfaceContainerHigh is the nearest role that is actually a tonal step above it, so the
+      bar separates by tone the way the design system's elevation rules say it should.
+    -->
+    <style name="Widget.Continuum.NavigationBar" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">?attr/colorSurfaceContainerHigh</item>
+        <item name="backgroundTint">?attr/colorSurfaceContainerHigh</item>
+        <item name="elevation">0dp</item>
+        <item name="itemIconSize">@dimen/navigation_icon_size</item>
+        <item name="itemIconTint">@color/navigation_item_tint</item>
+        <item name="itemTextColor">@color/navigation_item_tint</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.Continuum.NavigationBar.ActiveIndicator</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.Continuum.NavigationBar.Label</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.Continuum.NavigationBar.Label</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="Widget.Continuum.NavigationBar.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">?attr/colorSecondaryContainer</item>
+        <item name="android:width">@dimen/navigation_indicator_width</item>
+        <item name="android:height">@dimen/navigation_indicator_height</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Continuum.Large</item>
+    </style>
+
+    <!--
+      Meta with the text colour left to itemTextColor: the appearance decides size and family, the
+      selector decides which destinations are lit.
+    -->
+    <style name="TextAppearance.Continuum.NavigationBar.Label" parent="TextAppearance.Continuum.Meta">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+
     <style name="FontStyle" />
 
     <style name="FontStyle.XSmall">

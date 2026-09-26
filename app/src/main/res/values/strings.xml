@@ -1989,6 +1989,11 @@
     <string name="navigation_inbox">Inbox</string>
     <string name="navigation_saved">Saved</string>
     <string name="navigation_library">Library</string>
+    <!-- Primary bottom navigation: Home, Inbox, Account, Search, Settings. The title doubles as the
+         TalkBack announcement, so it is the destination's name and nothing else. -->
+    <string name="navigation_home">Home</string>
+    <string name="navigation_account">Account</string>
+    <string name="navigation_settings">Settings</string>
 
     <string name="comment">Comment</string>
     <string name="enable_reply_notifications">Receive reply notifications</string>
