@@ -1862,7 +1862,6 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     }
 
     @ExperimentalBadgeUtils
-    @ExperimentalBadgeUtils
     private void setInboxCount(int inboxCount) {
         if (adapter != null) {
             adapter.setInboxCount(inboxCount);
