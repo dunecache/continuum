@@ -50,6 +50,10 @@ class LayoutVariantIdParityTest {
             ),
             "app_bar_main.xml" to mapOf(
                 "navigation_rail" to "Tablet/landscape only; null-checked via NavigationWrapper.",
+                "bottom_navigation_main_activity" to
+                    "Phone portrait only; the rail replaces it, and every read in MainActivity " +
+                        "null-checks it (isPrimaryNavigationVisible, applyPrimaryNavigationBottomInset, " +
+                        "bindPrimaryNavigation, pinNavigationViews).",
             ),
             // Separate post/comment panes exist only where there is room for two columns.
             // ViewPostDetailFragmentNew.java:240-246 reads the binding field into a local and

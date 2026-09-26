@@ -525,7 +525,10 @@ class RoborazziLayoutTest(private val case: Case) {
             ),
         )
 
-        private val PRIMARY_NAVIGATION_WIDTHS = listOf(320, 411, 600)
+        // Phone widths only, and the reason is the same one the layout parity test records: the bar
+        // does not exist at sw600dp, where the rail is the navigation. Asking for a 600dp case here
+        // would be asking for a view the layout does not have.
+        private val PRIMARY_NAVIGATION_WIDTHS = listOf(320, 411)
 
         private fun tier(
             layouts: List<LayoutSpec>,
@@ -751,8 +754,9 @@ class RoborazziLayoutTest(private val case: Case) {
         // A navigation bar spans the window, so it is measured at the window's width rather than
         // at one column's, and on its own rather than through the shell around it.
         val capture = requireNotNull(view.findViewById<View>(captureViewId)) {
-            "case ${case.goldenName} captures view ${view.resources.getResourceEntryName(captureViewId)}, " +
-                "which the layout does not contain"
+            "case ${case.goldenName} captures view " +
+                "${view.resources.getResourceEntryName(captureViewId)}, which the layout does not " +
+                "contain in this configuration"
         }
         case.selectItemId?.let { (capture as? NavigationBarView)?.setSelectedItemId(it) }
         val displayWidth = activity.resources.displayMetrics.widthPixels
