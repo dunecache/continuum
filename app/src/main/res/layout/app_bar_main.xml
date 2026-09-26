@@ -61,6 +61,11 @@
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <!--
+      The primary navigation. Absent from the landscape and sw600dp shells, where the navigation
+      rail takes over, so the binding field is @Nullable there and every use in MainActivity
+      null-checks it before dereferencing.
+    -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation_main_activity"
         style="@style/Widget.Continuum.NavigationBar"
@@ -68,7 +73,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:visibility="gone"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"
+        tools:ignore="InconsistentLayoutVariantIds" />
 
     <!--
       The legacy custom-actions bar. It shares this layout with the navigation bar above because it
