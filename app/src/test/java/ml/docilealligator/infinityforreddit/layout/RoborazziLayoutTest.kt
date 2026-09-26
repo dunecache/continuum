@@ -30,6 +30,7 @@ import com.github.takahirom.roborazzi.captureRoboImage
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.loadingindicator.LoadingIndicator
+import com.google.android.material.navigation.NavigationBarView
 import kotlin.math.roundToInt
 import ml.docilealligator.infinityforreddit.R
 import ml.docilealligator.infinityforreddit.customtheme.CustomThemeWrapper
@@ -121,6 +122,16 @@ class RoborazziLayoutTest(private val case: Case) {
         val recoveredFlair: Boolean = false,
         val thumbnailSizeDp: Int? = null,
         val selfThemed: Boolean = false,
+        /**
+         * Capture this view from the inflated tree instead of the root, at the full display width.
+         *
+         * The bar is the one surface this harness cannot see otherwise: it is laid out at one
+         * column's width and at `wrap_content` height, which is a feed item's geometry, not a
+         * navigation bar's. Pointing the capture at the bar itself is what puts it in a golden.
+         */
+        val captureViewId: Int? = null,
+        /** Check this menu item after inflation, so the selected state is in the picture. */
+        val selectItemId: Int? = null,
     ) {
         /**
          * `{layout}_{theme}_sw{n}dp[_land][_xlarge][_thumb{n}]` — the pre-existing scheme with a
@@ -160,6 +171,8 @@ class RoborazziLayoutTest(private val case: Case) {
         val reveal: List<Int> = emptyList(),
         val recoveredFlair: Boolean = false,
         val selfThemed: Boolean = false,
+        val captureViewId: Int? = null,
+        val selectItemId: Int? = null,
     )
 
     companion object {
@@ -446,6 +459,7 @@ class RoborazziLayoutTest(private val case: Case) {
         )
         private val LIGHT_ONLY = listOf("light" to CustomThemeSharedPreferencesUtils.LIGHT)
         private val AMOLED_ONLY = listOf("amoled" to CustomThemeSharedPreferencesUtils.AMOLED)
+        private val LIGHT_DARK_AMOLED = LIGHT_DARK + AMOLED_ONLY
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
@@ -474,6 +488,11 @@ class RoborazziLayoutTest(private val case: Case) {
             addAll(tier(RECOVERED_LAYOUTS, LIGHT_ONLY, SECONDARY_FONT_WIDTHS, Orientation.PORTRAIT, FontScale.XLARGE))
             // Thumbnail size: a measurement axis, so it crosses widths against every compact layout
             // but samples one theme — resizing the box cannot change a palette.
+            // Primary navigation: all three themes, the widths the bar is most likely to break at
+            // (a small phone, a normal phone, a tablet-width portrait), and the font-scale stressor
+            // that decides whether the labels survive.
+            addAll(tier(PRIMARY_NAVIGATION, LIGHT_DARK_AMOLED, PRIMARY_NAVIGATION_WIDTHS, Orientation.PORTRAIT, FontScale.NORMAL))
+            addAll(tier(PRIMARY_NAVIGATION, LIGHT_ONLY, PRIMARY_NAVIGATION_WIDTHS, Orientation.PORTRAIT, FontScale.XLARGE))
             COMPACT_THUMBNAIL_SIZES.forEach { sizeDp ->
                 addAll(
                     tier(
@@ -483,6 +502,30 @@ class RoborazziLayoutTest(private val case: Case) {
                 )
             }
         }
+
+        /**
+         * The primary navigation bar, captured on its own at the window's width.
+         *
+         * This is the surface the rest of this harness structurally cannot reach: a bar is not one
+         * column wide and is not `wrap_content`, so it never appeared in a golden until now. It
+         * carries the five destinations, the selected state (filled glyph, pill, on-container tint)
+         * against four unselected ones, and the tonal container behind them, which is where the
+         * visual regressions on this surface have all been.
+         */
+        private val PRIMARY_NAVIGATION: List<LayoutSpec> = listOf(
+            LayoutSpec(
+                "primaryNav",
+                R.layout.app_bar_main,
+                Family.NONE,
+                reveal = listOf(R.id.bottom_navigation_main_activity),
+                captureViewId = R.id.bottom_navigation_main_activity,
+                // Inbox rather than Home, because the first destination is checked by default and a
+                // golden of the default state says nothing about what selecting one looks like.
+                selectItemId = R.id.navigation_bottom_inbox,
+            ),
+        )
+
+        private val PRIMARY_NAVIGATION_WIDTHS = listOf(320, 411, 600)
 
         private fun tier(
             layouts: List<LayoutSpec>,
@@ -499,7 +542,8 @@ class RoborazziLayoutTest(private val case: Case) {
                             Case(
                                 spec.name, spec.res, spec.family, swDp, orientation, themeLabel,
                                 themeType, fontScale, spec.reveal, spec.recoveredFlair,
-                                thumbnailSizeDp, spec.selfThemed,
+                                thumbnailSizeDp, spec.selfThemed, spec.captureViewId,
+                                spec.selectItemId,
                             ),
                         )
                     }
@@ -702,7 +746,22 @@ class RoborazziLayoutTest(private val case: Case) {
             View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
         )
         view.layout(0, 0, view.measuredWidth, view.measuredHeight)
-        return view
+
+        val captureViewId = case.captureViewId ?: return view
+        // A navigation bar spans the window, so it is measured at the window's width rather than
+        // at one column's, and on its own rather than through the shell around it.
+        val capture = requireNotNull(view.findViewById<View>(captureViewId)) {
+            "case ${case.goldenName} captures view ${view.resources.getResourceEntryName(captureViewId)}, " +
+                "which the layout does not contain"
+        }
+        case.selectItemId?.let { (capture as? NavigationBarView)?.setSelectedItemId(it) }
+        val displayWidth = activity.resources.displayMetrics.widthPixels
+        capture.measure(
+            View.MeasureSpec.makeMeasureSpec(displayWidth, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        )
+        capture.layout(0, 0, capture.measuredWidth, capture.measuredHeight)
+        return capture
     }
 
     /**

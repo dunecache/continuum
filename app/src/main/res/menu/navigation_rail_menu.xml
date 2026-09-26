@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  The legacy custom-actions rail: two or four user-chosen actions, which is what the settings screen
+  configures. The five primary destinations live in navigation_rail_primary_menu.xml, and the rail
+  holds one or the other depending on which mode is in use.
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navigation_rail_option_1"
         android:enabled="true"
-        android:title="@string/navigation_feed"/>
+        android:title="@string/navigation_feed" />
     <item
         android:id="@+id/navigation_rail_option_2"
         android:enabled="true"
-        android:title="@string/navigation_search"/>
+        android:title="@string/navigation_search" />
     <item
         android:id="@+id/navigation_rail_option_3"
         android:enabled="true"
-        android:title="@string/navigation_inbox"/>
+        android:title="@string/navigation_inbox" />
     <item
         android:id="@+id/navigation_rail_option_4"
         android:enabled="true"
-        android:title="@string/navigation_library"/>
+        android:title="@string/navigation_library" />
 </menu>

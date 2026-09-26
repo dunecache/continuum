@@ -128,6 +128,31 @@ class MainShellLayoutTest {
     }
 
     @Test
+    fun primaryNavigationKeepsItsRowAtALargeFontScale() {
+        RuntimeEnvironment.setFontScale(2f)
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-primary-nav-font200")
+        val navigation = shell.requireView(R.id.bottom_navigation_main_activity) as BottomNavigationView
+        navigation.visibility = View.VISIBLE
+        val measured = measure(shell, "phone-primary-nav-font200")
+
+        val row = navigation.requireMenuRow()
+        val rowBounds = boundsWithin(row, navigation)
+        assertTrue(
+            "a doubled font must not push the destinations out of the bar; row=$rowBounds " +
+                "bar=0..${navigation.height}. $measured",
+            rowBounds.height() > 0 && rowBounds.bottom <= navigation.height,
+        )
+        // The labels are the thing that gives way at a large font, exactly as they do on the legacy
+        // bar: what may not give way is the row, because a bar that has grown over the feed is a
+        // layout bug rather than a design choice.
+        assertTrue(
+            "the bar must stay one row tall at 200% font, not grow over the feed; bar=0.." +
+                "${navigation.height}. $measured",
+            navigation.height <= shell.resources.getDimensionPixelSize(R.dimen.navigation_item_min_height) * 2,
+        )
+    }
+
+    @Test
     fun navigationRowSurvivesALargeFontScale() {
         RuntimeEnvironment.setFontScale(2f)
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-font200")

@@ -67,6 +67,7 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.navigation.NavigationRailView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.android.material.textfield.TextInputEditText;
@@ -948,30 +949,36 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             setBottomAppBarContentDescription(navigationWrapper.option3BottomAppBar, option3);
             setBottomAppBarContentDescription(navigationWrapper.option4BottomAppBar, option4);
         } else {
-            navigationWrapper.setRailItemTitles(
-                    getBottomAppBarOptionTitle(this, option1),
-                    getBottomAppBarOptionTitle(this, option2),
-                    getBottomAppBarOptionTitle(this, option3),
-                    getBottomAppBarOptionTitle(this, option4));
-            navigationWrapper.navigationRailView.setOnItemSelectedListener(item -> {
-                int itemId = item.getItemId();
-                if (itemId == R.id.navigation_rail_option_1) {
-                    bottomAppBarOptionAction(option1);
-                    return true;
-                } else if (itemId == R.id.navigation_rail_option_2) {
-                    bottomAppBarOptionAction(option2);
-                    return true;
-                } else if (itemId == R.id.navigation_rail_option_3) {
-                    bottomAppBarOptionAction(option3);
-                    return true;
-                } else if (itemId == R.id.navigation_rail_option_4) {
-                    bottomAppBarOptionAction(option4);
-                    return true;
-                }
-                return false;
-            });
+            bindPrimaryNavigationRail();
         }
         navigationWrapper.setActiveItem(1);
+    }
+
+    /**
+     * The rail's half of the primary navigation: the same five destinations as the phone bar, in the
+     * same order, from the same strings and the same icons.
+     *
+     * <p>The rail's menu is inflated from XML with the legacy custom-actions items in it, because the
+     * rail layout is shared with the mode where those actions are what it shows. The primary set is
+     * swapped in here rather than by editing that resource, so turning the new navigation off still
+     * leaves the rail it was working on before.
+     */
+    private void bindPrimaryNavigationRail() {
+        NavigationRailView rail = navigationWrapper.navigationRailView;
+        if (rail == null) {
+            return;
+        }
+        Menu menu = rail.getMenu();
+        menu.clear();
+        getMenuInflater().inflate(R.menu.navigation_rail_primary_menu, menu);
+        // Checked before the listener goes on, for the same reason the bar is: the shell opens on
+        // Home, and a listener firing here would act on a destination nobody tapped.
+        rail.setSelectedItemId(R.id.navigation_bottom_home);
+        rail.setOnItemSelectedListener(item -> {
+            primaryNavigationAction(item.getItemId());
+            return true;
+        });
+        navigationWrapper.setRailInboxItemId(R.id.navigation_bottom_inbox);
     }
 
     /** The five-destination bar, when this layout variant has one and it is the bar in use. */

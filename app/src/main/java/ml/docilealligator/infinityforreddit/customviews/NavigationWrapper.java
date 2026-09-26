@@ -40,6 +40,11 @@ public class NavigationWrapper {
     private int option4 = -1;
 
     private int inboxCount;
+    /**
+     * The rail item that carries the inbox badge, or {@link View#NO_ID} when the rail is showing the
+     * legacy custom actions and the badge is found by matching the bound options instead.
+     */
+    private int railInboxItemId = View.NO_ID;
     @Nullable
     private BadgeDrawable badgeDrawable;
     @Nullable
@@ -333,6 +338,14 @@ public class NavigationWrapper {
         }
     }
 
+    /**
+     * Names the rail item that is the inbox, for when the rail is showing the primary destinations
+     * rather than the legacy options.
+     */
+    public void setRailInboxItemId(int railInboxItemId) {
+        this.railInboxItemId = railInboxItemId;
+    }
+
     @ExperimentalBadgeUtils
     public void setInboxCount(Context context, int inboxCount) {
         this.inboxCount = Math.max(0, inboxCount);
@@ -343,16 +356,18 @@ public class NavigationWrapper {
         }
 
         if (navigationRailView != null) {
+            if (railInboxItemId != View.NO_ID) {
+                // The primary destinations are in the rail, so the inbox is the item it names
+                // rather than whichever slot a legacy option happened to land in.
+                applyRailBadge(railInboxItemId);
+                return;
+            }
             int[] itemIds = {R.id.navigation_rail_option_1, R.id.navigation_rail_option_2,
                     R.id.navigation_rail_option_3, R.id.navigation_rail_option_4};
             int[] boundOptions = {option1, option2, option3, option4};
             for (int i = 0; i < itemIds.length; i++) {
                 if (isInboxOption(boundOptions[i])) {
-                    badgeDrawable = navigationRailView.getOrCreateBadge(itemIds[i]);
-                    badgeDrawable.setNumber(inboxCount);
-                    badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
-                    badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
-                    badgedRailItemId = itemIds[i];
+                    applyRailBadge(itemIds[i]);
                     return;
                 }
             }
@@ -383,6 +398,16 @@ public class NavigationWrapper {
     }
 
     /** Draws the badge on the current anchor, once that anchor has a width to position it against. */
+    @ExperimentalBadgeUtils
+    private void applyRailBadge(int itemId) {
+        badgeDrawable = navigationRailView.getOrCreateBadge(itemId);
+        badgeDrawable.setNumber(inboxCount);
+        badgeDrawable.setMaxCharacterCount(4);
+        badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
+        badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
+        badgedRailItemId = itemId;
+    }
+
     @ExperimentalBadgeUtils
     private void applyBadge(Context context) {
         View anchorView = badgedView;

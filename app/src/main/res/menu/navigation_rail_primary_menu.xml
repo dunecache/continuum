@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The five primary destinations on the large-screen rail: the same set, order, icons and strings as
+  bottom_nav_menu.xml, so rotating the phone does not replace one set of destinations with a
+  different one. Swapped in at bind time when the primary navigation is in use; the legacy
+  custom-actions rail keeps navigation_rail_menu.xml.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_bottom_home"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/navigation_home" />
+
+    <item
+        android:id="@+id/navigation_bottom_inbox"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_inbox"
+        android:title="@string/navigation_inbox" />
+
+    <item
+        android:id="@+id/navigation_bottom_account"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_account"
+        android:title="@string/navigation_account" />
+
+    <!-- Search has one glyph; see bottom_nav_menu.xml. -->
+    <item
+        android:id="@+id/navigation_bottom_search"
+        android:enabled="true"
+        android:icon="@drawable/ic_search_day_night_24dp"
+        android:title="@string/navigation_search" />
+
+    <item
+        android:id="@+id/navigation_bottom_settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_nav_settings"
+        android:title="@string/navigation_settings" />
+
+</menu>
