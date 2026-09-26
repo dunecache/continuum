@@ -1019,6 +1019,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     @ExperimentalBadgeUtils
     private void bindPrimaryNavigation() {
         BottomNavigationView navigation = binding.includedAppBar.bottomNavigationMainActivity;
+        if (navigation == null) {
+            return;
+        }
         if (navigationWrapper.bottomAppBar != null) {
             navigationWrapper.bottomAppBar.setVisibility(View.GONE);
         }
