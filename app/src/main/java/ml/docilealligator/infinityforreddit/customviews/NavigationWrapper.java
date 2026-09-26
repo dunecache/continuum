@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuItemImpl;
@@ -87,6 +88,54 @@ public class NavigationWrapper {
         } else {
             navigationRailView.setBackgroundColor(bottomAppBarBackgroundColor);
             applyMenuItemTheme(navigationRailView.getMenu(), bottomAppBarIconColor);
+        }
+    }
+
+    /**
+     * Sits the bar's surface behind the system navigation inset instead of lifting the bar above it.
+     *
+     * <p>Both earlier ways of making room read as a broken bar. A bottom margin left a strip of
+     * window background under the bar, so the bar hovered over the feed with a gap under it, half
+     * floating and half stuck to the bottom. Padding the row inside the bar took the inset out of the
+     * row's own height instead, which pushed the icons up, left empty bar below them and dropped the
+     * labels once the inset was more than a few dp. Here the row keeps its height at the top of the
+     * bar and the inset becomes more of the same surface below it, so the bar is one surface from
+     * its hairline to the bottom edge of the screen.
+     *
+     * <p>The row's top edge ends up exactly where the margin put it (one row plus the inset above
+     * the screen edge either way), so the feed's bottom clearance and anything the bar anchors stay
+     * where they were.
+     */
+    public void applyBottomInset(int bottomInset) {
+        if (bottomAppBar == null) {
+            return;
+        }
+
+        int inset = Math.max(0, bottomInset);
+        int rowHeight = bottomAppBar.getResources()
+                .getDimensionPixelSize(R.dimen.navigation_item_min_height);
+        ViewGroup.LayoutParams layoutParams = bottomAppBar.getLayoutParams();
+        if (layoutParams != null) {
+            boolean changed = false;
+            if (layoutParams instanceof ViewGroup.MarginLayoutParams marginParams
+                    && marginParams.bottomMargin != 0) {
+                marginParams.bottomMargin = 0;
+                changed = true;
+            }
+            if (layoutParams.height != rowHeight + inset) {
+                layoutParams.height = rowHeight + inset;
+                changed = true;
+            }
+            if (changed) {
+                bottomAppBar.setLayoutParams(layoutParams);
+            }
+        }
+
+        // The bar's own padding, not the row's: the row is a fixed height and must not give any of
+        // it up. The style's horizontal padding is left alone.
+        if (bottomAppBar.getPaddingBottom() != inset) {
+            bottomAppBar.setPadding(bottomAppBar.getPaddingLeft(), bottomAppBar.getPaddingTop(),
+                    bottomAppBar.getPaddingRight(), inset);
         }
     }
 

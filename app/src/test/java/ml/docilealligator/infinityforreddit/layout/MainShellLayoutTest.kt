@@ -12,10 +12,15 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.color.MaterialColors
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
+import kotlin.math.roundToInt
 import ml.docilealligator.infinityforreddit.R
+import ml.docilealligator.infinityforreddit.customviews.NavigationWrapper
 import ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
 import ml.docilealligator.infinityforreddit.font.FontFamily
 import ml.docilealligator.infinityforreddit.font.FontStyle
@@ -146,6 +151,83 @@ class MainShellLayoutTest {
             )
         }
     }
+
+    @Test
+    fun navigationBarSurfaceReachesTheBottomEdgeUnderASystemInset() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-inset")
+        val navigationBar = shell.requireView(R.id.bottom_app_bar_bottom_app_bar)
+        navigationBar.visibility = View.VISIBLE
+        val feedItem = shell.requireView(R.id.option_1_bottom_app_bar) as SignalNavigationItemView
+        feedItem.setLabel("Feed")
+        val row = shell.requireView(R.id.linear_layout_bottom_app_bar)
+        val rowHeight = shell.resources.getDimensionPixelSize(R.dimen.navigation_item_min_height)
+        // A 3-button navigation bar is the tall case; a gesture handle is shorter but behaves the
+        // same way, only with less to hide.
+        val inset = (48 * shell.resources.displayMetrics.density).roundToInt()
+        navigationWrapper(shell).applyBottomInset(inset)
+        val measured = measure(shell, "phone-inset")
+
+        // One surface from the hairline to the bottom edge of the screen. A bottom margin instead
+        // left a strip of window background under the bar, which read as a bar hovering over the
+        // feed rather than attached to it.
+        assertEquals(
+            "navigation bar must reach the bottom edge of the shell. $measured",
+            shell.height,
+            navigationBar.bottom,
+        )
+        assertEquals(
+            "the bar's surface must cover its row plus the system inset. $measured",
+            rowHeight + inset,
+            navigationBar.height,
+        )
+        // The row keeps its own height and sits above the inset: padding the row instead of the bar
+        // ate the row's height, which pushed the icons up and dropped the labels.
+        assertEquals(
+            "the destinations row must keep one row of height. $measured",
+            rowHeight,
+            row.height,
+        )
+        assertTrue(
+            "the destinations row must stay above the system inset. row=0..${row.height} " +
+                "inset=$inset. $measured",
+            row.bottom <= navigationBar.height - inset,
+        )
+        // The row's top edge does not move, so the feed's bottom clearance still lines up with it.
+        assertEquals(
+            "the row's top edge must not move when the inset is absorbed. $measured",
+            shell.height - rowHeight - inset,
+            navigationBar.top,
+        )
+        val label = requireNotNull(feedItem.findTextView()) { "navigation item has no label view" }
+        assertEquals(
+            "a navigation inset must not cost the row its label. $measured",
+            View.VISIBLE,
+            label.visibility,
+        )
+        val labelBounds = boundsWithin(label, feedItem)
+        assertTrue(
+            "navigation label must fit inside its row; label=$labelBounds row=0..${feedItem.height}. $measured",
+            labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height && labelBounds.height() > 0,
+        )
+    }
+
+    /**
+     * The bar's inset handling lives on [NavigationWrapper] because four activities share it, so the
+     * shell test has to go through the wrapper too. Only the bottom bar path is exercised here: the
+     * wrapper's theme and badge work is not what this test is about.
+     */
+    private fun navigationWrapper(shell: FrameLayout): NavigationWrapper = NavigationWrapper(
+        shell.requireView(R.id.bottom_app_bar_bottom_app_bar) as BottomAppBar,
+        shell.requireView(R.id.linear_layout_bottom_app_bar) as LinearLayout,
+        shell.requireView(R.id.option_1_bottom_app_bar) as SignalNavigationItemView,
+        shell.requireView(R.id.option_2_bottom_app_bar) as SignalNavigationItemView,
+        shell.requireView(R.id.option_3_bottom_app_bar) as SignalNavigationItemView,
+        shell.requireView(R.id.option_4_bottom_app_bar) as SignalNavigationItemView,
+        shell.requireView(R.id.fab_main_activity) as FloatingActionButton,
+        null,
+        null,
+        false,
+    )
 
     /** Rough perceptual distance; enough to catch "the label is the bar's own colour". */
     private fun colourDistance(a: Int, b: Int): Int {

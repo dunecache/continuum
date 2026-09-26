@@ -254,12 +254,10 @@ public class ViewMultiRedditDetailActivity extends BaseActivity implements SortT
                         }
 
                         if (navigationWrapper.bottomAppBar != null) {
-                            navigationWrapper.linearLayoutBottomAppBar.setPadding(
-                                    navigationWrapper.linearLayoutBottomAppBar.getPaddingLeft(),
-                                    navigationWrapper.linearLayoutBottomAppBar.getPaddingTop(),
-                                    navigationWrapper.linearLayoutBottomAppBar.getPaddingRight(),
-                                    allInsets.bottom
-                            );
+                            // The inset belongs to the bar's surface, not to the row inside it:
+                            // padding the row ate the row's height, which pushed the icons up and
+                            // dropped the labels on any device with a navigation inset.
+                            navigationWrapper.applyBottomInset(allInsets.bottom);
                         }
 
                         setMargins(binding.toolbarViewMultiRedditDetailActivity,
