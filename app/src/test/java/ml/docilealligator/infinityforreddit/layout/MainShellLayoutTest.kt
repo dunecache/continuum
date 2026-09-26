@@ -110,6 +110,7 @@ class MainShellLayoutTest {
             ),
             colourDistance(labelColour, barColour) > 24,
         )
+        assertIndicatorIsWhole(feedItem, measured)
         val pager = shell.requireView(R.id.view_pager_main_activity)
         // ScrollingViewBehavior offsets the pager by the app bar, so its height is the window minus
         // the app bar's scroll range and its bottom runs past the bar's top on purpose: the feed
@@ -140,6 +141,7 @@ class MainShellLayoutTest {
             "the icon must stay inside its row at 200% font. icon=$iconBounds row=0..${feedItem.height}. $measured",
             iconBounds.top >= 0 && iconBounds.bottom <= feedItem.height,
         )
+        assertIndicatorIsWhole(feedItem, measured)
         // Whether the label survives a doubled font is a design choice; overflowing the row is not.
         feedItem.findTextView()?.let { label ->
             val labelBounds = boundsWithin(label, feedItem)
@@ -201,6 +203,7 @@ class MainShellLayoutTest {
             shell.height - rowHeight - inset,
             navigationBar.top,
         )
+        assertIndicatorIsWhole(feedItem, measured)
         val label = requireNotNull(feedItem.findTextView()) { "navigation item has no label view" }
         assertEquals(
             "a navigation inset must not cost the row its label. $measured",
@@ -246,6 +249,23 @@ class MainShellLayoutTest {
             getChildAt(i).findImageView()?.let { return it }
         }
         return null
+    }
+
+    /**
+     * The active indicator is the one part of the bar that must never be cropped: a pill cut off by
+     * its row reads as a rendering fault, not as a navigation bar. Its position is a translation
+     * applied at layout time, so the offset has to be added before the bounds mean anything.
+     */
+    private fun assertIndicatorIsWhole(item: SignalNavigationItemView, measured: String) {
+        item.setActive(true)
+        val indicator = item.indicatorView
+        val bounds = boundsWithin(indicator, item)
+        bounds.offset(0, indicator.translationY.toInt())
+        assertTrue(
+            "the active indicator must sit whole inside its row; indicator=$bounds " +
+                "row=0..${item.height}. $measured",
+            bounds.top >= 0 && bounds.bottom <= item.height && bounds.height() > 0,
+        )
     }
 
     private fun boundsWithin(view: View, ancestor: View): Rect {

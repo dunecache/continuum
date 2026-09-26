@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import com.google.android.material.color.MaterialColors;
@@ -116,9 +117,22 @@ public final class SignalNavigationItemView extends FrameLayout {
         // the icon and its label, and spending 24dp of it on a separate indicator row left the
         // label with nowhere to go. Centring the pill on the icon is also what keeps it inside the
         // row once onMeasure has decided whether the label fits.
-        int iconCentre = contentView.getTop() + iconView.getTop() + iconView.getHeight() / 2;
-        int pillCentre = indicatorView.getTop() + indicatorView.getHeight() / 2;
-        indicatorView.setTranslationY(iconCentre - pillCentre);
+        int pillTop = indicatorView.getTop();
+        int pillHeight = indicatorView.getHeight();
+        int rowRoom = getHeight() - pillHeight;
+        int desired = contentView.getTop() + iconView.getTop() + iconView.getHeight() / 2
+                - pillHeight / 2 - pillTop;
+        // Clamped to the row so the pill cannot be sliced in half: a cropped indicator reads as a
+        // rendering fault rather than as a navigation bar. If the row is too short to hold the pill
+        // at all, the bounds cross over and it is centred on the icon and overflows evenly, which is
+        // the least broken thing a row that size can do.
+        indicatorView.setTranslationY(Math.max(Math.min(0, rowRoom) - pillTop,
+                Math.min(Math.max(0, rowRoom) - pillTop, desired)));
+    }
+
+    @VisibleForTesting
+    public View getIndicatorView() {
+        return indicatorView;
     }
 
     public void setImageResource(@DrawableRes int drawableResource) {
