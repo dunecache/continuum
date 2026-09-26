@@ -12,11 +12,9 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.color.MaterialColors
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.io.File
 import kotlin.math.roundToInt
 import ml.docilealligator.infinityforreddit.R
@@ -152,6 +150,11 @@ class MainShellLayoutTest {
         }
     }
 
+    /**
+     * The bar's inset handling lives on [NavigationWrapper] because four activities share it, so the
+     * shell test goes through that too. It is static geometry on the bar rather than wrapper state,
+     * which is also why this test does not have to stand up a rail and a theme to call it.
+     */
     @Test
     fun navigationBarSurfaceReachesTheBottomEdgeUnderASystemInset() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-inset")
@@ -164,7 +167,7 @@ class MainShellLayoutTest {
         // A 3-button navigation bar is the tall case; a gesture handle is shorter but behaves the
         // same way, only with less to hide.
         val inset = (48 * shell.resources.displayMetrics.density).roundToInt()
-        navigationWrapper(shell).applyBottomInset(inset)
+        NavigationWrapper.applyBottomInset(navigationBar as BottomAppBar, inset)
         val measured = measure(shell, "phone-inset")
 
         // One surface from the hairline to the bottom edge of the screen. A bottom margin instead
@@ -210,24 +213,6 @@ class MainShellLayoutTest {
             labelBounds.top >= 0 && labelBounds.bottom <= feedItem.height && labelBounds.height() > 0,
         )
     }
-
-    /**
-     * The bar's inset handling lives on [NavigationWrapper] because four activities share it, so the
-     * shell test has to go through the wrapper too. Only the bottom bar path is exercised here: the
-     * wrapper's theme and badge work is not what this test is about.
-     */
-    private fun navigationWrapper(shell: FrameLayout): NavigationWrapper = NavigationWrapper(
-        shell.requireView(R.id.bottom_app_bar_bottom_app_bar) as BottomAppBar,
-        shell.requireView(R.id.linear_layout_bottom_app_bar) as LinearLayout,
-        shell.requireView(R.id.option_1_bottom_app_bar) as SignalNavigationItemView,
-        shell.requireView(R.id.option_2_bottom_app_bar) as SignalNavigationItemView,
-        shell.requireView(R.id.option_3_bottom_app_bar) as SignalNavigationItemView,
-        shell.requireView(R.id.option_4_bottom_app_bar) as SignalNavigationItemView,
-        shell.requireView(R.id.fab_main_activity) as FloatingActionButton,
-        null,
-        null,
-        false,
-    )
 
     /** Rough perceptual distance; enough to catch "the label is the bar's own colour". */
     private fun colourDistance(a: Int, b: Int): Int {

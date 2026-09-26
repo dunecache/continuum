@@ -106,7 +106,7 @@ public class NavigationWrapper {
      * the screen edge either way), so the feed's bottom clearance and anything the bar anchors stay
      * where they were.
      */
-    public void applyBottomInset(int bottomInset) {
+    public static void applyBottomInset(@Nullable BottomAppBar bottomAppBar, int bottomInset) {
         if (bottomAppBar == null) {
             return;
         }

@@ -445,13 +445,12 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                             }
                         }
 
-                        if (navigationWrapper.bottomAppBar != null) {
-                            // The bar's surface runs behind the system inset, with the row of
-                            // destinations still one row tall at the top of it. A bottom margin here
-                            // left a strip of window background under the bar, which read as a slab
-                            // hovering over the feed instead of a bar attached to the screen edge.
-                            navigationWrapper.applyBottomInset(allInsets.bottom);
-                        }
+                        // The bar's surface runs behind the system inset, with the row of
+                        // destinations still one row tall at the top of it. A bottom margin here
+                        // left a strip of window background under the bar, which read as a slab
+                        // hovering over the feed instead of a bar attached to the screen edge.
+                        NavigationWrapper.applyBottomInset(navigationWrapper.bottomAppBar,
+                                allInsets.bottom);
 
                         setMargins(binding.includedAppBar.toolbar,
                                 allInsets.left,
