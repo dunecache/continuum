@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -66,6 +67,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigationrail.NavigationRailView;
 import com.google.android.material.tabs.TabLayout;
@@ -515,7 +517,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, binding.drawerLayout, binding.includedAppBar.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        toggle.getDrawerArrowDrawable().setColor(mCustomThemeWrapper.getToolbarPrimaryTextAndIconColor());
+        // The bar is a tonal surface now, so the drawer arrow takes the muted foreground rather than
+        // the custom theme's toolbar colour, which is meant for the accent-filled bar.
+        toggle.getDrawerArrowDrawable().setColor(MaterialColors.getColor(
+                binding.includedAppBar.toolbar, com.google.android.material.R.attr.colorOnSurfaceVariant));
         binding.drawerLayout.addDrawerListener(toggle);
         binding.drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
@@ -658,9 +663,50 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         binding.drawerLayout.setBackgroundColor(backgroundColor);
         navigationWrapper.applyCustomTheme(mCustomThemeWrapper.getBottomAppBarIconColor(), mCustomThemeWrapper.getBottomAppBarBackgroundColor());
         binding.navigationViewMainActivity.setBackgroundColor(backgroundColor);
-        applyAppBarLayoutAndCollapsingToolbarLayoutAndToolbarTheme(binding.includedAppBar.appbarLayoutMainActivity, binding.includedAppBar.collapsingToolbarLayoutMainActivity, binding.includedAppBar.toolbar);
+        applyHomeAppBarTheme();
         applyTabLayoutTheme(binding.includedAppBar.tabLayoutMainActivity);
         applyFABTheme(navigationWrapper.floatingActionButton);
+    }
+
+    /**
+     * The shell's own app bar theme, which is deliberately not the shared one.
+     *
+     * <p>The shared helper paints every screen's app bar in the theme's accent colour. That was right
+     * when the accent was the brand; it is wrong next to the new bottom bar, which is a tonal
+     * surface, because one screen would then have a saturated slab at the top and a quiet surface at
+     * the bottom. The redesign maps chrome onto surface roles, so this uses those.
+     *
+     * <p>Scoped here on purpose: the other twenty-odd screens keep the shared helper and their
+     * themed bars until each gets its own pass. The visible consequence is that a custom theme's
+     * accent still colours every other screen's bar and no longer colours this one, which is the
+     * same trade the bottom navigation bar already made.
+     */
+    private void applyHomeAppBarTheme() {
+        int surface = MaterialColors.getColor(binding.includedAppBar.appbarLayoutMainActivity,
+                com.google.android.material.R.attr.colorSurfaceContainerHigh);
+        int onSurface = MaterialColors.getColor(binding.includedAppBar.toolbar,
+                com.google.android.material.R.attr.colorOnSurface);
+        int onSurfaceVariant = MaterialColors.getColor(binding.includedAppBar.toolbar,
+                com.google.android.material.R.attr.colorOnSurfaceVariant);
+
+        binding.includedAppBar.appbarLayoutMainActivity.setBackgroundColor(surface);
+        // The scrim is what shows through while the bar is scrolled away, so it has to be the same
+        // surface or the title appears to slide out of one colour and into another.
+        binding.includedAppBar.collapsingToolbarLayoutMainActivity.setContentScrimColor(surface);
+        binding.includedAppBar.toolbar.setBackgroundColor(surface);
+        // The strip is pinned under the collapsing title, so it carries the surface itself rather
+        // than letting the feed scroll through it.
+        binding.includedAppBar.tabLayoutMainActivity.setBackgroundColor(surface);
+        binding.includedAppBar.toolbar.setTitleTextColor(onSurface);
+        binding.includedAppBar.toolbar.setSubtitleTextColor(onSurfaceVariant);
+        if (binding.includedAppBar.toolbar.getNavigationIcon() != null) {
+            binding.includedAppBar.toolbar.getNavigationIcon().setColorFilter(onSurfaceVariant,
+                    PorterDuff.Mode.SRC_IN);
+        }
+        if (binding.includedAppBar.toolbar.getOverflowIcon() != null) {
+            binding.includedAppBar.toolbar.getOverflowIcon().setColorFilter(onSurfaceVariant,
+                    PorterDuff.Mode.SRC_IN);
+        }
     }
 
     @ExperimentalBadgeUtils
