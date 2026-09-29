@@ -24,8 +24,12 @@ import kotlin.math.roundToInt
 import ml.docilealligator.infinityforreddit.R
 import ml.docilealligator.infinityforreddit.customviews.NavigationWrapper
 import ml.docilealligator.infinityforreddit.customviews.SignalNavigationItemView
+import ml.docilealligator.infinityforreddit.font.ContentFontFamily
+import ml.docilealligator.infinityforreddit.font.ContentFontStyle
 import ml.docilealligator.infinityforreddit.font.FontFamily
 import ml.docilealligator.infinityforreddit.font.FontStyle
+import ml.docilealligator.infinityforreddit.font.TitleFontFamily
+import ml.docilealligator.infinityforreddit.font.TitleFontStyle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -495,11 +499,18 @@ class MainShellLayoutTest {
 
     private fun themedActivity(): Activity {
         val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
-        // The theme stack BaseActivity builds at runtime, so `?attr/` references in the shell
-        // resolve the same way they do on the device.
+        // The theme stack BaseActivity builds at runtime (BaseActivity.java:212-228), so `?attr/`
+        // references in the shell resolve the same way they do on the device. All five font
+        // overlays matter: a title that goes through TextAppearance.Continuum.Title needs the title
+        // font attributes, and a three-overlay stack leaves them unset, which makes the inflate fail
+        // rather than merely look wrong.
         activity.theme.applyStyle(R.style.Theme_Normal_AmoledDark, true)
         activity.theme.applyStyle(FontStyle.Normal.resId, true)
+        activity.theme.applyStyle(TitleFontStyle.Normal.resId, true)
+        activity.theme.applyStyle(ContentFontStyle.Normal.resId, true)
         activity.theme.applyStyle(FontFamily.Default.resId, true)
+        activity.theme.applyStyle(TitleFontFamily.Default.resId, true)
+        activity.theme.applyStyle(ContentFontFamily.Default.resId, true)
         return activity
     }
 
