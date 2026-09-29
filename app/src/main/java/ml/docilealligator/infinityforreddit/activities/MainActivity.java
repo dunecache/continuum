@@ -11,6 +11,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -48,6 +49,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.OneShotPreDrawListener;
+import androidx.core.view.MenuItemCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.ViewGroupCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -516,6 +518,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         }
 
         setSupportActionBar(binding.includedAppBar.toolbar);
+        // setSupportActionBar hands the ActionBar the activity's label as its title, so the toolbar
+        // grew a second, truncating title TextView holding "Continuum (Debug)" that competed with
+        // the title block for the row. The feed in view is the title; the app name is the task's
+        // label, which is what recents shows regardless.
+        setTitle(null);
         setToolbarGoToTop(binding.includedAppBar.toolbar);
         // The sort caption is a command, so the block that holds it opens the sort sheet. Long
         // pressing the bar still means go-to-top, which is the older gesture and stays where it is.
@@ -673,8 +680,21 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         navigationWrapper.applyCustomTheme(mCustomThemeWrapper.getBottomAppBarIconColor(), mCustomThemeWrapper.getBottomAppBarBackgroundColor());
         binding.navigationViewMainActivity.setBackgroundColor(backgroundColor);
         applyHomeAppBarTheme();
-        applyTabLayoutTheme(binding.includedAppBar.tabLayoutMainActivity);
         applyFABTheme(navigationWrapper.floatingActionButton);
+    }
+
+    /**
+     * Retints the toolbar's own action items, which are coloured on a different path from the
+     * navigation and overflow icons and so miss the tonal foreground.
+     */
+    private void tintToolbarActionIcons(int color) {
+        Menu menu = binding.includedAppBar.toolbar.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getIcon() != null) {
+                MenuItemCompat.setIconTintList(item, ColorStateList.valueOf(color));
+            }
+        }
     }
 
     /**
@@ -705,7 +725,17 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         binding.includedAppBar.toolbar.setBackgroundColor(surface);
         // The strip is pinned under the collapsing title, so it carries the surface itself rather
         // than letting the feed scroll through it.
-        binding.includedAppBar.tabLayoutMainActivity.setBackgroundColor(surface);
+        TabLayout tabLayout = binding.includedAppBar.tabLayoutMainActivity;
+        tabLayout.setBackgroundColor(surface);
+        // The strip's own colours rather than the shared helper's, which paints tabs in the theme's
+        // accent: on a tonal bar those are the wrong pair, and the indicator in particular is the
+        // same pill colour the selected destination uses at the bottom of the screen.
+        tabLayout.setTabTextColors(MaterialColors.getColor(tabLayout,
+                com.google.android.material.R.attr.colorPrimary), onSurfaceVariant);
+        tabLayout.setSelectedTabIndicatorColor(MaterialColors.getColor(tabLayout,
+                com.google.android.material.R.attr.colorSecondaryContainer));
+        tabLayout.setTabRippleColor(ColorStateList.valueOf(MaterialColors.getColor(tabLayout,
+                com.google.android.material.R.attr.colorSecondaryContainer)));
         binding.includedAppBar.toolbar.setTitleTextColor(onSurface);
         binding.includedAppBar.toolbar.setSubtitleTextColor(onSurfaceVariant);
         if (binding.includedAppBar.toolbar.getNavigationIcon() != null) {
@@ -716,6 +746,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             binding.includedAppBar.toolbar.getOverflowIcon().setColorFilter(onSurfaceVariant,
                     PorterDuff.Mode.SRC_IN);
         }
+        // The search and compose actions are tinted by applyMenuItemTheme, which uses the custom
+        // theme's toolbar colour: a colour picked for an accent-filled bar, and on a tonal surface it
+        // leaves the two most used actions in the bar very hard to see.
+        tintToolbarActionIcons(onSurfaceVariant);
         // The user's chosen font still has to reach the title block, which is nested inside the
         // toolbar rather than being one of its direct text children the way the toolbar's own title
         // was. Re-read on every layout because the font is set after the theme in some entry paths,
