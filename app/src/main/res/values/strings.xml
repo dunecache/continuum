@@ -1991,6 +1991,9 @@
     <string name="navigation_library">Library</string>
     <!-- Primary bottom navigation: Home, Inbox, Account, Search, Settings. The title doubles as the
          TalkBack announcement, so it is the destination's name and nothing else. -->
+    <!-- TalkBack reads the shell's title block as one control, so it needs both what the feed is and
+         what tapping the sort caption does. -->
+    <string name="feed_header_content_description">%1$s, sorted %2$s. Double tap to change the sort.</string>
     <string name="navigation_home">Home</string>
     <string name="navigation_account">Account</string>
     <string name="navigation_settings">Settings</string>

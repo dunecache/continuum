@@ -32,6 +32,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -191,6 +192,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private static final int SIGNAL_OPTION_SAVED = Integer.MIN_VALUE + 2;
     /** Held so the Inbox badge can be applied when the bar binds, not only when the count changes. */
     private int primaryNavigationInboxCount;
+    @Nullable
+    private View cachedFeedHeader;
 
     @SuppressWarnings("NullAway.Init")
     MultiRedditViewModel multiRedditViewModel;
@@ -514,6 +517,12 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
         setSupportActionBar(binding.includedAppBar.toolbar);
         setToolbarGoToTop(binding.includedAppBar.toolbar);
+        // The sort caption is a command, so the block that holds it opens the sort sheet. Long
+        // pressing the bar still means go-to-top, which is the older gesture and stays where it is.
+        View feedHeader = feedHeader();
+        if (feedHeader != null) {
+            feedHeader.setOnClickListener(view -> changeSortType());
+        }
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, binding.drawerLayout, binding.includedAppBar.toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -707,6 +716,26 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             binding.includedAppBar.toolbar.getOverflowIcon().setColorFilter(onSurfaceVariant,
                     PorterDuff.Mode.SRC_IN);
         }
+        // The user's chosen font still has to reach the title block, which is nested inside the
+        // toolbar rather than being one of its direct text children the way the toolbar's own title
+        // was. Re-read on every layout because the font is set after the theme in some entry paths,
+        // which is the same reason the shared helper works this way.
+        View feedHeader = feedHeader();
+        if (feedHeader == null) {
+            return;
+        }
+        feedHeader.addOnLayoutChangeListener(
+                (view, i, i1, i2, i3, i4, i5, i6, i7) -> {
+                    if (typeface == null) {
+                        return;
+                    }
+                    ViewGroup block = (ViewGroup) view;
+                    for (int child = 0; child < block.getChildCount(); child++) {
+                        if (block.getChildAt(child) instanceof TextView text) {
+                            text.setTypeface(typeface);
+                        }
+                    }
+                });
     }
 
     @ExperimentalBadgeUtils
@@ -1598,6 +1627,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             // it settles at the start of the strip. Resuming onto a tab far along the strip would
             // come back with the first tabs showing and the indicator off screen.
             anchorTabStripToSelectedTab();
+            // Cold start: no page-change callback has fired yet, so the title block would sit empty
+            // until the first swipe.
+            updateFeedHeader();
 
             // Add double-tap to scroll to top functionality for all tabs
             binding.includedAppBar.tabLayoutMainActivity.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -1650,7 +1682,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                         navigationWrapper.showFab();
                     }
                 }
-                sectionsPagerAdapter.displaySortTypeInToolbar();
+                // Every way the feed in view changes arrives here: a tab tap, a swipe, a resume, and
+                // the re-seat that refreshTabs() does when a subscription lands. One place owns the
+                // title block, so the bar and the strip cannot disagree about which feed this is.
+                updateFeedHeader();
                 // The tab is half of what this screen records, and changing it moves no activity,
                 // so nothing would otherwise write it down until the next transition.
                 ResumeState.noteStateChanged(MainActivity.this);
@@ -2462,6 +2497,56 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         }
     }
 
+    /**
+     * The shell's title block.
+     *
+     * <p>It arrives through the toolbar's {@code app:layout}, so the toolbar inflates it and
+     * ViewBinding never sees it; the id is resolved from the toolbar instead. The result is cached
+     * because the block lives as long as the toolbar does.
+     */
+    @Nullable
+    private View feedHeader() {
+        if (cachedFeedHeader == null) {
+            cachedFeedHeader = binding.includedAppBar.toolbar.findViewById(R.id.feed_header_app_bar_main_activity);
+        }
+        return cachedFeedHeader;
+    }
+
+    /**
+     * Writes the shell's title block: the feed in view, and the sort it is showing.
+     *
+     * <p>Called from the one place the feed in view changes (the pager's page-change callback) and
+     * from the two places the sort changes, so the block is never stale. The feed name comes from
+     * the same resolved tab list the strip is built from, which is what keeps the two from drifting
+     * apart when a subscription arrives or a resume lands on a tab.
+     */
+    private void updateFeedHeader() {
+        View header = feedHeader();
+        if (!(header instanceof ViewGroup) || sectionsPagerAdapter == null) {
+            return;
+        }
+        ViewGroup block = (ViewGroup) header;
+        TextView titleView = block.findViewById(R.id.feed_title_app_bar_main_activity);
+        TextView sortView = block.findViewById(R.id.feed_sort_app_bar_main_activity);
+        if (titleView == null || sortView == null) {
+            return;
+        }
+
+        int position = Math.min(binding.includedAppBar.viewPagerMainActivity.getCurrentItem(),
+                Math.max(0, sectionsPagerAdapter.getItemCount() - 1));
+        String feedName = sectionsPagerAdapter.getPageTitle(position);
+        String sortLabel = Utils.sortTypeLabel(sectionsPagerAdapter.getCurrentSortType());
+        titleView.setText(feedName);
+        sortView.setText(sortLabel != null ? sortLabel : "");
+        sortView.setVisibility(sortLabel != null ? View.VISIBLE : View.GONE);
+        // TalkBack reads the block as one control, so the caption needs to say what it is and what
+        // tapping it does; without this the two lines are announced as loose text and the command
+        // they carry is invisible.
+        header.setContentDescription(sortLabel != null
+                ? getString(R.string.feed_header_content_description, feedName, sortLabel)
+                : feedName);
+    }
+
     @Override
     public void displaySortType() {
         if (sectionsPagerAdapter != null) {
@@ -3203,6 +3288,13 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             return null;
         }
 
+        /** The sort of the feed in view, or null before the fragment is realised. */
+        @Nullable
+        SortType getCurrentSortType() {
+            PostFragment currentFragment = getCurrentFragment();
+            return currentFragment != null ? currentFragment.getSortType() : null;
+        }
+
         @Nullable
         private Fragment getCurrentRawFragment() {
             return rawFragmentAtPosition(binding.includedAppBar.viewPagerMainActivity.getCurrentItem());
@@ -3288,11 +3380,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         }
 
         void displaySortTypeInToolbar() {
-            PostFragment currentFragment = getCurrentFragment();
-            if (currentFragment != null) {
-                SortType sortType = currentFragment.getSortType();
-                Utils.displaySortTypeInToolbar(sortType, binding.includedAppBar.toolbar);
-            }
+            updateFeedHeader();
         }
 
         void hideReadPosts() {

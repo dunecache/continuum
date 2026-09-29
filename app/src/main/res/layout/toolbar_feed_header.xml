@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The shell's title block: which feed you are in, and the sort it is showing.
+
+  A Toolbar's own title and subtitle cannot be tapped and cannot be told to truncate at a
+  predictable width, and the sort type is a command rather than a caption, so both are laid out here
+  instead. Added to the toolbar with app:layout, which is the supported way to put custom content in
+  one.
+
+  The block is the touch target for the sort sheet, because a caption nobody can tap is a caption
+  nobody learns. It is as wide as its text rather than the whole bar, with the 48dp floor kept under
+  it so a short feed name is still a big enough target.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/feed_header_app_bar_main_activity"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical|start"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/touch_target_min"
+    android:minWidth="@dimen/touch_target_min"
+    android:orientation="vertical"
+    android:paddingEnd="@dimen/space_8">
+
+    <TextView
+        android:id="@+id/feed_title_app_bar_main_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Continuum.TopBar.Title"
+        tools:text="r/pics" />
+
+    <TextView
+        android:id="@+id/feed_sort_app_bar_main_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textAppearance="@style/TextAppearance.Continuum.TopBar.Subtitle"
+        tools:text="Hot: Today" />
+
+</LinearLayout>

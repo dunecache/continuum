@@ -216,6 +216,19 @@
         <item name="dividerThickness">@dimen/divider_thickness</item>
     </style>
 
+    <!--
+      The shell's title block. Both steps are Phase 0 type with the chrome's own foreground: the
+      app bar is a surface rather than the theme's accent, so the custom theme's post text colours
+      are the wrong pairing here.
+    -->
+    <style name="TextAppearance.Continuum.TopBar.Title" parent="TextAppearance.Continuum.Title">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.Continuum.TopBar.Subtitle" parent="TextAppearance.Continuum.Meta">
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
     <style name="Widget.Continuum.BottomBar" parent="Widget.Material3.BottomAppBar">
         <item name="android:minHeight">@dimen/navigation_item_min_height</item>
         <item name="backgroundTint">?attr/colorSurface</item>

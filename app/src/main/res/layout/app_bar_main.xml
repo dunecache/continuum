@@ -31,25 +31,32 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorSurface"
+                app:layout="@layout/toolbar_feed_header"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
+        <!--
+          The feed strip, pinned: it carries no layout_scrollFlags, so it stays put under the
+          collapsing title instead of scrolling away with it. The feed you are reading is the one
+          thing the bar must never lose. Scrollable rather than fill, because a user's feed list is
+          however long it is and equal-width tabs truncate every name past the fourth.
+        -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout_main_activity"
             style="@style/Widget.Material3.TabLayout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/feed_tab_height"
             android:layout_gravity="bottom"
-            app:layout_scrollFlags="scroll|enterAlways"
             android:background="?attr/colorSurface"
-            app:tabGravity="fill"
+            app:tabGravity="start"
             app:tabIndicatorColor="?attr/colorPrimary"
             app:tabIndicatorHeight="@dimen/space_2"
             app:tabRippleColor="?attr/colorPrimaryContainer"
             app:tabSelectedTextColor="?attr/colorPrimary"
             app:tabTextColor="?attr/colorOnSurfaceVariant"
+            app:tabMode="scrollable"
             app:tabUnboundedRipple="false" />
 
     </com.google.android.material.appbar.AppBarLayout>

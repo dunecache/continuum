@@ -469,13 +469,28 @@ public final class Utils {
     }
 
     public static void displaySortTypeInToolbar(SortType sortType, Toolbar toolbar) {
-        if (sortType != null) {
-            if (sortType.getTime() != null) {
-                toolbar.setSubtitle(sortType.getType().fullName + ": " + sortType.getTime().fullName);
-            } else {
-                toolbar.setSubtitle(sortType.getType().fullName);
-            }
+        String label = sortTypeLabel(sortType);
+        if (label != null) {
+            toolbar.setSubtitle(label);
         }
+    }
+
+    /**
+     * The human-readable sort state, or null when there is no sort to describe.
+     *
+     * Split out of {@link #displaySortTypeInToolbar} so the shell's title block and the screens that
+     * still use a Toolbar subtitle read from one place: two copies of this string would be two
+     * chances to disagree about what the user is looking at.
+     */
+    @Nullable
+    public static String sortTypeLabel(@Nullable SortType sortType) {
+        if (sortType == null) {
+            return null;
+        }
+        if (sortType.getTime() != null) {
+            return sortType.getType().fullName + ": " + sortType.getTime().fullName;
+        }
+        return sortType.getType().fullName;
     }
 
     public static void showKeyboard(Context context, Handler handler, View view) {
