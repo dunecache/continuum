@@ -13,10 +13,12 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.tabs.TabLayout
 import java.io.File
 import kotlin.math.roundToInt
 import ml.docilealligator.infinityforreddit.R
@@ -407,6 +409,55 @@ class MainShellLayoutTest {
             current = current.parent as View
         }
         return bounds
+    }
+
+    /**
+     * The shell's top bar: a title block that fits its row, and a feed strip that is pinned rather
+     * than scrolling away with the title.
+     *
+     * Both of these are invisible in a screenshot of the resting state and both were wrong before,
+     * so they are asserted as facts about the layout rather than left to the eye.
+     */
+    @Test
+    fun shellTitleBlockFitsAndTheFeedStripIsPinned() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-title")
+        val toolbar = shell.requireView(R.id.toolbar)
+        val strip = shell.requireView(R.id.tab_layout_main_activity)
+        val header = requireNotNull(toolbar.findViewById<View>(R.id.feed_header_app_bar_main_activity)) {
+            "the toolbar has no title block"
+        }
+        val measured = measure(shell, "phone-title")
+
+        val headerBounds = boundsWithin(header, shell)
+        assertTrue(
+            "the title block must sit inside the toolbar; header=$headerBounds " +
+                "toolbar=0..${toolbar.height}. $measured",
+            headerBounds.height() > 0 && headerBounds.bottom <= toolbar.height,
+        )
+        assertTrue(
+            "the title block must not be wider than the row it is in; header=$headerBounds " +
+                "toolbar=0..${toolbar.width}. $measured",
+            headerBounds.width <= toolbar.width,
+        )
+
+        // No scroll flags is what pins it: a strip that scrolls is the strip that loses the feed you
+        // are reading, which is the one thing the bar must never do.
+        val stripParams = strip.layoutParams as AppBarLayout.LayoutParams
+        assertEquals(
+            "the feed strip must not scroll away with the title. $measured",
+            0,
+            stripParams.scrollFlags,
+        )
+        assertEquals(
+            "the feed strip must be scrollable, not fill: a long feed list truncates every name " +
+                "past the fourth. $measured",
+            TabLayout.MODE_SCROLLABLE,
+            (strip as TabLayout).tabMode,
+        )
+        assertTrue(
+            "the strip must sit below the title it belongs to. $measured",
+            strip.top >= toolbar.bottom,
+        )
     }
 
     @Test
