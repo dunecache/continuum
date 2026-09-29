@@ -31,9 +31,18 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 android:background="?attr/colorSurface"
-                app:layout="@layout/toolbar_feed_header"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                <!--
+                  Declared as a child rather than through app:layout: this AppCompat version has no
+                  Toolbar_layout attribute, so app:layout is silently ignored and the block never
+                  appears. A declared child lands as a Toolbar.LayoutParams.CUSTOM view, which is
+                  what the toolbar's own layout code looks for.
+                -->
+                <include layout="@layout/toolbar_feed_header" />
+
+            </com.google.android.material.appbar.MaterialToolbar>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
