@@ -230,14 +230,16 @@
     </style>
 
     <!--
-      The shell's toolbar. A Material 3 app bar is a surface with on-surface icons, which is what
-      ThemeOverlay.Material3.Toolbar.Surface supplies, so the action buttons pick up the 48dp target
-      and the tonal ripple rather than whatever the accent bar defaulted to.
+      The shell's toolbar: a Material 3 app bar on a surface container.
+
+      Deliberately just the surface. There is no toolbarActionStyle to point at: this AppCompat's
+      Toolbar styleable has 31 attributes and that is not one of them, so naming it fails resource
+      linking. The M3 parent already carries the tonal ripple and the 48dp target through its own
+      theme overlay, and the icon colours come from the shell's runtime theming, which has to own
+      them anyway because they come from the custom theme.
     -->
     <style name="Widget.Continuum.TopBar" parent="Widget.Material3.Toolbar">
         <item name="android:background">?attr/colorSurfaceContainerHigh</item>
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Toolbar.Surface</item>
-        <item name="toolbarActionStyle">@style/Widget.Material3.Button.IconButton</item>
     </style>
 
     <style name="Widget.Continuum.BottomBar" parent="Widget.Material3.BottomAppBar">
