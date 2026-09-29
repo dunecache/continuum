@@ -437,7 +437,7 @@ class MainShellLayoutTest {
         assertTrue(
             "the title block must not be wider than the row it is in; header=$headerBounds " +
                 "toolbar=0..${toolbar.width}. $measured",
-            headerBounds.width <= toolbar.width,
+            headerBounds.width() <= toolbar.width,
         )
 
         // No scroll flags is what pins it: a strip that scrolls is the strip that loses the feed you
