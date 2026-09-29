@@ -464,6 +464,55 @@ class MainShellLayoutTest {
         )
     }
 
+    /**
+     * A real feed name and sort caption have to fit the block, truncating rather than wrapping or
+     * pushing the bar's actions off the row.
+     *
+     * The block is `wrap_content`, which is what lets a long name take the space it needs and a
+     * short one stay a small target, so the risk it carries is a long name growing the bar rather
+     * than being cut. The title is written from a resolved tab label, and those are unbounded: a
+     * user can rename a multireddit to anything.
+     */
+    @Test
+    fun shellTitleBlockTruncatesALongFeedNameInsteadOfGrowingTheBar() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-title-long")
+        val toolbar = shell.requireView(R.id.toolbar)
+        val header = requireNotNull(toolbar.findViewById<View>(R.id.feed_header_app_bar_main_activity))
+        val title = requireNotNull(
+            header.findViewById<TextView>(R.id.feed_title_app_bar_main_activity)
+        ) { "the title block has no title" }
+        val sort = requireNotNull(
+            header.findViewById<TextView>(R.id.feed_sort_app_bar_main_activity)
+        ) { "the title block has no sort caption" }
+
+        // A short name first, so the comparison is against a realistic bar rather than against an
+        // empty block's minimum height.
+        title.text = "r/pics"
+        sort.text = "Hot: Today"
+        val shortHeight = measure(shell, "phone-title-long-short").let { toolbar.height }
+
+        title.text = "r/AskRedditLikeAPersonWhoHasVeryLongSubredditNameHere"
+        sort.text = "Top: This Month"
+        val measured = measure(shell, "phone-title-long")
+
+        assertEquals(
+            "the title must stay one line whatever the feed is called. $measured",
+            1,
+            title.lineCount,
+        )
+        assertTrue(
+            "a long feed name must not grow the bar: the actions share this row. " +
+                "toolbar=0..$shortHeight now=0..${toolbar.height}. $measured",
+            toolbar.height <= shortHeight,
+        )
+        val headerBounds = boundsWithin(header, shell)
+        assertTrue(
+            "the title block must still fit the row it is in; header=$headerBounds " +
+                "toolbar=0..${toolbar.width}. $measured",
+            headerBounds.width() <= toolbar.width,
+        )
+    }
+
     @Test
     @Config(qualifiers = TABLET_QUALIFIERS)
     fun railShellKeepsTheFeedAtFullHeight() {
