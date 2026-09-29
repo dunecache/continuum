@@ -905,8 +905,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 break;
             }
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_SEARCH: {
-                Intent intent = new Intent(this, SearchActivity.class);
-                startActivity(intent);
+                openSearch();
                 break;
             }
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_GO_TO_SUBREDDIT:
@@ -1183,7 +1182,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 startActivity(intent);
             }
         } else if (itemId == R.id.navigation_bottom_search) {
-            startActivity(new Intent(this, SearchActivity.class));
+            openSearch();
         } else if (itemId == R.id.navigation_bottom_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }
@@ -1397,8 +1396,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                     break;
                 }
                 case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_FAB_SEARCH: {
-                    Intent intent = new Intent(this, SearchActivity.class);
-                    startActivity(intent);
+                    openSearch();
                     break;
                 }
                 case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_FAB_GO_TO_SUBREDDIT:
@@ -2063,6 +2061,18 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
      * Opens the Reddit link on the clipboard, or says there is not one. The clipboard is read only
      * when the menu item is tapped, never on the way in.
      */
+    /**
+     * The one way this screen opens Search.
+     *
+     * <p>The toolbar's search action, the bottom navigation's Search destination, the legacy bar's
+     * search option and both FAB search options each built their own Intent to the same activity.
+     * Same destination, five code paths: any future argument to Search had to be added five times
+     * and three of them would have quietly drifted.
+     */
+    private void openSearch() {
+        startActivity(new Intent(this, SearchActivity.class));
+    }
+
     private void openClipboardRedditLink() {
         ClipboardManager clipboard = ContextCompat.getSystemService(this, ClipboardManager.class);
 
@@ -2100,8 +2110,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
         if (itemId == R.id.action_search_main_activity) {
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
+            openSearch();
             return true;
         } else if (itemId == R.id.action_create_post_main_activity) {
             PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
@@ -2608,8 +2617,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 postLayoutBottomSheetFragment.show(getSupportFragmentManager(), postLayoutBottomSheetFragment.getTag());
                 break;
             case FABMoreOptionsBottomSheetFragment.FAB_OPTION_SEARCH:
-                Intent intent = new Intent(this, SearchActivity.class);
-                startActivity(intent);
+                openSearch();
                 break;
             case FABMoreOptionsBottomSheetFragment.FAB_OPTION_GO_TO_SUBREDDIT: {
                 goToSubreddit();

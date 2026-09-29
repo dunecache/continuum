@@ -11,7 +11,7 @@
         android:id="@+id/appbar_layout_main_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorSurfaceContainerHigh"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:elevation="0dp"
         app:liftOnScroll="false">
@@ -20,17 +20,17 @@
             android:id="@+id/collapsing_toolbar_layout_main_activity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorSurface"
+            android:background="?attr/colorSurfaceContainerHigh"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleEnabled="false"
             app:toolbarId="@+id/toolbar">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
+                style="@style/Widget.Continuum.TopBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                android:background="?attr/colorSurface"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/feed_tab_height"
             android:layout_gravity="bottom"
-            android:background="?attr/colorSurface"
+            android:background="?attr/colorSurfaceContainerHigh"
             app:tabGravity="start"
             app:tabIndicator="@drawable/tab_indicator_continuum"
             app:tabIndicatorColor="@null"

@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
@@ -473,6 +474,40 @@ class MainShellLayoutTest {
      * than being cut. The title is written from a resolved tab label, and those are unbounded: a
      * user can rename a multireddit to anything.
      */
+    /**
+     * The top of the screen is one surface from the toolbar to the feed strip, and it is the same
+     * surface the bottom navigation sits on.
+     *
+     * A shared helper used to repaint the strip in the theme's accent, which left a tonal toolbar
+     * on an accent strip, so the roles are asserted here rather than left to whoever runs the app
+     * next. The layout declares them: the runtime theme method reinforces the same roles with
+     * colours it has already resolved, so the design does not live in one place only.
+     */
+    @Test
+    fun topChromeSitsOnTheSameSurfaceAsTheBottomNavigation() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-chrome")
+        val appBar = shell.requireView(R.id.appbar_layout_main_activity)
+        val collapsing = shell.requireView(R.id.collapsing_toolbar_layout_main_activity)
+        val toolbar = shell.requireView(R.id.toolbar)
+        val strip = shell.requireView(R.id.tab_layout_main_activity)
+        val navigation = shell.requireView(R.id.bottom_navigation_main_activity)
+        val measured = measure(shell, "phone-chrome")
+
+        val tonal = MaterialColors.getColor(
+            navigation, com.google.android.material.R.attr.colorSurfaceContainerHigh
+        )
+        for ((name, view) in listOf("app bar" to appBar, "collapsing toolbar" to collapsing,
+            "toolbar" to toolbar, "feed strip" to strip)) {
+            val painted = (view.background as? ColorDrawable)?.defaultColor
+            assertEquals(
+                "the $name must sit on the bottom navigation's surface role, not the theme " +
+                    "accent. $measured",
+                tonal,
+                painted,
+            )
+        }
+    }
+
     @Test
     fun shellTitleBlockTruncatesALongFeedNameInsteadOfGrowingTheBar() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-title-long")
