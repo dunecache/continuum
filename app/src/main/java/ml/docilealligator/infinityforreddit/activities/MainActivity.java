@@ -734,8 +734,6 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 com.google.android.material.R.attr.colorPrimary), onSurfaceVariant);
         tabLayout.setSelectedTabIndicatorColor(MaterialColors.getColor(tabLayout,
                 com.google.android.material.R.attr.colorSecondaryContainer));
-        tabLayout.setTabRippleColor(ColorStateList.valueOf(MaterialColors.getColor(tabLayout,
-                com.google.android.material.R.attr.colorSecondaryContainer)));
         binding.includedAppBar.toolbar.setTitleTextColor(onSurface);
         binding.includedAppBar.toolbar.setSubtitleTextColor(onSurfaceVariant);
         if (binding.includedAppBar.toolbar.getNavigationIcon() != null) {

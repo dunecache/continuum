@@ -66,7 +66,7 @@
             app:tabIndicatorGravity="stretch"
             app:tabPaddingStart="@dimen/space_12"
             app:tabPaddingEnd="@dimen/space_12"
-            app:tabRippleColor="?attr/colorPrimaryContainer"
+            app:tabRippleColor="?attr/colorSecondaryContainer"
             app:tabSelectedTextColor="?attr/colorPrimary"
             app:tabTextColor="?attr/colorOnSurfaceVariant"
             app:tabMode="scrollable"
