@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The sort caption's affordance: a chevron saying "this opens something", which is what tells a
+  caption apart from a piece of text. Stroked like the navigation icons rather than filled, and a
+  little heavier in proportion because it is a 16dp mark standing in for a 24dp one.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M4,6.5 L8,10.5 L12,6.5"
+      android:strokeColor="#000000"
+      android:strokeWidth="2"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round" />
+</vector>

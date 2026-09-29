@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The selected tab's indicator: the same pill the selected destination gets at the bottom of the
+  screen, so the two read as one system rather than two designs that happen to be on the same screen.
+
+  Wrapped in an inset layer because the tab row is a fixed 48dp and an indicator that stretches the
+  full height reads as a block, not a pill. 48dp less 8dp either side is the 32dp the bottom bar's
+  active indicator is, reached from the spacing scale rather than by copying the number: move
+  navigation_indicator_height and this one has to be revisited, which is the point of writing it down.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:insetHorizontal="@dimen/space_12"
+        android:insetVertical="@dimen/space_8">
+        <shape android:shape="rectangle">
+            <solid android:color="?attr/colorSecondaryContainer" />
+            <corners android:radius="@dimen/shape_corner_large" />
+        </shape>
+    </item>
+</layer-list>
