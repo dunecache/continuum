@@ -63,6 +63,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.loadingindicator.LoadingIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.collect.ImmutableList;
@@ -440,6 +441,29 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             mPostContentColor = customThemeWrapper.getPostContentColor();
             mReadPostTitleColor = customThemeWrapper.getReadPostTitleColor();
             mReadPostContentColor = customThemeWrapper.getReadPostContentColor();
+
+            // The card's own surface and text follow the role palette, the way the app bar and the
+            // navigation bar already do, so a post card stops being the one surface still painted
+            // from the custom theme. The reads above stay as the fallback: a theme that does not
+            // define a role keeps whatever the user chose rather than resolving to nothing. The
+            // role attributes belong to Material rather than to this app, hence Material's own R.
+            //
+            // These six cannot be left to the layout. setItemViewBackgroundColor() repaints the
+            // card on every bind to show read state, and on a MaterialCardView
+            // setBackgroundTintList() replaces cardBackgroundColor outright, so a role set in
+            // Widget.Continuum.PostCard would be thrown away the moment a row was bound. That is
+            // also why the unread and read surfaces have to be different roles and not shades of
+            // one: in light, dark and AMOLED alike, High sits above the page and Low sits below
+            // the card, which is the direction a read post is meant to recede.
+            //
+            // The compact family's filled surfaces are deliberately not touched here; they keep the
+            // custom theme until that family is brought over.
+            mCardViewBackgroundColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerHigh, mCardViewBackgroundColor);
+            mReadPostCardViewBackgroundColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerLow, mReadPostCardViewBackgroundColor);
+            mPostTitleColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurface, mPostTitleColor);
+            mReadPostTitleColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurfaceVariant, mReadPostTitleColor);
+            mPostContentColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurface, mPostContentColor);
+            mReadPostContentColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurfaceVariant, mReadPostContentColor);
             mStickiedPostIconTint = customThemeWrapper.getStickiedPostIconTint();
             mTextTypeBackgroundColor = customThemeWrapper.getTextTypeBackgroundColor();
             mImageTypeBackgroundColor = customThemeWrapper.getImageTypeBackgroundColor();

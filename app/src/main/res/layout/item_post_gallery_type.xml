@@ -4,11 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    app:cardElevation="2dp"
-    app:cardCornerRadius="16dp"
-    style="?attr/materialCardViewElevatedStyle">
+    android:layout_marginTop="@dimen/space_8"
+    android:layout_marginBottom="@dimen/space_8"
+    style="@style/Widget.Continuum.PostCard.Large">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +16,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="@dimen/space_16">
 
             <ml.docilealligator.infinityforreddit.customviews.AspectRatioGifImageView
                 android:id="@+id/icon_gif_image_view_item_post_gallery_type"
@@ -36,8 +34,7 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="8dp"
-                android:textSize="?attr/font_default"
-                android:fontFamily="?attr/font_family"
+                style="@style/TextAppearance.Continuum.Meta"
                 app:layout_constraintBottom_toTopOf="@id/user_text_view_item_post_gallery_type"
                 app:layout_constraintStart_toEndOf="@id/icon_gif_image_view_item_post_gallery_type"
                 app:layout_constraintEnd_toStartOf="@id/stickied_post_image_view_item_post_gallery_type"
@@ -51,8 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="8dp"
-                android:textSize="?attr/font_default"
-                android:fontFamily="?attr/font_family"
+                style="@style/TextAppearance.Continuum.Meta"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/icon_gif_image_view_item_post_gallery_type"
                 app:layout_constraintEnd_toStartOf="@id/stickied_post_image_view_item_post_gallery_type"
@@ -76,8 +72,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
-                android:textSize="?attr/font_default"
-                android:fontFamily="?attr/font_family"
+                style="@style/TextAppearance.Continuum.Meta"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/guideline2"
@@ -92,22 +87,33 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- The card's display type. Capped at three lines so a long title cannot push the media
+             and the action row off the bottom of a tall card; the rest of the title is the domain
+             chip's job to point at. -->
         <TextView
             android:id="@+id/title_text_view_item_post_gallery_type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:textSize="?attr/title_font_18"
-            android:fontFamily="?attr/title_font_family" />
+            android:layout_marginTop="@dimen/space_8"
+            android:paddingStart="@dimen/space_16"
+            android:paddingEnd="@dimen/space_16"
+            android:maxLines="3"
+            android:ellipsize="end"
+            style="@style/TextAppearance.Continuum.PostTitle" />
 
+        <!-- The badge row. Its own top padding plus the title's top margin add up to the 16dp the
+             title used to sit under the meta line with, so a post with no badges at all, which is
+             the common case, no longer reserves a full badge row's worth of space. The row is not
+             given a bottom margin: a badge belongs to the title, so it sits 8dp above it and the
+             16dp below the title separates the pair from the body. -->
         <com.nex3z.flowlayout.FlowLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            app:flChildSpacing="16dp"
+            android:paddingTop="@dimen/space_8"
+            android:paddingBottom="@dimen/space_8"
+            app:flChildSpacing="@dimen/space_16"
             app:flChildSpacingForLastRow="align"
-            app:flRowSpacing="8dp">
+            app:flRowSpacing="@dimen/space_8">
 
             <com.libRG.CustomTextView
                 android:id="@+id/type_text_view_item_post_gallery_type"
@@ -230,9 +236,10 @@
                 android:id="@+id/upvote_button_item_post_gallery_type"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:minWidth="0dp"
+                android:minHeight="@dimen/touch_target_min"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
+                android:minWidth="@dimen/touch_target_min"
                 android:backgroundTint="#00000000"
                 app:strokeWidth="0dp"
                 app:icon="@drawable/ic_upvote_24dp"
@@ -258,9 +265,10 @@
                 android:id="@+id/downvote_button_item_post_gallery_type"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:minWidth="0dp"
+                android:minHeight="@dimen/touch_target_min"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
+                android:minWidth="@dimen/touch_target_min"
                 android:backgroundTint="#00000000"
                 app:strokeWidth="0dp"
                 app:icon="@drawable/ic_downvote_24dp"
@@ -273,9 +281,10 @@
                 android:id="@+id/comments_count_button_item_post_gallery_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:minWidth="0dp"
+                android:minHeight="@dimen/touch_target_min"
+                android:minWidth="@dimen/touch_target_min"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
                 android:textSize="?attr/font_12"
                 android:textStyle="bold"
                 android:fontFamily="?attr/font_family"
@@ -293,6 +302,8 @@
                 android:id="@+id/save_button_item_post_gallery_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/touch_target_min"
+                android:minWidth="@dimen/touch_target_min"
                 app:strokeWidth="0dp"
                 app:iconSize="24dp"
                 app:layout_constraintHorizontal_bias="1"
@@ -306,6 +317,8 @@
                 android:id="@+id/share_button_item_post_gallery_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:minHeight="@dimen/touch_target_min"
+                android:minWidth="@dimen/touch_target_min"
                 app:strokeWidth="0dp"
                 app:icon="@drawable/ic_share_grey_24dp"
                 app:iconSize="24dp"

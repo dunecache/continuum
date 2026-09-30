@@ -53,6 +53,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 import com.google.common.collect.ImmutableList;
 import com.libRG.CustomTextView;
 import io.noties.markwon.AbstractMarkwonPlugin;
@@ -373,6 +374,13 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
         mCardViewColor = customThemeWrapper.getCardViewBackgroundColor();
         mPostTitleColor = customThemeWrapper.getPostTitleColor();
         mPrimaryTextColor = customThemeWrapper.getPrimaryTextColor();
+
+        // The header card shares Widget.Continuum.PostCard with the feed, so it has to follow the
+        // role palette too or the same card style paints two different surfaces. As in the feed
+        // adapter, the custom theme's own values stay as the fallback, and the role attributes are
+        // named in Material's R because they belong to Material rather than to this app.
+        mCardViewColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerHigh, mCardViewColor);
+        mPostTitleColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurface, mPostTitleColor);
         mTextTypeBackgroundColor = customThemeWrapper.getTextTypeBackgroundColor();
         mImageTypeBackgroundColor = customThemeWrapper.getImageTypeBackgroundColor();
         mLinkTypeBackgroundColor = customThemeWrapper.getLinkTypeBackgroundColor();
