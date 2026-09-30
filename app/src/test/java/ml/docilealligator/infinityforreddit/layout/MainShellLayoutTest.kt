@@ -498,7 +498,8 @@ class MainShellLayoutTest {
         )
         for ((name, view) in listOf("app bar" to appBar, "collapsing toolbar" to collapsing,
             "toolbar" to toolbar, "feed strip" to strip)) {
-            val painted = (view.background as? ColorDrawable)?.defaultColor
+            // getDefaultColor() rather than a property: Kotlin does not surface this one.
+            val painted = (view.background as? ColorDrawable)?.getDefaultColor()
             assertEquals(
                 "the $name must sit on the bottom navigation's surface role, not the theme " +
                     "accent. $measured",
