@@ -426,7 +426,6 @@ class MainShellLayoutTest {
     @Test
     fun shellTitleBlockFitsAndTheFeedStripIsPinned() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-title")
-        val toolbar = shell.requireView(R.id.toolbar)
         val strip = shell.requireView(R.id.tab_layout_main_activity)
         val header = requireNotNull(toolbar.findViewById<View>(R.id.feed_header_app_bar_main_activity)) {
             "the toolbar has no title block"
@@ -487,7 +486,6 @@ class MainShellLayoutTest {
     fun topChromeSitsOnTheSameSurfaceAsTheBottomNavigation() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-chrome")
         val collapsing = shell.requireView(R.id.collapsing_toolbar_layout_main_activity)
-        val toolbar = shell.requireView(R.id.toolbar)
         val strip = shell.requireView(R.id.tab_layout_main_activity)
         val navigation = shell.requireView(R.id.bottom_navigation_main_activity)
         val measured = measure(shell, "phone-chrome")
@@ -495,13 +493,13 @@ class MainShellLayoutTest {
         val tonal = MaterialColors.getColor(
             navigation, com.google.android.material.R.attr.colorSurfaceContainerHigh
         )
-        // The AppBarLayout is deliberately absent: it paints its own MaterialShapeDrawable, so what
-        // the layout says is not what reaches the screen. Its surface is applied at runtime by
-        // applyHomeAppBarTheme(), which is also why a shared helper repainting it went unnoticed -
-        // the layout could not contradict it either way. The three views below are the ones the
-        // layout does control.
+        // Only the two plain containers are checked. AppBarLayout and MaterialToolbar each paint
+        // their own MaterialShapeDrawable and ignore a background set in the layout, so their
+        // surfaces are decided at runtime by applyHomeAppBarTheme() and no layout test can see
+        // them - which is precisely how the shared helper repainting the strip went unnoticed. The
+        // collapsing layout and the strip are the views whose surface the layout does own.
         for ((name, view) in listOf("collapsing toolbar" to collapsing,
-            "toolbar" to toolbar, "feed strip" to strip)) {
+            "feed strip" to strip)) {
             // .color rather than getDefaultColor(): ColorDrawable is Kotlin in this SDK and the old
             // getter is gone.
             val painted = (view.background as? ColorDrawable)?.color
