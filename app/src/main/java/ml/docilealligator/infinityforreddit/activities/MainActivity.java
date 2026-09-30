@@ -730,8 +730,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         // The strip's own colours rather than the shared helper's, which paints tabs in the theme's
         // accent: on a tonal bar those are the wrong pair, and the indicator in particular is the
         // same pill colour the selected destination uses at the bottom of the screen.
-        tabLayout.setTabTextColors(MaterialColors.getColor(tabLayout,
-                com.google.android.material.R.attr.colorPrimary), onSurfaceVariant);
+        // colorPrimary is the app's own attr, not a Material one: the app declares it in attr.xml
+        // rather than taking the framework's reference-typed version, and the Material R has no
+        // field by that name.
+        tabLayout.setTabTextColors(MaterialColors.getColor(tabLayout, R.attr.colorPrimary),
+                onSurfaceVariant);
         tabLayout.setSelectedTabIndicatorColor(MaterialColors.getColor(tabLayout,
                 com.google.android.material.R.attr.colorSecondaryContainer));
         binding.includedAppBar.toolbar.setTitleTextColor(onSurface);
