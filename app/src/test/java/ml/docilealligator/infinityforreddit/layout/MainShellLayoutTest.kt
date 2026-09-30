@@ -503,7 +503,11 @@ class MainShellLayoutTest {
             val painted = (view.background as? ColorDrawable)?.color
             assertEquals(
                 "the $name must sit on the bottom navigation's surface role, not the theme " +
-                    "accent. $measured",
+                    "accent: expected #%06X, painted #%06X from a %s. $measured".format(
+                        tonal and 0xFFFFFF,
+                        (painted ?: -1) and 0xFFFFFF,
+                        view.background?.javaClass?.simpleName,
+                    ),
                 tonal,
                 painted,
             )
