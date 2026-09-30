@@ -498,8 +498,9 @@ class MainShellLayoutTest {
         )
         for ((name, view) in listOf("app bar" to appBar, "collapsing toolbar" to collapsing,
             "toolbar" to toolbar, "feed strip" to strip)) {
-            // getDefaultColor() rather than a property: Kotlin does not surface this one.
-            val painted = (view.background as? ColorDrawable)?.getDefaultColor()
+            // .color rather than getDefaultColor(): ColorDrawable is Kotlin in this SDK and the old
+            // getter is gone.
+            val painted = (view.background as? ColorDrawable)?.color
             assertEquals(
                 "the $name must sit on the bottom navigation's surface role, not the theme " +
                     "accent. $measured",
