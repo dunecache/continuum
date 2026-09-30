@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
-import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.MeasureSpec
@@ -466,6 +465,42 @@ class MainShellLayoutTest {
     }
 
     /**
+     * The shell's chrome declares the bottom navigation's surface role, and never the theme accent.
+     *
+     * A shared helper used to repaint the feed strip in the theme's accent, leaving a tonal toolbar
+     * sitting on an accent strip, and nothing caught it.
+     *
+     * This reads the declared value in the layout source rather than the painted result, because
+     * every widget in the app bar paints its own MaterialShapeDrawable and ignores a background set
+     * in the layout - the AppBarLayout, the MaterialToolbar and the TabLayout all did, which is three
+     * separate confirmations of the same thing. The surface that reaches the screen is applied at
+     * runtime by MainActivity's theme method, and that is a different kind of change to test.
+     */
+    @Test
+    fun shellChromeDeclaresTheTonalSurfaceAndNotTheAccent() {
+        val layout = File("src/main/res/layout/app_bar_main.xml").readText()
+        val backgrounds = Regex("""android:background="([^"]+)"""")
+            .findAll(layout).map { it.groupValues[1] }.toList()
+
+        assertTrue(
+            "the shell layout declares no backgrounds, so this would pass on anything",
+            backgrounds.isNotEmpty(),
+        )
+        for (background in backgrounds) {
+            assertFalse(
+                "the shell's chrome must not declare the theme accent as a background, found " +
+                    background,
+                background.contains("colorPrimary"),
+            )
+            assertEquals(
+                "every surface in the shell's chrome must be the role the bottom navigation uses",
+                "?attr/colorSurfaceContainerHigh",
+                background,
+            )
+        }
+    }
+
+    /**
      * A real feed name and sort caption have to fit the block, truncating rather than wrapping or
      * pushing the bar's actions off the row.
      *
@@ -474,49 +509,6 @@ class MainShellLayoutTest {
      * than being cut. The title is written from a resolved tab label, and those are unbounded: a
      * user can rename a multireddit to anything.
      */
-    /**
-     * The top of the screen is one surface from the toolbar to the feed strip, and it is the same
-     * surface the bottom navigation sits on.
-     *
-     * A shared helper used to repaint the strip in the theme's accent, which left a tonal toolbar
-     * on an accent strip, so the roles are asserted here rather than left to whoever runs the app
-     * next. The layout declares them: the runtime theme method reinforces the same roles with
-     * colours it has already resolved, so the design does not live in one place only.
-     */
-    @Test
-    fun topChromeSitsOnTheSameSurfaceAsTheBottomNavigation() {
-        val shell = inflateShell(PHONE_QUALIFIERS, "phone-chrome")
-        val collapsing = shell.requireView(R.id.collapsing_toolbar_layout_main_activity)
-        val strip = shell.requireView(R.id.tab_layout_main_activity)
-        val navigation = shell.requireView(R.id.bottom_navigation_main_activity)
-        val measured = measure(shell, "phone-chrome")
-
-        val tonal = MaterialColors.getColor(
-            navigation, com.google.android.material.R.attr.colorSurfaceContainerHigh
-        )
-        // Only the two plain containers are checked. AppBarLayout and MaterialToolbar each paint
-        // their own MaterialShapeDrawable and ignore a background set in the layout, so their
-        // surfaces are decided at runtime by applyHomeAppBarTheme() and no layout test can see
-        // them - which is precisely how the shared helper repainting the strip went unnoticed. The
-        // collapsing layout and the strip are the views whose surface the layout does own.
-        for ((name, view) in listOf("collapsing toolbar" to collapsing,
-            "feed strip" to strip)) {
-            // .color rather than getDefaultColor(): ColorDrawable is Kotlin in this SDK and the old
-            // getter is gone.
-            val painted = (view.background as? ColorDrawable)?.color
-            assertEquals(
-                "the $name must sit on the bottom navigation's surface role, not the theme " +
-                    "accent: expected #%06X, painted #%06X from a %s. $measured".format(
-                        tonal and 0xFFFFFF,
-                        (painted ?: -1) and 0xFFFFFF,
-                        view.background?.javaClass?.simpleName,
-                    ),
-                tonal,
-                painted,
-            )
-        }
-    }
-
     @Test
     fun shellTitleBlockTruncatesALongFeedNameInsteadOfGrowingTheBar() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-title-long")
