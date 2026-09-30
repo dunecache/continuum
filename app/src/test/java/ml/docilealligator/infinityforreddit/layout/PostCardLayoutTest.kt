@@ -133,7 +133,7 @@ class PostCardLayoutTest {
      */
     @Test
     fun everyCardActionControlMeasuresAtLeastTheTouchTargetFloor() {
-        val card = inflateCard()
+        val card = inflateCard().root
         val floor = card.resources.getDimensionPixelSize(R.dimen.touch_target_min)
         val controls = mapOf(
             R.id.upvote_button_item_post_with_preview to "upvote",
