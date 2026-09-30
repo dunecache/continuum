@@ -31,6 +31,7 @@ import ml.docilealligator.infinityforreddit.font.FontStyle
 import ml.docilealligator.infinityforreddit.font.TitleFontFamily
 import ml.docilealligator.infinityforreddit.font.TitleFontStyle
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
