@@ -371,16 +371,16 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
         mScale = resources.getDisplayMetrics().density;
 
         mColorAccent = customThemeWrapper.getColorAccent();
-        mCardViewColor = customThemeWrapper.getCardViewBackgroundColor();
-        mPostTitleColor = customThemeWrapper.getPostTitleColor();
         mPrimaryTextColor = customThemeWrapper.getPrimaryTextColor();
 
         // The header card shares Widget.Continuum.PostCard with the feed, so it has to follow the
         // role palette too or the same card style paints two different surfaces. As in the feed
-        // adapter, the custom theme's own values stay as the fallback, and the role attributes are
-        // named in Material's R because they belong to Material rather than to this app.
-        mCardViewColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerHigh, mCardViewColor);
-        mPostTitleColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurface, mPostTitleColor);
+        // adapter, the custom theme's own value is the fallback, so a theme that does not define a
+        // role keeps what the user chose, and the role attributes are named in Material's R
+        // because they belong to Material rather than to this app. Both fields are final, so the
+        // role and the fallback are resolved in the same statement.
+        mCardViewColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerHigh, customThemeWrapper.getCardViewBackgroundColor());
+        mPostTitleColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurface, customThemeWrapper.getPostTitleColor());
         mTextTypeBackgroundColor = customThemeWrapper.getTextTypeBackgroundColor();
         mImageTypeBackgroundColor = customThemeWrapper.getImageTypeBackgroundColor();
         mLinkTypeBackgroundColor = customThemeWrapper.getLinkTypeBackgroundColor();
