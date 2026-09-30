@@ -426,6 +426,7 @@ class MainShellLayoutTest {
     @Test
     fun shellTitleBlockFitsAndTheFeedStripIsPinned() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-title")
+        val toolbar = shell.requireView(R.id.toolbar)
         val strip = shell.requireView(R.id.tab_layout_main_activity)
         val header = requireNotNull(toolbar.findViewById<View>(R.id.feed_header_app_bar_main_activity)) {
             "the toolbar has no title block"
