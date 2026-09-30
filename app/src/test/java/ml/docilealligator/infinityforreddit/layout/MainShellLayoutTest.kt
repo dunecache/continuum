@@ -486,7 +486,6 @@ class MainShellLayoutTest {
     @Test
     fun topChromeSitsOnTheSameSurfaceAsTheBottomNavigation() {
         val shell = inflateShell(PHONE_QUALIFIERS, "phone-chrome")
-        val appBar = shell.requireView(R.id.appbar_layout_main_activity)
         val collapsing = shell.requireView(R.id.collapsing_toolbar_layout_main_activity)
         val toolbar = shell.requireView(R.id.toolbar)
         val strip = shell.requireView(R.id.tab_layout_main_activity)
@@ -496,7 +495,12 @@ class MainShellLayoutTest {
         val tonal = MaterialColors.getColor(
             navigation, com.google.android.material.R.attr.colorSurfaceContainerHigh
         )
-        for ((name, view) in listOf("app bar" to appBar, "collapsing toolbar" to collapsing,
+        // The AppBarLayout is deliberately absent: it paints its own MaterialShapeDrawable, so what
+        // the layout says is not what reaches the screen. Its surface is applied at runtime by
+        // applyHomeAppBarTheme(), which is also why a shared helper repainting it went unnoticed -
+        // the layout could not contradict it either way. The three views below are the ones the
+        // layout does control.
+        for ((name, view) in listOf("collapsing toolbar" to collapsing,
             "toolbar" to toolbar, "feed strip" to strip)) {
             // .color rather than getDefaultColor(): ColorDrawable is Kotlin in this SDK and the old
             // getter is gone.
