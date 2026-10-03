@@ -495,6 +495,9 @@ class MainShellLayoutTest {
      *    bigger than the text by.
      *  - the indicator drawable as source, because a horizontal inset there is a second subtraction
      *    that none of the above can see.
+     *
+     * The three tabs measure 71dp, 82dp and 49dp at xxhdpi, which is each label plus the 32dp of
+     * padding either side - against 14dp for "Home" and nothing at all for "All" before this.
      */
     @Test
     fun theSelectedTabPillCoversItsLabelWithRoomEitherSide() {
@@ -532,9 +535,13 @@ class MainShellLayoutTest {
             val tabView = requireNotNull(tabsRow.getChildAt(position) as? ViewGroup) {
                 "tab $position ($name) has no view in the row"
             }
-            val label = requireNotNull(tabView.getChildAt(0) as? TextView) {
-                "tab $position ($name) has no label"
-            }
+            val label = requireNotNull(
+                // By type and visibility, not by position: TabLayout gives a text-only tab an icon
+                // view anyway and adds it at index 0, so the label is the second child.
+                (0 until tabView.childCount)
+                    .mapNotNull { tabView.getChildAt(it) as? TextView }
+                    .firstOrNull { it.visibility == View.VISIBLE }
+            ) { "tab $position ($name) has no visible label" }
 
             assertTrue(
                 "the label must measure to something, or the comparison below passes on any pill. " +
