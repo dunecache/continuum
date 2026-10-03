@@ -50,6 +50,16 @@ private const val TABLET_QUALIFIERS = "sw600dp-w1280dp-h800dp-xhdpi"
 private const val REPORT_DIR = "build/reports/shell"
 
 /**
+ * The inset attributes that take width off the selected tab's pill, and the pair that does not.
+ *
+ * An `android:insetLeft`/`android:insetRight` pair is a subtraction, not a padding: Material hands
+ * the indicator drawable a box it has already narrowed to the label, so anything taken off the sides
+ * comes out of the text inside the pill.
+ */
+private val HORIZONTAL_INSETS = setOf("Left", "Right")
+private val VERTICAL_INSETS = setOf("Top", "Bottom")
+
+/**
  * Measures the MainActivity shell the way the device does, without an emulator.
  *
  * The shell has two variants and both are covered here, because they fail differently and both
@@ -463,6 +473,95 @@ class MainShellLayoutTest {
             "the strip must sit below the title it belongs to. $measured",
             strip.top >= toolbar.bottom,
         )
+    }
+
+    /**
+     * The selected tab's pill covers its label, with room either side of it.
+     *
+     * The pill used to be inset 12dp horizontally inside a box Material had already narrowed to the
+     * label - `tabIndicatorFullWidth="false"` sizes the indicator's bounds to `TabView.getContentWidth()`,
+     * which is the bare TextView - so it came out narrower than the text it was behind. "Home" was a
+     * 14dp sliver; "All" is a 17dp label, which Material floors at 24dp, and 12dp either side consumed
+     * that whole box, so the shortest tab in the strip had no pill at all.
+     *
+     * None of that shows in a screenshot of the resting state, and the indicator's bounds cannot show
+     * it either: `Drawable.getBounds()` on an `InsetDrawable` reports the outer box, and the inset is
+     * applied to the drawable inside it. So both halves are asserted where each is visible - the
+     * measured bounds for the layout's half, and the drawable source for its half. Reinstating the
+     * inset without moving the padding would pass on the measurement alone.
+     */
+    @Test
+    fun theSelectedTabPillCoversItsLabelWithRoomEitherSide() {
+        val shell = inflateShell(PHONE_QUALIFIERS, "phone-tab-pill")
+        val strip = shell.requireView(R.id.tab_layout_main_activity) as TabLayout
+        // The default tab list's three destinations, shortest label last: a pill sized off a long label
+        // looks right until the shortest label in the strip has to fit in one too.
+        for (name in listOf("Home", "Popular", "All")) {
+            strip.addTab(strip.newTab().setText(name))
+        }
+        // Measuring renders the shell, which is also what stretches the indicator's bounds to the
+        // strip's full height - tabIndicatorGravity="stretch" only resolves at draw time.
+        val measured = measure(shell, "phone-tab-pill")
+
+        val padding = shell.resources.getDimensionPixelSize(R.dimen.space_16)
+        val tabsRow = requireNotNull(strip.getChildAt(0) as? ViewGroup) {
+            "the strip holds no row of tabs"
+        }
+        val pill = strip.selectedTabIndicator
+
+        for (position in 0 until strip.tabCount) {
+            val tab = requireNotNull(strip.getTabAt(position)) { "the strip lost tab $position" }
+            val name = tab.text.toString()
+            val tabView = requireNotNull(tabsRow.getChildAt(position) as? ViewGroup) {
+                "tab $position ($name) has no view in the row"
+            }
+            val label = requireNotNull(tabView.getChildAt(0) as? TextView) {
+                "tab $position ($name) has no label"
+            }
+            tab.select()
+            val bounds = pill.bounds
+
+            assertEquals(
+                "the pill must span the whole tab; anything narrower is sized off the label, and a " +
+                    "horizontal inset in the indicator drawable then eats into the text. " +
+                    "tab=$position ($name) pill=$bounds tab=0..${tabView.width}. $measured",
+                tabView.width,
+                bounds.width(),
+            )
+            assertTrue(
+                "the pill must be wider than the label behind it by the strip's padding on each " +
+                    "side; tab=$position ($name) pill=${bounds.width()} label=${label.width} " +
+                    "padding=$padding. $measured",
+                bounds.width() >= label.width + padding * 2,
+            )
+            assertEquals(
+                "the pill must stretch the strip's row, which is what leaves the bottom bar's 32dp " +
+                    "after the drawable's vertical inset. tab=$position ($name) pill=$bounds. " +
+                    measured,
+                shell.resources.getDimensionPixelSize(R.dimen.feed_tab_height),
+                bounds.height(),
+            )
+        }
+
+        val indicator = File("src/main/res/drawable/tab_indicator_continuum.xml").readText()
+        val insets = Regex("android:inset(\\w*)=\"(.+)\"").findAll(indicator)
+            .associate { it.groupValues[1] to it.groupValues[2] }
+        assertTrue(
+            "the pill must not be inset horizontally: Material has already narrowed the box this " +
+                "drawable is given down to the label, so an inset here takes width away from the text " +
+                "inside the pill rather than padding it. Found ${insets.filterKeys { it in HORIZONTAL_INSETS }}.",
+            insets.keys.none { it in HORIZONTAL_INSETS },
+        )
+        // The vertical pair is what turns the stretched row into the bottom bar's 32dp active
+        // indicator, and it is safe precisely because it shortens the pill rather than narrowing it.
+        for (edge in VERTICAL_INSETS) {
+            assertEquals(
+                "the pill must keep the 8dp vertical inset that makes it the bottom bar's 32dp " +
+                    "pill rather than a block filling the row",
+                "@dimen/space_8",
+                insets[edge],
+            )
+        }
     }
 
     /**

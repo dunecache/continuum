@@ -3,17 +3,22 @@
   The selected tab's indicator: the same pill the selected destination gets at the bottom of the
   screen, so the two read as one system rather than two designs that happen to be on the same screen.
 
-  Inset rather than sized because the tab row is a fixed 48dp and an indicator that stretches the
-  full height reads as a block, not a pill. 48dp less 8dp either side is the 32dp the bottom bar's
-  active indicator is, reached from the spacing scale rather than by copying the number: move
-  navigation_indicator_height and this one has to be revisited, which is the point of writing it down.
+  Vertically inset rather than sized because the tab row is a fixed 48dp and an indicator that
+  stretches the full height reads as a block, not a pill. 48dp less 8dp either side is the 32dp the
+  bottom bar's active indicator is, reached from the spacing scale rather than by copying the number:
+  move navigation_indicator_height and this one has to be revisited, which is the point of writing it
+  down.
 
-  The four directional insets rather than insetHorizontal/insetVertical, which are API 26 and this
-  app supports 24.
+  NOT inset horizontally, and that is load-bearing. Material hands the indicator drawable a box that
+  is already only as wide as the label it sits behind - with tabIndicatorFullWidth=false that box is
+  TabView.getContentWidth(), the bare TextView, floored at Material's own 24dp minimum - so a
+  horizontal inset here does not pad the pill, it takes width away from the text inside it. A 12dp
+  inset each side left "Home" a 14dp sliver and "All" (a 17dp label, floored to 24dp) with no pill at
+  all, because the two insets consumed the whole box. The pill's room around the label comes from the
+  tab's own tabPadding instead, which is why the layout declares tabIndicatorFullWidth and the tab
+  padding and this drawable declares neither.
 -->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:insetLeft="@dimen/space_12"
-    android:insetRight="@dimen/space_12"
     android:insetTop="@dimen/space_8"
     android:insetBottom="@dimen/space_8">
     <shape android:shape="rectangle">

@@ -42,6 +42,13 @@
     <dimen name="navigation_item_min_height">64dp</dimen>
     <dimen name="feed_bottom_navigation_clearance">64dp</dimen>
     <dimen name="feed_tab_height">48dp</dimen>
+    <!--
+         Zero on purpose. A scrollable TabLayout gives every tab a 72dp minimum width unless told
+         otherwise, which would floor the selected tab's pill at 72dp whatever the label says: "All"
+         would get a lozenge twice its own width, and every label in the strip would carry the same
+         oversized pill. The pill is sized by its label plus the strip's tab padding instead.
+    -->
+    <dimen name="feed_tab_min_width">0dp</dimen>
     <dimen name="community_banner_height">160dp</dimen>
     <dimen name="navigation_icon_size">24dp</dimen>
     <dimen name="navigation_indicator_width">64dp</dimen>

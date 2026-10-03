@@ -51,6 +51,12 @@
           collapsing title instead of scrolling away with it. The feed you are reading is the one
           thing the bar must never lose. Scrollable rather than fill, because a user's feed list is
           however long it is and equal-width tabs truncate every name past the fourth.
+
+          The indicator spans the whole tab, and the 16dp of padding either side of the label is what
+          gives the pill its room. Split the other way - indicator on the label's own width with the
+          padding declared in the drawable - and the pill ends up narrower than the text it is
+          behind, because Material sizes the indicator's bounds to the label before the drawable ever
+          sees them. See tab_indicator_continuum.xml.
         -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout_main_activity"
@@ -62,10 +68,11 @@
             app:tabGravity="start"
             app:tabIndicator="@drawable/tab_indicator_continuum"
             app:tabIndicatorColor="@null"
-            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorFullWidth="true"
             app:tabIndicatorGravity="stretch"
-            app:tabPaddingStart="@dimen/space_12"
-            app:tabPaddingEnd="@dimen/space_12"
+            app:tabMinWidth="@dimen/feed_tab_min_width"
+            app:tabPaddingStart="@dimen/space_16"
+            app:tabPaddingEnd="@dimen/space_16"
             app:tabRippleColor="?attr/colorSecondaryContainer"
             app:tabSelectedTextColor="?attr/colorPrimary"
             app:tabTextColor="?attr/colorOnSurfaceVariant"
