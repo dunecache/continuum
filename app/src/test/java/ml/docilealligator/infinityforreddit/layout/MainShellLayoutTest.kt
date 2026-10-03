@@ -484,11 +484,17 @@ class MainShellLayoutTest {
      * 14dp sliver; "All" is a 17dp label, which Material floors at 24dp, and 12dp either side consumed
      * that whole box, so the shortest tab in the strip had no pill at all.
      *
-     * None of that shows in a screenshot of the resting state, and the indicator's bounds cannot show
-     * it either: `Drawable.getBounds()` on an `InsetDrawable` reports the outer box, and the inset is
-     * applied to the drawable inside it. So both halves are asserted where each is visible - the
-     * measured bounds for the layout's half, and the drawable source for its half. Reinstating the
-     * inset without moving the padding would pass on the measurement alone.
+     * Nothing about that shows in a screenshot of the resting state, and the indicator drawable's
+     * bounds cannot show it either: TabLayout keeps the indicator private, and `Drawable.getBounds()`
+     * on an `InsetDrawable` reports the outer box rather than the inset applied inside it. So the
+     * three things the pill's width is made of are each asserted where it is actually written:
+     *
+     *  - `tabIndicatorFullWidth` and `tabIndicatorGravity`, read off the inflated strip. Full width
+     *    means Material's bounds are the whole tab; stretch means their height is the whole row.
+     *  - the tab's measured width against its label's, which is the padding the pill has to be
+     *    bigger than the text by.
+     *  - the indicator drawable as source, because a horizontal inset there is a second subtraction
+     *    that none of the above can see.
      */
     @Test
     fun theSelectedTabPillCoversItsLabelWithRoomEitherSide() {
@@ -499,47 +505,47 @@ class MainShellLayoutTest {
         for (name in listOf("Home", "Popular", "All")) {
             strip.addTab(strip.newTab().setText(name))
         }
-        // Measuring renders the shell, which is also what stretches the indicator's bounds to the
-        // strip's full height - tabIndicatorGravity="stretch" only resolves at draw time.
         val measured = measure(shell, "phone-tab-pill")
+
+        // These two are what make the pill the whole tab. Read off the inflated strip rather than the
+        // layout source, so a style that overrides them is caught here too.
+        assertTrue(
+            "the pill must span the whole tab; sized to the label instead, an inset in the indicator " +
+                "drawable can only narrow it further. $measured",
+            strip.isTabIndicatorFullWidth,
+        )
+        assertEquals(
+            "the pill must stretch the strip's row, which is what leaves the bottom bar's 32dp once " +
+                "the drawable's vertical inset comes off it. $measured",
+            TabLayout.INDICATOR_GRAVITY_STRETCH,
+            strip.tabIndicatorGravity,
+        )
 
         val padding = shell.resources.getDimensionPixelSize(R.dimen.space_16)
         val tabsRow = requireNotNull(strip.getChildAt(0) as? ViewGroup) {
             "the strip holds no row of tabs"
         }
-        val pill = strip.selectedTabIndicator
 
         for (position in 0 until strip.tabCount) {
-            val tab = requireNotNull(strip.getTabAt(position)) { "the strip lost tab $position" }
-            val name = tab.text.toString()
+            val name = requireNotNull(strip.getTabAt(position)) { "the strip lost tab $position" }
+                .text.toString()
             val tabView = requireNotNull(tabsRow.getChildAt(position) as? ViewGroup) {
                 "tab $position ($name) has no view in the row"
             }
             val label = requireNotNull(tabView.getChildAt(0) as? TextView) {
                 "tab $position ($name) has no label"
             }
-            tab.select()
-            val bounds = pill.bounds
 
-            assertEquals(
-                "the pill must span the whole tab; anything narrower is sized off the label, and a " +
-                    "horizontal inset in the indicator drawable then eats into the text. " +
-                    "tab=$position ($name) pill=$bounds tab=0..${tabView.width}. $measured",
-                tabView.width,
-                bounds.width(),
+            assertTrue(
+                "the label must measure to something, or the comparison below passes on any pill. " +
+                    "tab=$position ($name) label=${label.width}px. $measured",
+                label.width > 0,
             )
             assertTrue(
-                "the pill must be wider than the label behind it by the strip's padding on each " +
-                    "side; tab=$position ($name) pill=${bounds.width()} label=${label.width} " +
-                    "padding=$padding. $measured",
-                bounds.width() >= label.width + padding * 2,
-            )
-            assertEquals(
-                "the pill must stretch the strip's row, which is what leaves the bottom bar's 32dp " +
-                    "after the drawable's vertical inset. tab=$position ($name) pill=$bounds. " +
-                    measured,
-                shell.resources.getDimensionPixelSize(R.dimen.feed_tab_height),
-                bounds.height(),
+                "the pill spans the tab, so the tab must be wider than the label behind it by the " +
+                    "strip's padding on each side; tab=$position ($name) tab=${tabView.width}px " +
+                    "label=${label.width}px padding=${padding}px. $measured",
+                tabView.width >= label.width + padding * 2,
             )
         }
 
@@ -549,7 +555,8 @@ class MainShellLayoutTest {
         assertTrue(
             "the pill must not be inset horizontally: Material has already narrowed the box this " +
                 "drawable is given down to the label, so an inset here takes width away from the text " +
-                "inside the pill rather than padding it. Found ${insets.filterKeys { it in HORIZONTAL_INSETS }}.",
+                "inside the pill rather than padding it. Found " +
+                insets.filterKeys { it in HORIZONTAL_INSETS } + ".",
             insets.keys.none { it in HORIZONTAL_INSETS },
         )
         // The vertical pair is what turns the stretched row into the bottom bar's 32dp active

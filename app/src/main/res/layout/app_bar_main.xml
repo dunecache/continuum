@@ -56,7 +56,9 @@
           gives the pill its room. Split the other way - indicator on the label's own width with the
           padding declared in the drawable - and the pill ends up narrower than the text it is
           behind, because Material sizes the indicator's bounds to the label before the drawable ever
-          sees them. See tab_indicator_continuum.xml.
+          sees them. See tab_indicator_continuum.xml. The zero tabMinWidth is the other half of it:
+          Material's 72dp floor for a scrollable strip would put the same oversized lozenge behind
+          every label regardless of how long it is.
         -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout_main_activity"
