@@ -76,6 +76,12 @@
          stops matching. Reach for @android:interpolator/fast_out_slow_in only if a duration alone
          proves insufficient, and name the curve when it does.
 
+         Integers, not dimens, and in milliseconds. aapt rejects a time value in a <dimen> outright -
+         "Invalid <dimen> for given resource value", which fails mergeDebugResources rather than
+         warning - so these are read with getInteger() and handed to Animator.setDuration(). That is
+         also the only shape that can work, since a duration attribute in a resource-qualified file
+         is the one place a time value is legal and no screen here qualifies on time.
+
          UnusedResources is suppressed on each of these rather than added to lint-baseline.xml, and
          the reason is worth stating: the check is correct, the tokens are genuinely unreferenced,
          and every piece of motion in the shell today is Material's own - the tab indicator, the
@@ -84,7 +90,7 @@
          lint.yml, and so the definition site says why. The first hand-rolled animation in the
          shell is what should consume them, and it should drop this suppression when it does.
     -->
-    <dimen name="motion_duration_short" tools:ignore="UnusedResources">100ms</dimen>
-    <dimen name="motion_duration_medium" tools:ignore="UnusedResources">200ms</dimen>
-    <dimen name="motion_duration_long" tools:ignore="UnusedResources">300ms</dimen>
+    <integer name="motion_duration_short" tools:ignore="UnusedResources">100</integer>
+    <integer name="motion_duration_medium" tools:ignore="UnusedResources">200</integer>
+    <integer name="motion_duration_long" tools:ignore="UnusedResources">300</integer>
 </resources>
