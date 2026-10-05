@@ -181,8 +181,11 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         mCommentIconAndInfoColor = customThemeWrapper.getCommentIconAndInfoColor();
         mVoteNeutralColor = MaterialColors.getColor(activity,
                 com.google.android.material.R.attr.colorOnSurfaceVariant, mCommentIconAndInfoColor);
+        // R.attr.colorPrimary, not Material's R: the app declares colorPrimary in attr.xml as
+        // a colour of its own rather than taking the reference-typed one, so Material's R has
+        // no field by that name. Every other role here is a Material one and keeps Material's R.
         mVoteActiveColor = MaterialColors.getColor(activity,
-                com.google.android.material.R.attr.colorPrimary, mUpvotedColor);
+                R.attr.colorPrimary, mUpvotedColor);
         int linkColor = customThemeWrapper.getLinkColor();
         MarkwonPlugin miscPlugin = new AbstractMarkwonPlugin() {
             @Override

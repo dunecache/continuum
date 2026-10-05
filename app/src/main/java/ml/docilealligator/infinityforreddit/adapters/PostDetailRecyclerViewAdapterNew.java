@@ -425,8 +425,13 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
         mPostIconAndInfoColor = customThemeWrapper.getPostIconAndInfoColor();
         mVoteNeutralColor = MaterialColors.getColor(mActivity,
                 com.google.android.material.R.attr.colorOnSurfaceVariant, mPostIconAndInfoColor);
+        // R.attr, not Material's: the app declares colorPrimary in attr.xml as a colour of its
+        // own rather than taking the reference-typed one, so Material's R has no field for it.
+        // R.attr.colorPrimary, not Material's R: the app declares colorPrimary in attr.xml as
+        // a colour of its own rather than taking the reference-typed one, so Material's R has
+        // no field by that name. Every other role here is a Material one and keeps Material's R.
         mVoteActiveColor = MaterialColors.getColor(mActivity,
-                com.google.android.material.R.attr.colorPrimary, mUpvotedColor);
+                R.attr.colorPrimary, mUpvotedColor);
         mCommentColor = customThemeWrapper.getCommentColor();
 
         mExoCreator = exoCreator;

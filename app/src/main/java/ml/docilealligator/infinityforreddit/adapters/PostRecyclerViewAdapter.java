@@ -508,8 +508,11 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             mPostTypeTextColor = customThemeWrapper.getPostTypeTextColor();
             mVoteNeutralColor = MaterialColors.getColor(mActivity,
                     com.google.android.material.R.attr.colorOnSurfaceVariant, mPostIconAndInfoColor);
-            mVoteActiveColor = MaterialColors.getColor(mActivity,
-                    com.google.android.material.R.attr.colorPrimary, mUpvotedColor);
+            // R.attr.colorPrimary, not Material's R: the app declares colorPrimary in attr.xml as
+        // a colour of its own rather than taking the reference-typed one, so Material's R has
+        // no field by that name. Every other role here is a Material one and keeps Material's R.
+        mVoteActiveColor = MaterialColors.getColor(mActivity,
+                    R.attr.colorPrimary, mUpvotedColor);
             mChipSurfaceColor = MaterialColors.getColor(mActivity,
                     com.google.android.material.R.attr.colorSecondaryContainer, mPostTypeTextColor);
             mChipOnSurfaceColor = MaterialColors.getColor(mActivity,
