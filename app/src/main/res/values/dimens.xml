@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
@@ -58,4 +58,33 @@
     <dimen name="domain_chip_icon_size">16dp</dimen>
     <dimen name="feed_state_icon_size">48dp</dimen>
     <dimen name="content_max_width">720dp</dimen>
+
+    <!--
+         Motion. Phase 0 asked for duration/easing tokens "even if unused yet" and never wrote them,
+         so the two chrome bars had nothing to agree on: the tab pill, the bottom bar's item
+         selection and every sheet ran on whatever each Material component happened to default to.
+
+         These are Material 3's own three emphasis tiers, not invented numbers. M3 names them
+         short/medium/long at 100/200/300ms, which is also the 150-250ms band AGENTS.md asks for
+         read as "the two tiers a state change should use" - the long tier is for motion that
+         travels rather than for a selection. Deliberately the same numbers Material's components
+         already animate at, so pointing a component at a token changes nothing about its timing
+         unless the token itself moves; that is what makes it a token rather than a second opinion.
+
+         Easing is deliberately absent: Material 3's standard curve is an interpolator resource
+         inside the library, and a hand-written approximation of it would be a copy that silently
+         stops matching. Reach for @android:interpolator/fast_out_slow_in only if a duration alone
+         proves insufficient, and name the curve when it does.
+
+         UnusedResources is suppressed on each of these rather than added to lint-baseline.xml, and
+         the reason is worth stating: the check is correct, the tokens are genuinely unreferenced,
+         and every piece of motion in the shell today is Material's own - the tab indicator, the
+         popup, the app bar scroll - none of which exposes a duration attribute to point a token
+         at. Suppressed here so the intent survives the baseline being regenerated wholesale by
+         lint.yml, and so the definition site says why. The first hand-rolled animation in the
+         shell is what should consume them, and it should drop this suppression when it does.
+    -->
+    <dimen name="motion_duration_short" tools:ignore="UnusedResources">100ms</dimen>
+    <dimen name="motion_duration_medium" tools:ignore="UnusedResources">200ms</dimen>
+    <dimen name="motion_duration_long" tools:ignore="UnusedResources">300ms</dimen>
 </resources>

@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay">
+                app:popupTheme="@style/Widget.Continuum.TopBar.Popup">
 
                 <!--
                   Declared as a child rather than through app:layout: this AppCompat version has no

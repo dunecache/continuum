@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The shell's overflow menu background: a tonal step above the page it drops over.
+
+  Material 3's own popup stylesheet fills from ?colorSurfaceContainer, which in this theme resolves to
+  the page background (Theme.Normal.* maps it to @color/backgroundColor, deliberately, so the bar would
+  separate from the feed it sits over). Inheriting that here would paint the menu in exactly the
+  colour of the feed behind it and leave a menu with no surface of its own, so the role is named.
+
+  The bar's own container role is the right step up rather than a new one, and it has to be that one:
+  an overflow menu opens downwards over the feed, not over the bar, so this fill is read against the
+  page background. It is also the same role the bar and the post cards use, which is what keeps the
+  three reading as one set of planes.
+
+  The medium corner rather than the large one the selected pills use: this is a floating surface, not
+  a selected-state fill, and at menu size the 16dp corner reads as a screen rather than a menu.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/colorSurfaceContainerHigh" />
+    <corners android:radius="@dimen/shape_corner_medium" />
+</shape>

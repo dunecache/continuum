@@ -11,7 +11,7 @@
         android:id="@+id/appbar_layout_main_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorSurfaceContainerHigh"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:elevation="0dp"
         app:liftOnScroll="false">
@@ -20,34 +20,49 @@
             android:id="@+id/collapsing_toolbar_layout_main_activity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorSurface"
+            android:background="?attr/colorSurfaceContainerHigh"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleEnabled="false"
             app:toolbarId="@+id/toolbar">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
+                style="@style/Widget.Continuum.TopBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                android:background="?attr/colorSurface"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                app:popupTheme="@style/Widget.Continuum.TopBar.Popup" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
+        <!--
+          Identical to the phone shell's strip, and for the same reasons: the pill rather than an
+          underline, sized off its label by the tab padding rather than Material's 72dp scrollable
+          floor, and pinned rather than scrolling away.
+
+          The fill gravity this used to declare is the other half of that: filling would stretch three
+          short labels across a tablet's whole width, putting each one in a full-width pill. Start
+          gravity plus a scrollable strip keeps the pill the width of its own label, which is the
+          same shape the bottom navigation bar's active indicator is.
+        -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout_main_activity"
             style="@style/Widget.Material3.TabLayout"
             android:layout_width="match_parent"
             android:layout_height="@dimen/feed_tab_height"
             android:layout_gravity="bottom"
-            app:layout_scrollFlags="scroll|enterAlways"
-            android:background="?attr/colorSurface"
-            app:tabGravity="fill"
-            app:tabIndicatorColor="?attr/colorPrimary"
-            app:tabIndicatorHeight="@dimen/space_2"
-            app:tabRippleColor="?attr/colorPrimaryContainer"
+            android:background="?attr/colorSurfaceContainerHigh"
+            app:tabGravity="start"
+            app:tabIndicator="@drawable/tab_indicator_continuum"
+            app:tabIndicatorColor="@null"
+            app:tabIndicatorFullWidth="true"
+            app:tabIndicatorGravity="stretch"
+            app:tabMinWidth="@dimen/feed_tab_min_width"
+            app:tabMode="scrollable"
+            app:tabPaddingStart="@dimen/space_16"
+            app:tabPaddingEnd="@dimen/space_16"
+            app:tabRippleColor="?attr/colorSecondaryContainer"
             app:tabSelectedTextColor="?attr/colorPrimary"
             app:tabTextColor="?attr/colorOnSurfaceVariant"
             app:tabUnboundedRipple="false" />

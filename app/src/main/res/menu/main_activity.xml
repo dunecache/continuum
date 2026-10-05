@@ -4,11 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:application="ml.docilealligator.infinityforreddit.activities.MainActivity">
 
+    <!--
+      ic_search_day_night_24dp, not the old ic_search_toolbar_24dp: the two are the same glyph to the
+      byte, but the toolbar one was a flat #FF000000 with no drawable-night counterpart, so it only
+      read correctly because MainActivity retints the action icons at runtime. The bottom nav's Search
+      destination already used the day/night one, and the same magnifier appearing light-on-dark in
+      one bar and dark-on-light in the other is the kind of drift this shell exists to remove.
+    -->
     <item
         android:id="@+id/action_search_main_activity"
         android:orderInCategory="1"
         android:title="@string/action_search"
-        android:icon="@drawable/ic_search_toolbar_24dp"
+        android:icon="@drawable/ic_search_day_night_24dp"
         app:showAsAction="ifRoom" />
 
     <item

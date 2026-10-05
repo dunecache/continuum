@@ -60,6 +60,20 @@ private val HORIZONTAL_INSETS = setOf("Left", "Right")
 private val VERTICAL_INSETS = setOf("Top", "Bottom")
 
 /**
+ * Every shell variant, as paths relative to the module root.
+ *
+ * The three are near-copies of one another, so a change to the phone's app bar is only a change to
+ * the app bar in the configuration being read. Both the surface-role test and the feed-strip test
+ * loop over this list rather than naming a file, because a test that reads one variant will pass
+ * forever while the other two are as wrong as they were before it was written.
+ */
+private val SHELL_VARIANTS = listOf(
+    "src/main/res/layout/app_bar_main.xml",
+    "src/main/res/layout-land/app_bar_main.xml",
+    "src/main/res/layout-sw600dp/app_bar_main.xml",
+)
+
+/**
  * Measures the MainActivity shell the way the device does, without an emulator.
  *
  * The shell has two variants and both are covered here, because they fail differently and both
@@ -589,27 +603,91 @@ class MainShellLayoutTest {
      * in the layout - the AppBarLayout, the MaterialToolbar and the TabLayout all did, which is three
      * separate confirmations of the same thing. The surface that reaches the screen is applied at
      * runtime by MainActivity's theme method, and that is a different kind of change to test.
+     *
+     * All three shell variants, not just the phone. The landscape and sw600dp bars were carried over
+     * from before the redesign with `?attr/colorSurface` and an underline indicator while the phone
+     * moved to the container role and a pill - so "one system" held on exactly the configuration
+     * that was already covered, and the two variants nobody re-read stayed Material 2. Reading one
+     * file is what let that happen; the loop is what stops it.
      */
     @Test
     fun shellChromeDeclaresTheTonalSurfaceAndNotTheAccent() {
-        val layout = File("src/main/res/layout/app_bar_main.xml").readText()
-        val backgrounds = Regex("""android:background="([^"]+)"""")
-            .findAll(layout).map { it.groupValues[1] }.toList()
+        for (variant in SHELL_VARIANTS) {
+            val layout = File(variant).readText()
+            val backgrounds = Regex("""android:background="([^"]+)"""")
+                .findAll(layout).map { it.groupValues[1] }.toList()
 
-        assertTrue(
-            "the shell layout declares no backgrounds, so this would pass on anything",
-            backgrounds.isNotEmpty(),
-        )
-        for (background in backgrounds) {
-            assertFalse(
-                "the shell's chrome must not declare the theme accent as a background, found " +
+            assertTrue(
+                "$variant declares no backgrounds, so this would pass on anything",
+                backgrounds.isNotEmpty(),
+            )
+            for (background in backgrounds) {
+                assertFalse(
+                    "$variant must not declare the theme accent as a background, found $background",
+                    background.contains("colorPrimary"),
+                )
+                assertEquals(
+                    "$variant must use the surface role the bottom navigation uses",
+                    "?attr/colorSurfaceContainerHigh",
                     background,
-                background.contains("colorPrimary"),
+                )
+            }
+        }
+    }
+
+    /**
+     * The feed strip is the same control in all three variants: a pinned row of scrollable tabs with
+     * the bottom nav's pill, not a Material 2 underline.
+     *
+     * The phone has carried this since the redesign and both other variants still had
+     * `tabIndicatorHeight` plus `tabGravity="fill"` - which is the combination that produces the
+     * defect the pill was written to avoid: a filled strip stretches its labels to the window width,
+     * and Material floors a scrollable tab at 72dp, so "All" gets a lozenge twice its own width.
+     *
+     * Asserted across the variants because the pill is invisible in a screenshot of the resting
+     * state at any one configuration, and a variant that is only ever seen in landscape is exactly
+     * the one that rots.
+     */
+    @Test
+    fun everyShellVariantPinsTheStripAndGivesItThePill() {
+        for (variant in SHELL_VARIANTS) {
+            val layout = File(variant).readText()
+            val strip = requireNotNull(Regex("""<com\.google\.android\.material\.tabs\.TabLayout[\s\S]*?/>""")
+                .find(layout)?.value) { "$variant has no feed strip" }
+
+            assertFalse(
+                "$variant's feed strip must not scroll away with the title. $strip",
+                strip.contains("layout_scrollFlags"),
+            )
+            assertTrue(
+                "$variant's selected tab must get the pill, not an underline. $strip",
+                strip.contains("""tabIndicator="@drawable/tab_indicator_continuum""""),
+            )
+            // Full width plus stretch is what makes the indicator the whole tab rather than the bare
+            // label, which the drawable's own comment explains is a subtraction rather than padding.
+            assertTrue(
+                "$variant's pill must span the whole tab. $strip",
+                strip.contains("""tabIndicatorFullWidth="true""""),
+            )
+            assertTrue(
+                "$variant's pill must stretch the row. $strip",
+                strip.contains("""tabIndicatorGravity="stretch""""),
             )
             assertEquals(
-                "every surface in the shell's chrome must be the role the bottom navigation uses",
-                "?attr/colorSurfaceContainerHigh",
-                background,
+                "$variant's strip must be scrollable so a long feed list never truncates a name",
+                "scrollable",
+                Regex("""tabMode="([^"]+)"""").find(strip)?.groupValues?.get(1),
+            )
+            assertTrue(
+                "$variant's strip must not floor every tab at Material's 72dp, or the pill stops " +
+                    "being sized by its label. $strip",
+                strip.contains("""tabMinWidth="@dimen/feed_tab_min_width""""),
+            )
+            assertTrue(
+                "$variant's pill needs the tab's own padding for its room either side of the label. " +
+                    "$strip",
+                strip.contains("""tabPaddingStart="@dimen/space_16"""") &&
+                    strip.contains("""tabPaddingEnd="@dimen/space_16""""),
             )
         }
     }

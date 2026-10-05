@@ -262,6 +262,40 @@
         <item name="android:background">?attr/colorSurfaceContainerHigh</item>
     </style>
 
+    <!--
+      The shell's overflow menu: a Material 3 popup on the same surface role the bar and the post
+      cards are drawn in, one tonal step above the page it drops over.
+    -->
+
+      One style is named, popupMenuStyle, and nothing else. Material 3's popup stylesheet resolves its
+      own text and insets off ?colorOnSurface and friends, which BaseActivity has already populated
+      from Theme.Normal.* - so the popup lands on the app's signal palette in light, dark and AMOLED
+      without a single colour being written here, and without a -night counterpart to keep in step
+      with a theme the app actually picks at runtime from a preference rather than from the night
+      qualifier.
+
+      What was deliberately NOT done: parenting this on ThemeOverlay.Material3.Light/.Dark. Those
+      restate the whole M3 colour baseline, so they would replace the custom theme's signal roles
+      inside the popup with library defaults - the exact accent-vs-surface split this redesign
+      removed everywhere else.
+
+      A separate style rather than a change to AppTheme.PopupOverlay because that one is shared by
+      seventy-one layouts across the app; repointing it would restyle every other screen's overflow
+      menu, which is each screen's own pass and not this one's.
+    -->
+    <style name="Widget.Continuum.TopBar.Popup" parent="AppTheme.PopupOverlay">
+        <item name="popupMenuStyle">@style/Widget.Continuum.PopupMenu</item>
+    </style>
+
+    <!--
+      The popup menu itself. Only the background is overridden: the menu rows, their insets and their
+      text styling are left to Material 3's own stylesheet, which reads ?colorOnSurface and
+      ?colorSurfaceContainerHigh from the theme BaseActivity has already populated.
+    -->
+    <style name="Widget.Continuum.PopupMenu" parent="Widget.Material3.PopupMenu">
+        <item name="android:popupBackground">@drawable/continuum_popup_background</item>
+    </style>
+
     <style name="Widget.Continuum.BottomBar" parent="Widget.Material3.BottomAppBar">
         <item name="android:minHeight">@dimen/navigation_item_min_height</item>
         <item name="backgroundTint">?attr/colorSurface</item>
