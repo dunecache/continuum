@@ -203,25 +203,27 @@
         <item name="android:textColor">?attr/primaryTextColor</item>
     </style>
 
-    <!-- One post card, app-wide, per the redesign's "tonal surfaces instead of hard borders": a
-         raised plane the same tone as the app bar and the navigation bar, carrying no stroke and
-         no shadow. The page margin around it is what separates one card from the next, so a feed
-         reads as a stack of surfaces rather than a list of outlined boxes.
+    <!--
+      A raised plane for something that genuinely floats over the page, same tone as the app bar and
+      the navigation bar and carrying no stroke and no shadow.
 
-         The colour here is the surface an unread post gets. The adapter repaints the background on
-         every bind to show read state and points a read post one step down the ramp
-         (colorSurfaceContainerLow), so the two must stay distinct in all three themes. -->
+      Its one remaining user is the post-detail screen's search panel - a sheet that slides up over
+      the comment thread, where a raised surface with a corner is what tells you it is above the
+      content rather than part of it.
+
+      Post rows are NOT this any more, and that is the point of the redesign. They used to be, which
+      is why a feed read as a stack of rounded boxes with 8dp of margin between each one; REDESIGN.md
+      rules that out ("no stock Material demo look", "tonal surfaces instead of hard borders", content
+      owns the frame). They now draw continuum_post_surface instead - one fill, no radius, no margin -
+      and are separated by a hairline rather than by a gap between boxes. The adapter's read-state
+      repaint still works on them unchanged, because setBackgroundTintList tints any view that has a
+      background; see that drawable and PostRecyclerViewAdapter's colour block.
+    -->
     <style name="Widget.Continuum.PostCard" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/colorSurfaceContainerHigh</item>
         <item name="cardCornerRadius">@dimen/shape_corner_medium</item>
         <item name="cardElevation">0dp</item>
         <item name="strokeWidth">0dp</item>
-    </style>
-
-    <!-- The default feed family's card, at the larger corner it has always used. The corner is the
-         only thing that separates the two densities, so it is the only thing spelled out here. -->
-    <style name="Widget.Continuum.PostCard.Large" parent="Widget.Continuum.PostCard">
-        <item name="cardCornerRadius">@dimen/shape_corner_large</item>
     </style>
 
     <!-- The post title: the card's one piece of display type, so it takes the title slot of the

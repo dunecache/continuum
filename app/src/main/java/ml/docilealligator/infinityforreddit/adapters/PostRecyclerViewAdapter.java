@@ -256,6 +256,34 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
     private int mGifTypeBackgroundColor;
     private int mGalleryTypeBackgroundColor;
     private int mPostTypeTextColor;
+    /**
+     * The vote control's two colours, per REDESIGN.md's vote control: a muted neutral until the
+     * reader has voted, the palette's accent once they have.
+     *
+     * <p>Both directions take the same accent. There is no downvote role in Material 3, and
+     * inventing one - or reusing colorError, which would read as the control being broken - buys
+     * nothing a filled glyph does not already say. Colour here answers "have I voted", the glyph
+     * answers "which way".
+     *
+     * <p>The neutral is onSurfaceVariant rather than the row's own icon-and-info colour, because
+     * that colour is the custom theme's and is tuned to sit on an accent-filled bar. It stays in
+     * use for the rest of the row's chrome - comment count, save, share, more, reply - and only
+     * the two arrows and the score moved to the role.
+     *
+     * <p>The custom theme's upvoted/downvoted colours are kept as the lookup's fallback, which is
+     * the same trade every other role in this constructor makes: a theme that does not define the
+     * role keeps what the user chose rather than resolving to nothing.
+     */
+    private int mVoteNeutralColor;
+    private int mVoteActiveColor;
+    /**
+     * The type and flair chips' one tonal pair, read from the theme. See {@link #applyTypeColor}.
+     *
+     * <p>Kept as fields rather than read at each bind because there are several holders and the
+     * lookup walks the view's theme, which is the one thing in a bind that is not free.
+     */
+    private int mChipSurfaceColor;
+    private int mChipOnSurfaceColor;
     private int mSubredditColor;
     private int mUsernameColor;
     private int mModeratorColor;
@@ -275,7 +303,6 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
     private int mNoPreviewPostTypeBackgroundColor;
     private int mNoPreviewPostTypeIconTint;
     private int mUpvotedColor;
-    private int mDownvotedColor;
     private int mVoteAndReplyUnavailableVoteButtonColor;
     private int mPostIconAndInfoColor;
     private int mDividerColor;
@@ -458,6 +485,13 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             //
             // The compact family's filled surfaces are deliberately not touched here; they keep the
             // custom theme until that family is brought over.
+            //
+            // The default feed family is no longer a card at all, so for those four layouts the
+            // unread/read roles now paint a plain rectangle (continuum_post_surface) rather than
+            // replacing a MaterialCardView's cardBackgroundColor. setBackgroundTintList still wins
+            // over whatever the layout declared, because it tints the drawable rather than reading
+            // the card's own attribute - which is why the surface has to be a drawable there and
+            // why the two roles still have to be distinct roles. See the style's own comment.
             mCardViewBackgroundColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerHigh, mCardViewBackgroundColor);
             mReadPostCardViewBackgroundColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorSurfaceContainerLow, mReadPostCardViewBackgroundColor);
             mPostTitleColor = MaterialColors.getColor(mActivity, com.google.android.material.R.attr.colorOnSurface, mPostTitleColor);
@@ -472,6 +506,14 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             mGifTypeBackgroundColor = customThemeWrapper.getGifTypeBackgroundColor();
             mGalleryTypeBackgroundColor = customThemeWrapper.getGalleryTypeBackgroundColor();
             mPostTypeTextColor = customThemeWrapper.getPostTypeTextColor();
+            mVoteNeutralColor = MaterialColors.getColor(mActivity,
+                    com.google.android.material.R.attr.colorOnSurfaceVariant, mPostIconAndInfoColor);
+            mVoteActiveColor = MaterialColors.getColor(mActivity,
+                    com.google.android.material.R.attr.colorPrimary, mUpvotedColor);
+            mChipSurfaceColor = MaterialColors.getColor(mActivity,
+                    com.google.android.material.R.attr.colorSecondaryContainer, mPostTypeTextColor);
+            mChipOnSurfaceColor = MaterialColors.getColor(mActivity,
+                    com.google.android.material.R.attr.colorOnSecondaryContainer, mPostTypeTextColor);
             mSubredditColor = customThemeWrapper.getSubreddit();
             mUsernameColor = customThemeWrapper.getUsername();
             mModeratorColor = customThemeWrapper.getModerator();
@@ -489,7 +531,6 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             mNoPreviewPostTypeBackgroundColor = customThemeWrapper.getNoPreviewPostTypeBackgroundColor();
             mNoPreviewPostTypeIconTint = customThemeWrapper.getNoPreviewPostTypeIconTint();
             mUpvotedColor = customThemeWrapper.getUpvoted();
-            mDownvotedColor = customThemeWrapper.getDownvoted();
             mVoteAndReplyUnavailableVoteButtonColor = customThemeWrapper.getVoteAndReplyUnavailableButtonColor();
             mPostIconAndInfoColor = customThemeWrapper.getPostIconAndInfoColor();
             mDividerColor = customThemeWrapper.getDividerColor();
@@ -1108,14 +1149,14 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                 case 1:
                     //Upvoted
                     ((PostViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                    ((PostViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                    ((PostViewHolder) holder).scoreTextView.setTextColor(mUpvotedColor);
+                    ((PostViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                    ((PostViewHolder) holder).scoreTextView.setTextColor(mVoteActiveColor);
                     break;
                 case -1:
                     //Downvoted
                     ((PostViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                    ((PostViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                    ((PostViewHolder) holder).scoreTextView.setTextColor(mDownvotedColor);
+                    ((PostViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                    ((PostViewHolder) holder).scoreTextView.setTextColor(mVoteActiveColor);
                     break;
             }
 
@@ -2464,11 +2505,35 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
         return background;
     }
 
+    /**
+     * The post-type chip, as a tonal container rather than a per-type colour.
+     *
+     * <p>It used to be {@link #getTypeColor}, so IMAGE was green, LINK was blue and VIDEO was red,
+     * and the chip's text was {@code mPostTypeTextColor} chosen to sit on whichever of those it
+     * happened to be. That is six colour pairs to keep legible in three themes and against a custom
+     * theme's six backgrounds, and it is the loudest thing on a card whose content is supposed to be
+     * the loudest thing. The redesign asks for a muted container instead.
+     *
+     * <p>One pair now, read from the theme rather than from the custom theme: colorSecondaryContainer
+     * with colorOnSecondaryContainer. Not colorSurfaceContainerHigh, which would be the unread post's
+     * own plane and so invisible on exactly the posts a reader has not seen yet, and not
+     * colorSurfaceContainer, which is the page background. It is the same role the selected tab pill
+     * and the selected navigation destination use, so a chip reads as part of the app's own pill
+     * language rather than as a new category of thing.
+     *
+     * <p>The post type is still the chip's <i>text</i>, and the corner triangle on a compact card's
+     * thumbnail is still tinted per type - that one is a graphic accent sitting on the media rather
+     * than chrome sitting beside it, and it has to stay distinguishable from the image it overlays.
+     *
+     * <p>postType is kept in the signature rather than dropped, because the two call sites are
+     * branches over post type and removing an argument from each of them is a wider diff than the
+     * behaviour change is worth.
+     */
     private void applyTypeColor(@Nullable CustomTextView typeTextView, int postType) {
         if (typeTextView == null) return;
-        int color = getTypeColor(postType);
-        typeTextView.setBackgroundColor(color);
-        typeTextView.setBorderColor(color);
+        typeTextView.setBackgroundColor(mChipSurfaceColor);
+        typeTextView.setBorderColor(mChipSurfaceColor);
+        typeTextView.setTextColor(mChipOnSurfaceColor);
     }
 
     private void applyTriangleIndicator(PostCompactBaseViewHolder holder, int postType) {
@@ -3090,10 +3155,10 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             }
 
             ((PostViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-            ((PostViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-            ((PostViewHolder) holder).scoreTextView.setTextColor(mPostIconAndInfoColor);
+            ((PostViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+            ((PostViewHolder) holder).scoreTextView.setTextColor(mVoteNeutralColor);
             ((PostViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-            ((PostViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+            ((PostViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
             if (holder instanceof PostBaseViewHolder) {
                 if (holder instanceof PostBaseVideoAutoplayViewHolder) {
@@ -3929,22 +3994,22 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     String newVoteType;
 
                     downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                    downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
                     if (previousVoteType != 1) {
                         //Not upvoted before
                         post.setVoteType(1);
                         newVoteType = APIUtils.DIR_UPVOTE;
                         upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                        upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                        scoreTextView.setTextColor(mUpvotedColor);
+                        upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                        scoreTextView.setTextColor(mVoteActiveColor);
                     } else {
                         //Upvoted before
                         post.setVoteType(0);
                         newVoteType = APIUtils.DIR_UNVOTE;
                         upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                        upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                        scoreTextView.setTextColor(mPostIconAndInfoColor);
+                        upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                        scoreTextView.setTextColor(mVoteNeutralColor);
                     }
 
                     if (Account.ANONYMOUS_ACCOUNT.equals(mAccountName)) {
@@ -3972,21 +4037,21 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                                 post.setVoteType(1);
                                 if (currentPosition == position) {
                                     upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                                    upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                                    scoreTextView.setTextColor(mUpvotedColor);
+                                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                                    scoreTextView.setTextColor(mVoteActiveColor);
                                 }
                             } else {
                                 post.setVoteType(0);
                                 if (currentPosition == position) {
                                     upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                                    upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                                    scoreTextView.setTextColor(mPostIconAndInfoColor);
+                                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                                    scoreTextView.setTextColor(mVoteNeutralColor);
                                 }
                             }
 
                             if (currentPosition == position) {
                                 downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                                downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                                downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
                                 if (!mHideTheNumberOfVotes) {
                                     scoreTextView.setText(Utils.getNVotes(mShowAbsoluteNumberOfVotes, post.getScore() + post.getVoteType()));
                                 }
@@ -4048,22 +4113,22 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     String newVoteType;
 
                     upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                    upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
                     if (previousVoteType != -1) {
                         //Not downvoted before
                         post.setVoteType(-1);
                         newVoteType = APIUtils.DIR_DOWNVOTE;
                         downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                        downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                        scoreTextView.setTextColor(mDownvotedColor);
+                        downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                        scoreTextView.setTextColor(mVoteActiveColor);
                     } else {
                         //Downvoted before
                         post.setVoteType(0);
                         newVoteType = APIUtils.DIR_UNVOTE;
                         downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                        downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                        scoreTextView.setTextColor(mPostIconAndInfoColor);
+                        downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                        scoreTextView.setTextColor(mVoteNeutralColor);
                     }
 
                     if (Account.ANONYMOUS_ACCOUNT.equals(mAccountName)) {
@@ -4091,21 +4156,21 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                                 post.setVoteType(-1);
                                 if (currentPosition == position) {
                                     downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                                    downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                                    scoreTextView.setTextColor(mDownvotedColor);
+                                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                                    scoreTextView.setTextColor(mVoteActiveColor);
                                 }
                             } else {
                                 post.setVoteType(0);
                                 if (currentPosition == position) {
                                     downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                                    downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                                    scoreTextView.setTextColor(mPostIconAndInfoColor);
+                                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                                    scoreTextView.setTextColor(mVoteNeutralColor);
                                 }
                             }
 
                             if (currentPosition == position) {
                                 upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                                upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                                upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
                                 if (!mHideTheNumberOfVotes) {
                                     scoreTextView.setText(Utils.getNVotes(mShowAbsoluteNumberOfVotes, post.getScore() + post.getVoteType()));
                                 }
@@ -5052,9 +5117,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             titleTextView.setTextColor(mPostTitleColor);
             stickiedPostImageView.setColorFilter(mStickiedPostIconTint, PorterDuff.Mode.SRC_IN);
 
-            if (typeTextView != null) {
-                typeTextView.setTextColor(mPostTypeTextColor);
-            }
+            // The type chip's colour is not set here: applyTypeColor owns it, and setting it in
+            // both places made the result depend on which of the two ran last on a given bind.
 
             if (spoilerTextView != null) {
                 spoilerTextView.setBackgroundColor(mSpoilerBackgroundColor);
@@ -5069,9 +5133,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             }
 
             if (flairTextView != null) {
-                flairTextView.setBackgroundColor(mFlairBackgroundColor);
-                flairTextView.setBorderColor(mFlairBackgroundColor);
-                flairTextView.setTextColor(mFlairTextColor);
+                flairTextView.setBackgroundColor(mChipSurfaceColor);
+                flairTextView.setBorderColor(mChipSurfaceColor);
+                flairTextView.setTextColor(mChipOnSurfaceColor);
             }
 
             if (archivedImageView != null) {
@@ -5086,9 +5150,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                 crosspostImageView.setColorFilter(mCrosspostIconTint, PorterDuff.Mode.SRC_IN);
             }
 
-            upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-            scoreTextView.setTextColor(mPostIconAndInfoColor);
-            downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+            upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+            scoreTextView.setTextColor(mVoteNeutralColor);
+            downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
             commentsCountButton.setTextColor(mPostIconAndInfoColor);
             commentsCountButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
             saveButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
@@ -6251,9 +6315,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             postTimeTextView.setTextColor(mSecondaryTextColor);
             titleTextView.setTextColor(mPostTitleColor);
             stickiedPostImageView.setColorFilter(mStickiedPostIconTint, PorterDuff.Mode.SRC_IN);
-            if (typeTextView != null) {
-                typeTextView.setTextColor(mPostTypeTextColor);
-            }
+            // The type chip's colour is not set here: applyTypeColor owns it, and setting it in
+            // both places made the result depend on which of the two ran last on a given bind.
             if (spoilerTextView != null) {
                 spoilerTextView.setBackgroundColor(mSpoilerBackgroundColor);
                 spoilerTextView.setBorderColor(mSpoilerBackgroundColor);
@@ -6265,9 +6328,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                 nsfwTextView.setTextColor(mNSFWTextColor);
             }
             if (flairTextView != null) {
-                flairTextView.setBackgroundColor(mFlairBackgroundColor);
-                flairTextView.setBorderColor(mFlairBackgroundColor);
-                flairTextView.setTextColor(mFlairTextColor);
+                flairTextView.setBackgroundColor(mChipSurfaceColor);
+                flairTextView.setBorderColor(mChipSurfaceColor);
+                flairTextView.setTextColor(mChipOnSurfaceColor);
             }
             if (archivedImageView != null) {
                 archivedImageView.setColorFilter(mArchivedIconTint, PorterDuff.Mode.SRC_IN);
@@ -6291,9 +6354,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                             mPostLayout == SharedPreferencesUtils.POST_LAYOUT_CARD_3 ? 12 : 8));
             noPreviewLinkImageView.setBackground(null);
             noPreviewLinkImageView.setColorFilter(mNoPreviewPostTypeIconTint, android.graphics.PorterDuff.Mode.SRC_IN);
-            upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-            scoreTextView.setTextColor(mPostIconAndInfoColor);
-            downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+            upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+            scoreTextView.setTextColor(mVoteNeutralColor);
+            downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
             if (commentsCountButton != null) {
                 commentsCountButton.setTextColor(mPostIconAndInfoColor);
                 commentsCountButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));

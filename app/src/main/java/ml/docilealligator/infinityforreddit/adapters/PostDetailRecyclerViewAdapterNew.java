@@ -264,9 +264,19 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
     private final int mNoPreviewPostTypeBackgroundColor;
     private final int mNoPreviewPostTypeIconTint;
     private final int mUpvotedColor;
-    private final int mDownvotedColor;
     private final int mVoteAndReplyUnavailableVoteButtonColor;
     private final int mPostIconAndInfoColor;
+    /**
+     * The vote control's two colours, matching the feed card's exactly.
+     *
+     * <p>Same roles and same reasoning as PostRecyclerViewAdapter: a muted neutral until voted, the
+     * palette accent once voted, and one accent for both directions because Material 3 has no
+     * downvote role and the filled glyph already carries direction. Declared here as well as there
+     * because this adapter never sees the other one - a post card and the post-detail card are bound
+     * by different adapters, so a role resolved in only one of them is a screen that disagrees.
+     */
+    private final int mVoteNeutralColor;
+    private final int mVoteActiveColor;
     private final int mCommentColor;
 
     private final float mScale;
@@ -411,9 +421,12 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
         mUsernameColor = customThemeWrapper.getUsername();
         mModeratorColor = customThemeWrapper.getModerator();
         mUpvotedColor = customThemeWrapper.getUpvoted();
-        mDownvotedColor = customThemeWrapper.getDownvoted();
         mVoteAndReplyUnavailableVoteButtonColor = customThemeWrapper.getVoteAndReplyUnavailableButtonColor();
         mPostIconAndInfoColor = customThemeWrapper.getPostIconAndInfoColor();
+        mVoteNeutralColor = MaterialColors.getColor(mActivity,
+                com.google.android.material.R.attr.colorOnSurfaceVariant, mPostIconAndInfoColor);
+        mVoteActiveColor = MaterialColors.getColor(mActivity,
+                com.google.android.material.R.attr.colorPrimary, mUpvotedColor);
         mCommentColor = customThemeWrapper.getCommentColor();
 
         mExoCreator = exoCreator;
@@ -819,21 +832,21 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
                 case 1:
                     //Upvoted
                     ((PostDetailBaseViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                    ((PostDetailBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                    ((PostDetailBaseViewHolder) holder).scoreTextView.setTextColor(mUpvotedColor);
+                    ((PostDetailBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                    ((PostDetailBaseViewHolder) holder).scoreTextView.setTextColor(mVoteActiveColor);
                     break;
                 case -1:
                     //Downvoted
                     ((PostDetailBaseViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                    ((PostDetailBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                    ((PostDetailBaseViewHolder) holder).scoreTextView.setTextColor(mDownvotedColor);
+                    ((PostDetailBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                    ((PostDetailBaseViewHolder) holder).scoreTextView.setTextColor(mVoteActiveColor);
                     break;
                 case 0:
                     ((PostDetailBaseViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                    ((PostDetailBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                    ((PostDetailBaseViewHolder) holder).scoreTextView.setTextColor(mPostIconAndInfoColor);
+                    ((PostDetailBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                    ((PostDetailBaseViewHolder) holder).scoreTextView.setTextColor(mVoteNeutralColor);
                     ((PostDetailBaseViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                    ((PostDetailBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                    ((PostDetailBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
             }
 
             if (mPost.isArchived()) {
@@ -1861,10 +1874,10 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
         holder.userTextView.setTextColor(mUsernameColor);
         holder.userTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
         holder.upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-        holder.upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-        holder.scoreTextView.setTextColor(mPostIconAndInfoColor);
+        holder.upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+        holder.scoreTextView.setTextColor(mVoteNeutralColor);
         holder.downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-        holder.downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+        holder.downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
         holder.flairTextView.setVisibility(View.GONE);
         holder.recoveredTextView.setVisibility(View.GONE);
         holder.lockedImageView.setVisibility(View.GONE);
@@ -2175,22 +2188,22 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
                 String newVoteType;
 
                 downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
                 if (previousVoteType != 1) {
                     //Not upvoted before
                     mPost.setVoteType(1);
                     newVoteType = APIUtils.DIR_UPVOTE;
                     upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                    upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                    scoreTextView.setTextColor(mUpvotedColor);
+                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                    scoreTextView.setTextColor(mVoteActiveColor);
                 } else {
                     //Upvoted before
                     mPost.setVoteType(0);
                     newVoteType = APIUtils.DIR_UNVOTE;
                     upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                    upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                    scoreTextView.setTextColor(mPostIconAndInfoColor);
+                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                    scoreTextView.setTextColor(mVoteNeutralColor);
                 }
 
                 if (Account.ANONYMOUS_ACCOUNT.equals(mAccountName)) {
@@ -2218,17 +2231,17 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
                         if (newVoteType.equals(APIUtils.DIR_UPVOTE)) {
                             mPost.setVoteType(1);
                             upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                            upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                            scoreTextView.setTextColor(mUpvotedColor);
+                            upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                            scoreTextView.setTextColor(mVoteActiveColor);
                         } else {
                             mPost.setVoteType(0);
                             upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                            upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                            scoreTextView.setTextColor(mPostIconAndInfoColor);
+                            upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                            scoreTextView.setTextColor(mVoteNeutralColor);
                         }
 
                         downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                        downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                        downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
                         if (!mHideTheNumberOfVotes) {
                             scoreTextView.setText(Utils.getNVotes(mShowAbsoluteNumberOfVotes,
                                     mPost.getScore() + mPost.getVoteType()));
@@ -2283,22 +2296,22 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
                 String newVoteType;
 
                 upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
                 if (previousVoteType != -1) {
                     //Not downvoted before
                     mPost.setVoteType(-1);
                     newVoteType = APIUtils.DIR_DOWNVOTE;
                     downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                    downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                    scoreTextView.setTextColor(mDownvotedColor);
+                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                    scoreTextView.setTextColor(mVoteActiveColor);
                 } else {
                     //Downvoted before
                     mPost.setVoteType(0);
                     newVoteType = APIUtils.DIR_UNVOTE;
                     downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                    downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                    scoreTextView.setTextColor(mPostIconAndInfoColor);
+                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                    scoreTextView.setTextColor(mVoteNeutralColor);
                 }
 
                 if (Account.ANONYMOUS_ACCOUNT.equals(mAccountName)) {
@@ -2326,17 +2339,17 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
                         if (newVoteType.equals(APIUtils.DIR_DOWNVOTE)) {
                             mPost.setVoteType(-1);
                             downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                            downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                            scoreTextView.setTextColor(mDownvotedColor);
+                            downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                            scoreTextView.setTextColor(mVoteActiveColor);
                         } else {
                             mPost.setVoteType(0);
                             downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                            downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-                            scoreTextView.setTextColor(mPostIconAndInfoColor);
+                            downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                            scoreTextView.setTextColor(mVoteNeutralColor);
                         }
 
                         upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                        upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+                        upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
                         if (!mHideTheNumberOfVotes) {
                             scoreTextView.setText(Utils.getNVotes(mShowAbsoluteNumberOfVotes,
                                     mPost.getScore() + mPost.getVoteType()));
@@ -2579,9 +2592,9 @@ public class PostDetailRecyclerViewAdapterNew extends RecyclerView.Adapter<Recyc
             upvoteRatioTextView.setCompoundDrawablesWithIntrinsicBounds(
                     upvoteRatioDrawable, null, null, null);
             upvoteRatioTextView.setTextColor(mSecondaryTextColor);
-            upvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
-            scoreTextView.setTextColor(mPostIconAndInfoColor);
-            downvoteButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
+            upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+            scoreTextView.setTextColor(mVoteNeutralColor);
+            downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
             commentsCountButton.setTextColor(mPostIconAndInfoColor);
             commentsCountButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));
             saveButton.setIconTint(ColorStateList.valueOf(mPostIconAndInfoColor));

@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.Markwon;
 import io.noties.markwon.MarkwonConfiguration;
@@ -116,10 +117,20 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
     private final int mAuthorFlairColor;
     private final int mSubredditColor;
     private final int mUpvotedColor;
-    private final int mDownvotedColor;
     private final int mButtonTextColor;
     private final int mColorAccent;
     private final int mCommentIconAndInfoColor;
+    /**
+     * The vote control's two colours, matching CommentsRecyclerViewAdapterNew exactly.
+     *
+     * <p>This adapter and that one bind the same comment rows on two different screens, so a role
+     * resolved in only one of them is a screen that disagrees with the other for no visible reason.
+     * Same roles and same reasoning: a muted neutral until voted, the palette accent once voted, and
+     * one accent for both directions because Material 3 has no downvote role and the filled glyph
+     * already carries direction.
+     */
+    private final int mVoteNeutralColor;
+    private final int mVoteActiveColor;
     private final boolean mVoteButtonsOnTheRight;
     private final boolean mShowElapsedTime;
     private final String mTimeFormatPattern;
@@ -165,10 +176,13 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         mUsernameColor = customThemeWrapper.getUsername();
         mAuthorFlairColor = customThemeWrapper.getAuthorFlairTextColor();
         mUpvotedColor = customThemeWrapper.getUpvoted();
-        mDownvotedColor = customThemeWrapper.getDownvoted();
         mButtonTextColor = customThemeWrapper.getButtonTextColor();
         mColorAccent = customThemeWrapper.getColorAccent();
         mCommentIconAndInfoColor = customThemeWrapper.getCommentIconAndInfoColor();
+        mVoteNeutralColor = MaterialColors.getColor(activity,
+                com.google.android.material.R.attr.colorOnSurfaceVariant, mCommentIconAndInfoColor);
+        mVoteActiveColor = MaterialColors.getColor(activity,
+                com.google.android.material.R.attr.colorPrimary, mUpvotedColor);
         int linkColor = customThemeWrapper.getLinkColor();
         MarkwonPlugin miscPlugin = new AbstractMarkwonPlugin() {
             @Override
@@ -344,13 +358,13 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                 switch (comment.getVoteType()) {
                     case Comment.VOTE_TYPE_UPVOTE:
                         ((CommentBaseViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                        ((CommentBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                        ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mUpvotedColor);
+                        ((CommentBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                        ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mVoteActiveColor);
                         break;
                     case Comment.VOTE_TYPE_DOWNVOTE:
                         ((CommentBaseViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                        ((CommentBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                        ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mDownvotedColor);
+                        ((CommentBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                        ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mVoteActiveColor);
                         break;
                 }
 
@@ -391,10 +405,10 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             ((CommentBaseViewHolder) holder).authorFlairTextView.setText("");
             ((CommentBaseViewHolder) holder).authorFlairTextView.setVisibility(View.GONE);
             ((CommentBaseViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-            ((CommentBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-            ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mCommentIconAndInfoColor);
+            ((CommentBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+            ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mVoteNeutralColor);
             ((CommentBaseViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-            ((CommentBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+            ((CommentBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
         }
     }
 
@@ -670,9 +684,9 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             authorTextView.setTextColor(mUsernameColor);
             authorFlairTextView.setTextColor(mAuthorFlairColor);
             commentTimeTextView.setTextColor(mSecondaryTextColor);
-            upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-            scoreTextView.setTextColor(mCommentIconAndInfoColor);
-            downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+            upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+            scoreTextView.setTextColor(mVoteNeutralColor);
+            downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
             moreButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             saveButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             commentDivider.setBackgroundColor(mDividerColor);
@@ -767,22 +781,22 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     String newVoteType;
 
                     downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                    downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
                     if (previousVoteType != Comment.VOTE_TYPE_UPVOTE) {
                         //Not upvoted before
                         comment.setVoteType(Comment.VOTE_TYPE_UPVOTE);
                         newVoteType = APIUtils.DIR_UPVOTE;
                         upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                        upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                        scoreTextView.setTextColor(mUpvotedColor);
+                        upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                        scoreTextView.setTextColor(mVoteActiveColor);
                     } else {
                         //Upvoted before
                         comment.setVoteType(Comment.VOTE_TYPE_NO_VOTE);
                         newVoteType = APIUtils.DIR_UNVOTE;
                         upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                        upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-                        scoreTextView.setTextColor(mCommentIconAndInfoColor);
+                        upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                        scoreTextView.setTextColor(mVoteNeutralColor);
                     }
 
                     if (!comment.isScoreHidden()) {
@@ -798,21 +812,21 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                                 comment.setVoteType(Comment.VOTE_TYPE_UPVOTE);
                                 if (currentPosition == position) {
                                     upvoteButton.setIconResource(R.drawable.ic_upvote_filled_24dp);
-                                    upvoteButton.setIconTint(ColorStateList.valueOf(mUpvotedColor));
-                                    scoreTextView.setTextColor(mUpvotedColor);
+                                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                                    scoreTextView.setTextColor(mVoteActiveColor);
                                 }
                             } else {
                                 comment.setVoteType(Comment.VOTE_TYPE_NO_VOTE);
                                 if (currentPosition == position) {
                                     upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                                    upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-                                    scoreTextView.setTextColor(mCommentIconAndInfoColor);
+                                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                                    scoreTextView.setTextColor(mVoteNeutralColor);
                                 }
                             }
 
                             if (currentPosition == position) {
                                 downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                                downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+                                downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
                                 if (!comment.isScoreHidden()) {
                                     scoreTextView.setText(Utils.getNVotes(mShowAbsoluteNumberOfVotes,
                                             comment.getScore() + comment.getVoteType()));
@@ -847,22 +861,22 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     String newVoteType;
 
                     upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                    upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+                    upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
 
                     if (previousVoteType != Comment.VOTE_TYPE_DOWNVOTE) {
                         //Not downvoted before
                         comment.setVoteType(Comment.VOTE_TYPE_DOWNVOTE);
                         newVoteType = APIUtils.DIR_DOWNVOTE;
                         downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                        downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                        scoreTextView.setTextColor(mDownvotedColor);
+                        downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                        scoreTextView.setTextColor(mVoteActiveColor);
                     } else {
                         //Downvoted before
                         comment.setVoteType(Comment.VOTE_TYPE_NO_VOTE);
                         newVoteType = APIUtils.DIR_UNVOTE;
                         downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                        downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-                        scoreTextView.setTextColor(mCommentIconAndInfoColor);
+                        downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                        scoreTextView.setTextColor(mVoteNeutralColor);
                     }
 
                     if (!comment.isScoreHidden()) {
@@ -878,21 +892,21 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                                 comment.setVoteType(Comment.VOTE_TYPE_DOWNVOTE);
                                 if (currentPosition == position) {
                                     downvoteButton.setIconResource(R.drawable.ic_downvote_filled_24dp);
-                                    downvoteButton.setIconTint(ColorStateList.valueOf(mDownvotedColor));
-                                    scoreTextView.setTextColor(mDownvotedColor);
+                                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteActiveColor));
+                                    scoreTextView.setTextColor(mVoteActiveColor);
                                 }
                             } else {
                                 comment.setVoteType(Comment.VOTE_TYPE_NO_VOTE);
                                 if (currentPosition == position) {
                                     downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-                                    downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-                                    scoreTextView.setTextColor(mCommentIconAndInfoColor);
+                                    downvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
+                                    scoreTextView.setTextColor(mVoteNeutralColor);
                                 }
                             }
 
                             if (currentPosition == position) {
                                 upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-                                upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+                                upvoteButton.setIconTint(ColorStateList.valueOf(mVoteNeutralColor));
                                 if (!comment.isScoreHidden()) {
                                     scoreTextView.setText(Utils.getNVotes(mShowAbsoluteNumberOfVotes,
                                             comment.getScore() + comment.getVoteType()));

@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ml.docilealligator.infinityforreddit.customviews.TouchInterceptableMaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="@dimen/space_8"
-    android:layout_marginBottom="@dimen/space_8"
-    android:layout_marginStart="@dimen/space_12"
-    android:layout_marginEnd="@dimen/space_12"
-    style="@style/Widget.Continuum.PostCard">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    android:background="@drawable/continuum_post_surface"
+    android:orientation="vertical">
 
         <FrameLayout
             android:id="@+id/image_wrapper_relative_layout_item_post_card_3_with_preview"
@@ -362,6 +354,9 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_thickness"
+        android:background="?attr/colorOutlineVariant" />
 
-</ml.docilealligator.infinityforreddit.customviews.TouchInterceptableMaterialCardView>
+</LinearLayout>

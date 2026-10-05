@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+  The default feed card: content on a plane, not a card.
+
+  The root is a LinearLayout drawing continuum_post_surface rather than a MaterialCardView. What that
+  buys, per REDESIGN.md: no 16dp radius, no stroke, no elevation, and no 8dp of margin above and
+  below every row, so two posts share an edge and the reader's content owns the frame instead of
+  sitting inside a tile. The rows are divided by the hairline at the foot of this one.
+
+  Read state is untouched and did not need the card to survive it: the adapter repaints itemView with
+  setBackgroundTintList on every bind, which works on any view holding a background, so an unread post
+  keeps the tonal step below and a read one drops to the page. See continuum_post_surface.xml.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="@dimen/space_8"
-    android:layout_marginBottom="@dimen/space_8"
-    style="@style/Widget.Continuum.PostCard.Large">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    android:background="@drawable/continuum_post_surface"
+    android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -386,6 +392,17 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+    <!--
+      What separates one post from the next, now that the gap between cards is gone. On the foot of
+      every post rather than the head of every post, so there is no rule above the first row and the
+      last row of a feed is not left with a trailing line against the navigation bar.
 
-</com.google.android.material.card.MaterialCardView>
+      colorOutlineVariant rather than a stronger outline: this is a hairline between two pieces of
+      content, not a control, and it has to stay quieter than the text it sits between.
+    -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_thickness"
+        android:background="?attr/colorOutlineVariant" />
+
+</LinearLayout>

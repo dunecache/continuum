@@ -29,15 +29,17 @@ import org.robolectric.annotation.Config
 private const val PHONE_QUALIFIERS = "w411dp-h891dp-xxhdpi"
 
 /**
- * The default feed family's post card: the one `POST_LAYOUT_CARD` inflates for every post type,
+ * The default feed family's post row: the one `POST_LAYOUT_CARD` inflates for every post type,
  * which is text, preview, gallery, and both autoplay video controllers.
  *
- * The family used to be the one card in the app that no phase had touched, carrying a 2dp
+ * The family used to be the one row in the app that no phase had touched, carrying a 2dp
  * `MaterialCardView` elevation, 16dp corners, hardcoded margins, an uncapped title and a badge row
- * that reserved a full row of space on every post whether or not the post had a badge. It is also
- * the family that cannot be verified by looking at a style, because the adapter repaints the card on
- * every bind: see the read-state test below for why the surface has to be checked where it is
- * actually decided.
+ * that reserved a full row of space on every post whether or not the post had a badge. It has since
+ * lost the card entirely: it is a plane now, with a hairline between rows rather than a gap between
+ * boxes. That change is invisible in a screenshot of a single post, which is why the shape is
+ * asserted from the source below - and it is still not verifiable by looking at a style, because the
+ * adapter repaints the row on every bind: see the read-state test for why the surface has to be
+ * checked where it is actually decided.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [33], application = Application::class, qualifiers = PHONE_QUALIFIERS)
@@ -51,30 +53,76 @@ class PostCardLayoutTest {
         "item_post_video_type_autoplay_legacy_controller.xml",
     )
 
+    /** The other user-selectable feed family, which is the one that used to drift. */
+    private val card3FamilyLayouts = listOf(
+        "item_post_card_3_with_preview.xml",
+        "item_post_card_3_text.xml",
+        "item_post_card_3_gallery_type.xml",
+        "item_post_card_3_video_type_autoplay.xml",
+        "item_post_card_3_video_type_autoplay_legacy_controller.xml",
+    )
+
     /**
-     * Every layout in the family has to be on the same card style, and none may go back to the
-     * elevated Material one.
+     * Every post row in both selectable families is a plane, not a card.
      *
-     * Read from the source rather than from a painted card for the same reason the shell's chrome
-     * test is: the card's own background is replaced at bind time, so a value found on an inflated
-     * view is the adapter's doing and says nothing about what the layout declared. What can drift
-     * silently here is a layout left behind on the old style, which is exactly what happened to the
-     * five card_3 layouts while the default family was skipped.
+     * The families used to declare `Widget.Continuum.PostCard.Large`, which is gone: a post row is
+     * no longer a `MaterialCardView` at all, because a radius and 8dp of margin above and below
+     * every row is what made a feed read as a column of tiles, and REDESIGN.md rules that out twice
+     * over ("no stock Material demo look", "tonal surfaces instead of hard borders").
+     *
+     * Read from the source for the same reason as the shell's chrome test: the row's background is
+     * replaced at bind time by `setBackgroundTintList`, so a value on an inflated view is the
+     * adapter's doing and says nothing about what the layout declared. What can drift here is a
+     * layout left behind - and it did: the card_3 family sat on the old style while the default
+     * family moved, which is exactly what a per-family test catches and a one-file test never will.
+     *
+     * The card_3 family is in the list rather than trusted, because that is the family whose root
+     * was a `TouchInterceptableMaterialCardView` - a subclass whose only method,
+     * `setShouldInterceptTouch`, nothing in the app ever called, so it was already a plain card.
      */
     @Test
-    fun everyDefaultFamilyLayoutDeclaresTheTonalCardAndNotTheElevatedOne() {
-        for (name in defaultFamilyLayouts) {
+    fun everyPostRowDeclaresThePlaneAndIsNotACard() {
+        for (name in defaultFamilyLayouts + card3FamilyLayouts) {
             val layout = File("src/main/res/layout/$name").readText()
+            // Comments are stripped before the root is read, because the layouts explain this
+            // decision in a comment directly above it - and that comment names the card class it
+            // replaced, which a naive substring would read as the root still being one.
+            val body = layout.replace(Regex("""<!--[\s\S]*?-->"""), "")
+                .substringAfterLast("?>").trim()
+            val root = body.substringBefore('>')
+
+            assertFalse(
+                "$name is still rooted in a card ($root). A post row is a plane; the only things " +
+                    "left as cards are the gallery's media tiles and the post-detail search panel.",
+                root.contains("CardView"),
+            )
+            // Scoped to the root: margins inside a row are the card's own spacing and stay. It is
+            // the margin *around* a row - the gap that used to separate one card from the next -
+            // that the hairline replaces, and only the root could ever have declared it.
+            assertFalse(
+                "$name still gives its rows a margin, which is the gap the hairline replaces: " +
+                    root.substringAfter("android:layout_width"),
+                Regex("""android:layout_margin(Start|End|Top|Bottom|Begin|End)=""").containsMatchIn(root),
+            )
             assertTrue(
-                "$name declares no card style, so this would pass on anything",
-                layout.contains("style=\"@style/Widget.Continuum.PostCard.Large\""),
+                "$name declares no surface, so this would pass on anything",
+                layout.contains("""android:background="@drawable/continuum_post_surface""""),
+            )
+            assertTrue(
+                "$name must draw the hairline that replaces the gap between cards, or two rows " +
+                    "sharing an edge read as one",
+                layout.contains("""android:background="?attr/colorOutlineVariant""""),
+            )
+            assertFalse(
+                "$name still declares a card style, whose radius and fill the design has dropped",
+                layout.contains("Widget.Continuum.PostCard"),
             )
             assertFalse(
                 "$name still uses the elevated Material card, which brings the 2dp shadow back",
                 layout.contains("materialCardViewElevatedStyle"),
             )
             assertFalse(
-                "$name still sets a card elevation, which overrides the style's 0dp",
+                "$name still sets a card elevation",
                 layout.contains("cardElevation"),
             )
         }
