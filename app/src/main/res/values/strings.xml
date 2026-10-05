@@ -114,6 +114,15 @@
     <string name="action_download_all_album_media">Download All Album Media</string>
     <string name="action_next_parent_comment">Next Top-Level Comment</string>
     <string name="action_previous_parent_comment">Previous Top-Level Comment</string>
+    <!--
+      The chevron's TalkBack label. It is the only way a screen-reader user learns whether tapping
+      will open or shut a subtree, because the chevron itself is a bare glyph swap on a TextView and
+      carries no text of its own. Announced as the state and the action together rather than as a
+      noun, so the label does not need changing to match a state change the way "Collapse" alone
+      would.
+    -->
+    <string name="action_expand_comment">Expand comment</string>
+    <string name="action_collapse_comment">Collapse comment</string>
     <string name="action_back_content_description">Back</string>
     <string name="action_more_post_options">More Post Options</string>
     <string name="action_open_clipboard_reddit_link">Open Reddit Link in the Clipboard</string>

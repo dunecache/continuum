@@ -1,8 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  "Load more comments", as a quiet row inside the thread rather than a card of its own.
+
+  It was cardViewBackgroundColor, which is the theme's post-card fill - the right pairing back when
+  a comment row was itself a card, and the wrong one now that the feed is a stack of tonal surfaces
+  and the comment list is a page. colorSurface is the role a row on that page sits on.
+
+  The row keeps its own CommentIndentationView, so it stays attached to the depth of the comment that
+  owns it rather than sitting at the left edge.
+
+  Meta for the label: this is a control in the margin of the conversation, so it should read as
+  available without competing with the comment above it. Note that the adapter still sets this row's
+  colour and typeface per bind from the custom theme, so the appearance decides the size and the
+  theme keeps deciding the rest - which is why only the size moved.
+
+  The divider stays GONE in XML and is turned on by the adapter for the failed state, so it is the
+  one divider here that is not always drawn.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/cardViewBackgroundColor">
+    android:background="?attr/colorSurface">
 
     <ml.docilealligator.infinityforreddit.customviews.CommentIndentationView
         android:id="@+id/vertical_block_indentation_item_load_more_comments_placeholder"
@@ -19,15 +37,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:padding="8dp"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="?attr/font_default"
-            android:fontFamily="?attr/font_family" />
+            android:minHeight="@dimen/touch_target_min"
+            android:padding="@dimen/space_8"
+            android:textAppearance="@style/TextAppearance.Continuum.Meta" />
 
         <View
             android:id="@+id/divider_item_load_more_comments_placeholder"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/divider_thickness"
             android:visibility="gone" />
 
     </LinearLayout>

@@ -10,7 +10,7 @@
         android:id="@+id/appbar_layout_view_post_detail_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="?attr/colorSurfaceContainerHigh"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:elevation="0dp"
         app:liftOnScroll="false">
@@ -19,18 +19,30 @@
             android:id="@+id/collapsing_toolbar_layout_view_post_detail_activity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorSurface"
+            android:background="?attr/colorSurfaceContainerHigh"
             app:layout_scrollFlags="scroll|enterAlways"
             app:titleEnabled="false"
             app:toolbarId="@+id/toolbar_view_post_detail_activity">
 
+            <!--
+              The same treatment as the shell's bar: a Material 3 toolbar on the surface container,
+              and the shell's popup, so this screen's overflow menu is not the only AppCompat-styled
+              one left in the app.
+
+              Deliberately still an androidx Toolbar rather than a MaterialToolbar, and still carrying
+              its title and subtitle. This bar's subreddit and sort are set with setTitle/setSubtitle
+              and the sort is not tappable here - a real gap, and the reason the shell grew a combined
+              title+sort block instead. Replacing them is a behaviour change to this screen and
+              belongs with its own pass; what this change does is make the bar it sits in look like
+              the rest of the app.
+            -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar_view_post_detail_activity"
+                style="@style/Widget.Continuum.TopBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                android:background="?attr/colorSurface"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:popupTheme="@style/Widget.Continuum.TopBar.Popup"
                 app:navigationIcon="?attr/homeAsUpIndicator" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>

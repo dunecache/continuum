@@ -237,6 +237,42 @@
     </style>
 
     <!--
+      Scores and counts. The one piece of type in the app that is a number rather than a label, so it
+      is the one piece that gets tabular figures: without them a score re-lays itself every time a
+      vote lands, and the vote row's most stable element is the only one that moves. REDESIGN.md
+      asks for tabular numerals on scores and counts for exactly this reason.
+
+      Bold and on-surface, because the score is the state a reader checks first. The size is Meta's
+      - the same step the surrounding meta row uses - rather than a size of its own, so a card's
+      vote row and its metadata line are one type scale.
+
+      The colour is the surface foreground, not the custom theme's post text colour: the card is a
+      tonal surface now, so it needs the pairing that goes with that surface. The adapters still
+      repaint scores per row, and code-set colour wins over the appearance, so a custom theme that
+      colours its own scores keeps doing so.
+    -->
+    <style name="TextAppearance.Continuum.Score" parent="TextAppearance.Continuum.Meta">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+
+    <!--
+      An author or subreddit name in a meta row. Meta's step and family, so a comment header stays
+      as compact as it was - which matters most on the deeply indented rows that have the least
+      width to give - but on the surface foreground and bold, so it is the strongest thing on the
+      line it shares with the score and the timestamp.
+
+      Deliberately not Title. A comment header carries author, "x pts", timestamp, flair and a
+      child count on one line; at Title's 18sp step the name alone can claim the row, and a thread
+      ten levels deep is where that shows first.
+    -->
+    <style name="TextAppearance.Continuum.Author" parent="TextAppearance.Continuum.Meta">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--
       The shell's title block. Both steps are Phase 0 type with the chrome's own foreground: the
       app bar is a surface rather than the theme's accent, so the custom theme's post text colours
       are the wrong pairing here.

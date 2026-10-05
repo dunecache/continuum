@@ -688,8 +688,16 @@ public class CommentsRecyclerViewAdapterNew extends ListAdapter<Comment, Recycle
                 if (comment.hasReply()) {
                     if (comment.isExpanded()) {
                         ((CommentBaseViewHolder) holder).expandButton.setCompoundDrawablesWithIntrinsicBounds(collapseDrawable, null, null, null);
+                        // Set in the same branch that picks the glyph, so the two cannot disagree about
+                        // the state. Without it the chevron is an unlabelled clickable glyph, and a
+                        // screen-reader user has no way to learn whether a tap opens or shuts the
+                        // subtree - which is the only thing this control does.
+                        ((CommentBaseViewHolder) holder).expandButton.setContentDescription(
+                                mActivity.getString(R.string.action_collapse_comment));
                     } else {
                         ((CommentBaseViewHolder) holder).expandButton.setCompoundDrawablesWithIntrinsicBounds(expandDrawable, null, null, null);
+                        ((CommentBaseViewHolder) holder).expandButton.setContentDescription(
+                                mActivity.getString(R.string.action_expand_comment));
                     }
                 }
                 ((CommentBaseViewHolder) holder).bottomConstraintLayout.setOptionalVisibility(

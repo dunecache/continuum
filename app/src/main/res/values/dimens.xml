@@ -60,6 +60,25 @@
     <dimen name="content_max_width">720dp</dimen>
 
     <!--
+         An absent stroke, as a value rather than a literal. The action row's icon buttons all spell
+         "no outline" as app:strokeWidth="0dp", which reads as a hardcoded number the way a colour
+         literal does; it also is the one value in that row that no token could otherwise reach.
+    -->
+    <dimen name="stroke_width_none">0dp</dimen>
+
+    <!--
+         The vote column's width on a post, as opposed to comment_score_min_width's minimum on a
+         comment. The two are the same number on purpose: it is what puts the score on the centre
+         line between the arrows whether it reads "6" or "11356", so a post row and a comment row
+         have to agree or the same control sits in two places.
+
+         Fixed here and released under pressure on a comment, because CommentToolbar shrinks the
+         column first when a deeply indented row runs out of width, whereas a post row has the whole
+         card width and no need to give any of it back.
+    -->
+    <dimen name="post_score_column_width">64dp</dimen>
+
+    <!--
          Motion. Phase 0 asked for duration/easing tokens "even if unused yet" and never wrote them,
          so the two chrome bars had nothing to agree on: the tab pill, the bottom bar's item
          selection and every sheet ran on whatever each Material component happened to default to.

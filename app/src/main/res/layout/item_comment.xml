@@ -20,8 +20,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
+            android:paddingStart="@dimen/space_16"
+            android:paddingEnd="@dimen/space_16">
 
             <ImageView
                 android:id="@+id/author_icon_image_view_item_post_comment"
@@ -38,11 +38,9 @@
                 android:id="@+id/author_text_view_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="@dimen/space_8"
+                android:layout_marginEnd="@dimen/space_8"
                 android:drawablePadding="4dp"
-                android:fontFamily="?attr/font_family"
-                android:textSize="?attr/font_default"
                 android:maxLines="1"
                 android:ellipsize="end"
                 app:layout_constrainedWidth="true"
@@ -50,14 +48,16 @@
                 app:layout_constraintStart_toEndOf="@id/author_icon_image_view_item_post_comment"
                 app:layout_constraintEnd_toStartOf="@+id/barrier"
                 app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:textAppearance="@style/TextAppearance.Continuum.Author"
+                />
 
             <TextView
                 android:id="@+id/author_flair_text_view_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="@dimen/space_8"
+                android:layout_marginEnd="@dimen/space_8"
                 android:fontFamily="?attr/font_family"
                 android:textSize="?attr/font_12"
                 android:visibility="gone"
@@ -74,7 +74,7 @@
                 android:id="@+id/edited_text_view_item_post_comment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="@dimen/space_8"
                 android:fontFamily="?attr/font_family"
                 android:gravity="end"
                 android:text="@string/edited"
@@ -88,7 +88,7 @@
                 android:id="@+id/topChildCountTextViewItemPostComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="@dimen/space_4"
                 android:visibility="gone"
                 android:textSize="?attr/font_default"
                 tools:text="+99"
@@ -101,24 +101,24 @@
                 android:id="@+id/top_score_text_view_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:fontFamily="?attr/font_family"
+                android:layout_marginEnd="@dimen/space_8"
                 android:gravity="end"
-                android:textSize="?attr/font_default"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/comment_time_text_view_item_post_comment"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:textAppearance="@style/TextAppearance.Continuum.Meta"
+                />
 
             <TextView
                 android:id="@+id/comment_time_text_view_item_post_comment"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="?attr/font_family"
                 android:gravity="end"
-                android:textSize="?attr/font_default"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:textAppearance="@style/TextAppearance.Continuum.Meta"
+                />
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/barrier"
@@ -141,16 +141,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="@dimen/space_8"
+            android:layout_marginEnd="@dimen/space_8"
             android:nestedScrollingEnabled="false" />
 
         <ml.docilealligator.infinityforreddit.customviews.CommentToolbar
             android:id="@+id/bottom_constraint_layout_item_post_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="4dp"
-            android:paddingEnd="4dp">
+            android:paddingStart="@dimen/space_4"
+            android:paddingEnd="@dimen/space_4">
 
             <com.google.android.material.button.MaterialButton
                 android:minHeight="@dimen/touch_target_min"
@@ -158,13 +158,13 @@
                 android:id="@+id/upvote_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
                 android:minWidth="0dp"
-                android:backgroundTint="#00000000"
-                app:strokeWidth="0dp"
+                android:backgroundTint="@android:color/transparent"
+                app:strokeWidth="@dimen/stroke_width_none"
                 app:icon="@drawable/ic_upvote_24dp"
-                app:iconSize="24dp"
+                app:iconSize="@dimen/navigation_icon_size"
                 app:layout_constraintHorizontal_chainStyle="spread_inside"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/score_text_view_item_post_comment"
@@ -178,14 +178,13 @@
                 android:layout_height="wrap_content"
                 android:minWidth="@dimen/comment_score_min_width"
                 android:gravity="center"
-                android:textSize="?attr/font_12"
-                android:textStyle="bold"
-                android:fontFamily="?attr/font_family"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/downvote_button_item_post_comment"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/upvote_button_item_post_comment"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:textAppearance="@style/TextAppearance.Continuum.Score"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:minHeight="@dimen/touch_target_min"
@@ -193,13 +192,13 @@
                 android:id="@+id/downvote_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
                 android:minWidth="0dp"
-                android:backgroundTint="#00000000"
-                app:strokeWidth="0dp"
+                android:backgroundTint="@android:color/transparent"
+                app:strokeWidth="@dimen/stroke_width_none"
                 app:icon="@drawable/ic_downvote_24dp"
-                app:iconSize="24dp"
+                app:iconSize="@dimen/navigation_icon_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/childCountTextViewItemPostComment"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -219,15 +218,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:textSize="?attr/font_12"
-                android:textStyle="bold"
-                android:fontFamily="?attr/font_family"
                 tools:text="+99"
                 tools:visibility="visible"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/placeholder_item_post_comment"
-                app:layout_constraintStart_toEndOf="@+id/downvote_button_item_post_comment" />
+                app:layout_constraintStart_toEndOf="@+id/downvote_button_item_post_comment"
+                android:textAppearance="@style/TextAppearance.Continuum.Score"
+                />
 
             <View
                 android:id="@+id/placeholder_item_post_comment"
@@ -246,9 +244,9 @@
                 android:id="@+id/more_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
+                app:strokeWidth="@dimen/stroke_width_none"
                 app:icon="@drawable/ic_more_vert_grey_24dp"
-                app:iconSize="24dp"
+                app:iconSize="@dimen/navigation_icon_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -267,8 +265,8 @@
                 android:minHeight="@dimen/touch_target_min"
                 android:fontFamily="?attr/font_family"
                 android:gravity="center"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingStart="@dimen/space_8"
+                android:paddingEnd="@dimen/space_8"
                 android:textSize="?attr/font_default"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -282,8 +280,8 @@
                 android:id="@+id/save_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
-                app:iconSize="24dp"
+                app:strokeWidth="@dimen/stroke_width_none"
+                app:iconSize="@dimen/navigation_icon_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/reply_button_item_post_comment"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -296,9 +294,9 @@
                 android:id="@+id/reply_button_item_post_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
+                app:strokeWidth="@dimen/stroke_width_none"
                 app:icon="@drawable/ic_reply_grey_24dp"
-                app:iconSize="24dp"
+                app:iconSize="@dimen/navigation_icon_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/more_button_item_post_comment"
                 app:layout_constraintHorizontal_bias="0.5"
